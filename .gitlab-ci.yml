@@ -1,0 +1,15 @@
+image: node
+
+stages:
+  - lint
+
+eslint:
+  stage: lint
+  image: tamnt/jc93-eslint-master:bf6c1c39
+  script:
+    - /root/eslint.sh .
+  except:
+    - dev
+    - stg
+    - prd
+    - uat

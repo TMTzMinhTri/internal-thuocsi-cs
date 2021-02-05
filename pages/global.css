@@ -1,0 +1,18 @@
+body {
+    background-color: #e0eaea;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 0px;
+}
+
+.panel {
+    border: solid 1px #ddd;
+    border-radius: 3px;
+    background-color: #fff;
+    padding: 12px;
+    clear: both;
+}
+
+.MuiTableCell-head {
+    font-weight: 700 !important;
+    text-transform: uppercase;
+}
