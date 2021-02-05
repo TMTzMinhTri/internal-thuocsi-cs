@@ -1,11 +1,32 @@
+import { faList,faFile
+
+} from "@fortawesome/free-solid-svg-icons";
 import App from "@thuocsi/nextjs-components/app/app";
 import { Component } from "react";
-export default class AppCMS extends Component {
+export default class AppCS extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            menu: []
+            menu: [{
+                key:"ALL_CASE",
+                name: "All cases",
+                link:"/cs/all_case",
+                icon: faList
+            },
+            {
+                key:"MY_CASE",
+                name: "My cases",
+                link:"/cs/my_case",
+                icon: faList
+            },
+            {
+                key:"LIST_FILE",
+                name: "List files",
+                link:"/cs/list_file",
+                icon: faFile
+            },
+        ]
         }
     }
 
