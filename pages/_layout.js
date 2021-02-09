@@ -10,19 +10,19 @@ export default class AppCS extends Component {
         this.state = {
             menu: [{
                 key:"ALL_CASE",
-                name: "All cases",
+                name: "All Cases",
                 link:"/cs/all_case",
                 icon: faList
             },
             {
                 key:"MY_CASE",
-                name: "My cases",
+                name: "My Case",
                 link:"/cs/my_case",
                 icon: faList
             },
             {
                 key:"LIST_FILE",
-                name: "List files",
+                name: "List Files",
                 link:"/cs/list_file",
                 icon: faFile
             },
