@@ -1,3 +1,7 @@
+import {
+    faCapsules, faCube, faCubes, faFeather,
+    faIndustry, faMapMarked, faTags, faList, faFile
+} from '@fortawesome/free-solid-svg-icons';
 import { Backdrop, CircularProgress, createMuiTheme, ThemeProvider } from '@material-ui/core';
 import Layout from '@thuocsi/nextjs-components/layout/layout';
 import Loader from '@thuocsi/nextjs-components/loader/loader';
@@ -15,6 +19,25 @@ export var theme = createMuiTheme({
         }
     }
 })
+
+const menu = [{
+    key: "ALLCASE",
+    name: "All Cases",
+    link: "/cs/all_case",
+    icon: faList
+}, 
+{
+    key: "MYCASE",
+    name: "My Cases",
+    link: "/cs/my_case",
+    icon: faList
+}, 
+{
+    key: "LISTFILE",
+    name: "List Files",
+    link: "/cs/list_file",
+    icon: faFile
+}]
 
 export default function App(props) {
     const router = useRouter();
@@ -44,7 +67,7 @@ export default function App(props) {
         return (
             <ThemeProvider theme={theme}>
                 <ToastProvider>
-                    <Layout className={styles.blank} loggedInUserInfo={pageProps.loggedInUserInfo}>
+                    <Layout className={styles.blank} loggedInUserInfo={pageProps.loggedInUserInfo} menu={menu} title="CS">
                         <Component {...pageProps} />
                         <Backdrop style={{zIndex: theme.zIndex.drawer + 1, color: '#fff'}} open={showBackdrop}>
                             <CircularProgress color="inherit" />

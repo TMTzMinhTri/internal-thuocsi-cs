@@ -169,10 +169,10 @@ function render(props) {
                 <title>Danh sách yêu cầu của khách hàng</title>
             </Head>
             <div className={styles.grid}>
-                <Grid container spacing={3} direction="row" justify="space-between" alignItems="center" style={{ marginBottom: "5px" }}>
+                <Grid container spacing={3} direction="row" justify="space-between" alignItems="center" style={{marginBottom:"5px"}}>
                     <Grid item xs={6} sm={3} md={3}></Grid>
                     <Grid item xs={6} sm={3} md={3}>
-                        <Link href="/cs/all_case/new">
+                        <Link href="/cs/my_case/new">
                             <ButtonGroup color="primary" aria-label="contained primary button group" className={styles.rightGroup}>
                                 <Button variant="contained" color="primary">
                                     Thêm yêu cầu
@@ -291,18 +291,18 @@ function render(props) {
                                         </Grid>
                                         <Grid item container xs={12} justify="flex-end" spacing={1}>
                                             <Grid item>
-                                                <Link href="/cs/all_case/new">
+                                            <Link href="/cs/all_case/new">
                                                     <Button variant="contained" color="primary">
                                                         Xuất file
                                                     </Button>
-                                                </Link>
+                                            </Link>
                                             </Grid>
                                             <Grid item>
-                                                <Link href="/cs/all_case/new">
+                                            <Link href="/cs/all_case/new">
                                                     <Button variant="contained" color="primary">
                                                         Tìm kiếm
                                                     </Button>
-                                                </Link>
+                                            </Link>
                                             </Grid>
                                         </Grid>
                                     </Grid>
