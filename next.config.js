@@ -7,7 +7,7 @@ const withTM = require("next-transpile-modules")(
 
 // disable log for built environment
 if (process.env.ENV !== "local") {
-    // console.log = function() {}
+    console.log = function() {}
 }
 
 module.exports = withPlugins([withTM], {

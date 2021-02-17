@@ -1,12 +1,13 @@
 import { doWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
-import ProductPage, { loadProductData } from "pages/cms/product/index";
+import ProductPage, {loadRequestData} from "pages/cs/all_case/index";
+
 
 export async function getServerSideProps(ctx) {
     return await doWithLoggedInUser(ctx, (ctx) => {
-        return loadProductData(ctx)
+        return loadRequestData(ctx)
     })
 }
 
-export default function CMSIndexPage(props) {
+export default function CSIndexPage(props) {
     return ProductPage(props)
 }

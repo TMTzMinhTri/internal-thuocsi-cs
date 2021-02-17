@@ -1,0 +1,17 @@
+.grid {
+    margin-bottom: 10px;
+}
+
+.rightGroup {
+    float: right;
+    align-items: center;
+}
+
+.contentPadding {
+    padding: 12px;
+}
+
+.form {
+    display: flex;
+    flex-wrap: wrap;
+}
