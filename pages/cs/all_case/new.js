@@ -7,23 +7,26 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    TextField,
+    IconButton,
+    Tooltip,
 } from "@material-ui/core";
 import Head from "next/head";
 import { doWithLoggedInUser, renderWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
 import AppCuS from "pages/_layout"
 import styles from './request.module.css'
-import TextField from "@material-ui/core/TextField";
 import RichTextField from "@thuocsi/nextjs-components/editor/rich-text-field/index";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { makeStyles } from '@material-ui/core/styles';
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { red } from '@material-ui/core/colors';
 import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single"
+import Link from "next/link";
+import EditIcon from "@material-ui/icons/Edit";
 
 
 import React, { useEffect, useState } from "react";
 
-const LIMIT = 20
 
 export async function getServerSideProps(ctx) {
     return await doWithLoggedInUser(ctx, (ctx) => {
@@ -253,6 +256,7 @@ function render(props) {
                             <TableCell align="center">Khách hàng</TableCell>
                             <TableCell align="center">Người tạo</TableCell>
                             <TableCell align="center">Người cập nhật</TableCell>
+                            <TableCell align="center">Thao tác</TableCell>
                         </TableRow>
                     </TableHead>
                     {data.count <= 0 ?
@@ -275,6 +279,17 @@ function render(props) {
                                         <TableCell align="center">Nguyễn Văn A</TableCell>
                                         <TableCell align="center">ct</TableCell>
                                         <TableCell align="center">ct</TableCell>
+                                        <TableCell align="center">
+                                        <Link href={`/cs/all_case/edit`}>
+                                            <a>
+                                                <Tooltip title="Cập nhật thông tin của vùng">
+                                                    <IconButton>
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </a>
+                                        </Link>
+                                    </TableCell>
                                     </TableRow>
                                 
                                 ))}
