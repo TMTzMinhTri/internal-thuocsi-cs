@@ -9,6 +9,7 @@ import { ToastProvider } from "@thuocsi/nextjs-components/toast/providers/ToastP
 import { useRouter } from "next/router";
 import React, { useEffect } from 'react';
 import styles from "./global.css";
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 export var theme = createMuiTheme({
     palette: {
@@ -66,6 +67,7 @@ export default function App(props) {
     if (pageProps.loggedIn) {
         return (
             <ThemeProvider theme={theme}>
+                <CssBaseline />
                 <ToastProvider>
                     <Layout className={styles.blank} loggedInUserInfo={pageProps.loggedInUserInfo} menu={menu} title="CS">
                         <Component {...pageProps} />

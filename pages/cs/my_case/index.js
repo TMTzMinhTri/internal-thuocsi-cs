@@ -1,6 +1,5 @@
 import {
     Button,
-    ButtonGroup,
     Paper,
     Table,
     TableBody,
@@ -11,21 +10,21 @@ import {
     FormControl,
     FormLabel,
     TextField,
-    CardContent,
-    CardActions,
-    Collapse,
     IconButton,
     Typography,
     Grid,
-    Card,
     InputBase,
     Tooltip,
+    Box,
+    CircularProgress,
+    InputLabel,
+    MenuItem,
+    Select,
 } from "@material-ui/core";
 
 import React, { useEffect, useState } from "react";
+import { MyCard, MyCardContent, MyCardHeader } from "@thuocsi/nextjs-components/my-card/my-card";
 
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import SearchIcon from "@material-ui/icons/Search";
 import EditIcon from "@material-ui/icons/Edit";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -35,13 +34,10 @@ import Head from "next/head";
 import { doWithLoggedInUser, renderWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
 import AppCuS from "pages/_layout";
 import styles from "./request.module.css";
-import clsx from "clsx";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import MyTablePagination from "@thuocsi/nextjs-components/my-pagination/my-pagination";
 import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
-
-// const LIMIT = 20;
 
 export async function getServerSideProps(ctx) {
     return await doWithLoggedInUser(ctx, (ctx) => {
@@ -161,18 +157,24 @@ function render(props) {
     };
 
     const [showResults, setShowResults] = React.useState(false);
+    const [showSearchTool, setShowSearchTool] = React.useState(true);
     const SetResults = () => {
         if (showResults === false) {
             setShowResults(true);
+            setShowSearchTool(false)
         } else {
             setShowResults(false);
+            setShowSearchTool(true)
         }
     };
     const ShowFilter = () => {
-        return <div>{showResults ? <Results /> : null}</div>;
+        return <div>{showResults ? <Filter /> : null}</div>;
     };
 
-    const Results = () => (
+    const ShowSearch = () => {
+        return <div>{showSearchTool ? <SearchTool /> : null}</div>;
+    };
+    const Filter = () => (
         <Paper className={`${styles.search}`}>
             <FormControl size="small">
                 <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
@@ -269,54 +271,93 @@ function render(props) {
         </Paper>
     );
 
+    const SearchTool = () => {
+        <React.Fragment>
+            <Grid item xs={6} sm={4} md={4}>
+                <Paper className={`${styles.search} ${styles.floadSpaceBetween}`}>
+                    <InputBase
+                        id="q"
+                        name="q"
+                        className={styles.inputSearch}
+                        inputRef={register}
+                        onKeyPress={(event) => {
+                            if (event.key === "Enter") {
+                                onSearch();
+                            }
+                        }}
+                        autoComplete="off"
+                        placeholder="Nhập SO number hoặc Order number"
+                        inputProps={{ "aria-label": "Nhập SO number hoặc Order number" }}
+                    />
+                </Paper>
+            </Grid>
+            <Grid item xs={6} sm={5} md={5}>
+                <Button variant="contained" color="primary">
+                    Tìm kiếm
+                </Button>
+            </Grid>
+        </React.Fragment>;
+    };
+
+    let breadcrumb = [
+        {
+            name: "Danh sách yêu cầu",
+            link: "/cs/all_case",
+        },
+        {
+            name: "Thêm tag mới",
+        },
+    ];
+
     return (
-        <AppCuS select="/cs/all_case">
+        <AppCuS select="/cs/all_case" breadcrumb={breadcrumb}>
             <Head>
                 <title>Danh sách yêu cầu của khách hàng</title>
             </Head>
             <div className={styles.grid}>
-                <Grid container spacing={3} direction="row" justify="flex-end" alignItems="center" style={{ marginBottom: "5px" }}>
-                    <Grid item xs={2} sm={8} md={9}></Grid>
-                    <Grid item xs={5} sm={2} md={1}>
-                        <Button variant="contained" color="primary" onClick={SetResults}>
+                <MyCard>
+                    <MyCardHeader title="Yêu cầu">
+                        <Button variant="contained" color="primary" onClick={SetResults} className={styles.cardButton} style={{ marginRight: "10px" }}>
                             Bộ lọc
                         </Button>
-                    </Grid>
-                    <Grid item xs={5} sm={2} md={2}>
                         <Link href="/cs/all_case/new">
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="primary" className={styles.cardButton}>
                                 Thêm yêu cầu
                             </Button>
                         </Link>
-                    </Grid>
-                </Grid>
-                <Grid container spacing={3} direction="row" justify="space-between" alignItems="center" style={{ marginBottom: "5px" }}>
-                    <Grid item xs={6} sm={4} md={4}>
-                        <Paper className={`${styles.search} ${styles.floadSpaceBetween}`}>
-                            <InputBase
-                                id="q"
-                                name="q"
-                                className={styles.inputSearch}
-                                inputRef={register}
-                                onKeyPress={(event) => {
-                                    if (event.key === "Enter") {
-                                        onSearch();
-                                    }
-                                }}
-                                autoComplete="off"
-                                placeholder="Nhập SO number hoặc Order number"
-                                inputProps={{ "aria-label": "Nhập SO number hoặc Order number" }}
-                            />
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={6} sm={5} md={5}>
-                        <Button variant="contained" color="primary">
-                            Tìm kiếm
-                        </Button>
-                    </Grid>
-                    <Grid item xs={6} sm={3} md={3}></Grid>
-                </Grid>
-                <ShowFilter />
+                    </MyCardHeader>
+                    <form>
+                        <MyCardContent>
+                            <Grid container spacing={3} direction="row" justify="space-between" alignItems="center" style={{ marginBottom: "5px" }}>
+                            <Grid item xs={6} sm={4} md={4}>
+                <Paper className={`${styles.search} ${styles.floadSpaceBetween}`}>
+                    <InputBase
+                        id="q"
+                        name="q"
+                        className={styles.inputSearch}
+                        inputRef={register}
+                        onKeyPress={(event) => {
+                            if (event.key === "Enter") {
+                                onSearch();
+                            }
+                        }}
+                        autoComplete="off"
+                        placeholder="Nhập SO number hoặc Order number"
+                        inputProps={{ "aria-label": "Nhập SO number hoặc Order number" }}
+                    />
+                </Paper>
+            </Grid>
+            <Grid item xs={6} sm={5} md={5}>
+                <Button variant="contained" color="primary">
+                    Tìm kiếm
+                </Button>
+            </Grid>
+                                <Grid item xs={6} sm={3} md={3}></Grid>
+                            </Grid>
+                            <ShowFilter />
+                        </MyCardContent>
+                    </form>
+                </MyCard>
             </div>
             <TableContainer component={Paper}>
                 <Table size="small" aria-label="a dense table">
