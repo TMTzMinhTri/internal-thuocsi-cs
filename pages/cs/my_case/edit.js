@@ -139,6 +139,16 @@ function render(props) {
         setExpanded(!expanded);
     };
 
+    let breadcrumb = [
+        {
+            name: "Danh sách yêu cầu của tôi",
+            link: "/cs/all_case",
+        },
+        {
+            name: "Sửa yêu cầu dành cho tôi",
+        },
+    ];
+
     return (
         <AppCuS select="/cs/my_case">
             <Head>
