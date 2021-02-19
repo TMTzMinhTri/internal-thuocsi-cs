@@ -1,15 +1,17 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip } from "@material-ui/core";
 import Head from "next/head";
+import { MyCard, MyCardContent, MyCardHeader } from "@thuocsi/nextjs-components/my-card/my-card";
+
 import { doWithLoggedInUser, renderWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
-import AppCuS from "pages/_layout";
+import AppCS from "pages/_layout";
 import styles from "./request.module.css";
-import TextField from "@material-ui/core/TextField";
 import RichTextField from "@thuocsi/nextjs-components/editor/rich-text-field/index";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { makeStyles } from "@material-ui/core/styles";
 import { Controller, useForm } from "react-hook-form";
 import { red } from "@material-ui/core/colors";
 import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
+import Link from "next/link";
 
 import React, { useEffect, useState } from "react";
 
@@ -137,180 +139,179 @@ function render(props) {
         setExpanded(!expanded);
     };
 
+    let breadcrumb = [
+        {
+            name: "Danh sách yêu cầu",
+            link: "/cs/all_case",
+        },
+        {
+            name: "Chỉnh sửa yêu cầu"
+        },
+    ];
+
     return (
-        <AppCuS select="/cs/all_case">
+        <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
             <Head>
                 <title>Chỉnh sửa</title>
             </Head>
             <div className={styles.grid}>
-                <TableContainer component={Paper}>
-                    <Table size="small" aria-label="a dense table">
-                        <colgroup>
-                            <col width="10%" />
-                            <col width="10%" />
-                            <col width="10%" />
-                            <col width="10%" />
-                        </colgroup>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    Ngày tạo: 18/12/2020 13:17
-                                </TableCell>
-                                <TableCell align="left" colSpan="4">
-                                    {/* Người tạo: <span style={{ color: "grey" }}>Minh Trí</span> */}
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    <span style={{ fontSize: "2rem" }}>SO18487 - 62532</span>
-                                </TableCell>
-                                <TableCell align="left" colSpan="4">
-                                Người tạo: <span style={{ color: "grey" }}>Minh Trí</span>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    Giá đơn hàng: <span style={{ color: "green" }}>2.165.150 đ</span>
-                                </TableCell>
-                                <TableCell align="left" colSpan="4">
-                                Ngày mua: <span style={{ color: "grey" }}>26/2/2020</span>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    Số lượng sản phẩm: 37
-                                </TableCell>
-                                <TableCell align="left" colSpan="4">
-                                Trạng thái đơn hàng: <span style={{ color: "red" }}>Hoàn tất</span>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="8">
-                                    Sai sản phẩm
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    <MuiSingleAuto placeholder="Chọn" name="người tạo" fullWidth errors={errors} control={control}></MuiSingleAuto>
-                                </TableCell>
-                                <TableCell align="left" colSpan="4"></TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    Số tiền chuyển lại khách:
-                                </TableCell>
-                                <TableCell align="left" colSpan="4">
-                                    User ID: 5355
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    <TextField variant="outlined" size="small" fullWidth type="number" placeholder="7777777777" />
-                                </TableCell>
-                                <TableCell align="left" colSpan="4">
-                                    Tên doanh nghiệp: Quầy Thuốc Phương Lan
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    Mã trả hàng:
-                                </TableCell>
-                                <TableCell align="left" colSpan="4">
-                                    Họ Tên KH: Nguyễn Phương Lan
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    <TextField variant="outlined" size="small" fullWidth type="number" placeholder="7777777777" />
-                                </TableCell>
-                                <TableCell align="left" colSpan="4">
-                                    Số điện thoại: 0123456789
-                                </TableCell>
-                            </TableRow>
-
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    * Thông tin ngân hàng
-                                </TableCell>
-                                <TableCell align="left" colSpan="4"></TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="2">
-                                    Tên khách hàng
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    Số tài khoản
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    Ngân hàng
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    Chi nhánh
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="2">
-                                    <TextField variant="outlined" size="small" fullWidth type="text" placeholder="Bùi Huỳnh Trấn Thành" />
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    <TextField variant="outlined" size="small" fullWidth type="text" placeholder="123456789" />
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    <TextField variant="outlined" size="small" fullWidth type="text" placeholder="DongA Bank" />
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    <TextField variant="outlined" size="small" fullWidth type="text" placeholder="Tân Phú" />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    Chọn bộ phận tiếp nhận:
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    Người tiếp nhận:
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    Trạng thái:
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="4">
-                                    <MuiSingleAuto placeholder="Chọn" name="người tạo" fullWidth errors={errors} control={control}></MuiSingleAuto>
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    <MuiSingleAuto placeholder="Chọn" name="người tạo" fullWidth errors={errors} control={control}></MuiSingleAuto>
-                                </TableCell>
-                                <TableCell align="left" colSpan="2">
-                                    <MuiSingleAuto placeholder="Chọn" name="người tạo" fullWidth errors={errors} control={control}></MuiSingleAuto>
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="8">
-                                    Mô tả:
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell align="left" colSpan="8">
-                                    <RichTextField name="description" getValue={getValues} setValue={setValue} />
-                                </TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell colSpan="6"></TableCell>
-                                <TableCell align="right">
-                                    <Button variant="contained" color="primary">
-                                        Lưu
-                                    </Button>
-                                </TableCell>
-                                <TableCell align="left">
-                                    <Button variant="contained" color="default">
-                                        Hủy bỏ
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                    </Table>
-                </TableContainer>
+                <MyCard>
+                    <MyCardHeader title="Chỉnh sửa yêu cầu"></MyCardHeader>
+                    <form>
+                        <MyCardContent>
+                            <FormControl size="small">
+                                <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
+                                    <Grid item xs={12} sm={6} md={6}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Ngày tạo: 18/12/2020 13:17
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px", fontSize: "40px" }}>
+                                                SO18487 - 62532
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Gía đơn hàng: <span style={{ color: "green" }}>2.165.150 đ</span>
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Số lượng sản phẩm: 37
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Người tạo: <span style={{ color: "grey" }}>Minh Trí</span>
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Ngày mua: <span style={{ color: "grey" }}>26/2/2020</span>
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Trạng thái đơn hàng: <span style={{ color: "red" }}>Hoàn tất</span>
+                                            </FormLabel>
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={6}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                User ID: 5355
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Tên doanh nghiệp: QUẦY THUỐC PHƯƠNG LAN
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Họ tên khách hàng: NGUYỄN PHƯƠNG LAN
+                                            </FormLabel>
+                                            <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
+                                                Số điện thoại: 0123456789
+                                            </FormLabel>
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Tên khách hàng:
+                                            </FormLabel>
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Trấn Thành" />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Số tài khoản:
+                                            </FormLabel>
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth placeholder="0987654321" />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Ngân hàng:
+                                            </FormLabel>
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Dong A Bank" />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Chi nhánh:
+                                            </FormLabel>
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Tân Phú" />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Sai sản phẩm:
+                                            </FormLabel>
+                                        </Typography>
+                                        <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Chọn bộ phận tiếp nhận:
+                                            </FormLabel>
+                                        </Typography>
+                                        <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Chọn người tiếp nhận:
+                                            </FormLabel>
+                                        </Typography>
+                                        <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Chọn trạng thái:
+                                            </FormLabel>
+                                        </Typography>
+                                        <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={6}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Mã trả hàng:
+                                            </FormLabel>
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth placeholder="0" />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={6}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Số tiền chuyển lại khách:
+                                            </FormLabel>
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="number" fullWidth placeholder="0" />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={6}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Mô tả
+                                            </FormLabel>
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Ghi chú..." />
+                                    </Grid>
+                                    <Grid item container xs={12} justify="flex-end" spacing={1}>
+                                        <Grid item>
+                                            <Link href="#">
+                                                <Button variant="contained" color="primary">
+                                                    Lưu
+                                                </Button>
+                                            </Link>
+                                        </Grid>
+                                        <Grid item>
+                                            <Link href="#">
+                                                <Button variant="contained" color="default">
+                                                    Hủy bỏ
+                                                </Button>
+                                            </Link>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </FormControl>
+                        </MyCardContent>
+                    </form>
+                </MyCard>
             </div>
-        </AppCuS>
+        </AppCS>
     );
 }

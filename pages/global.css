@@ -1,7 +1,8 @@
 body {
-    background-color: #e0eaea;
+    background-color: #fafafa;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-top: 0px;
+    margin: 0;
+    font-size: 14px;
 }
 
 .panel {

@@ -1,9 +1,9 @@
 import App from "@thuocsi/nextjs-components/app/app";
-export default function AppCS(props){
-    let { children } = props
+export default function AppCS(props) {
+    let { children } = props;
     return (
-        <App select={props.select}>
+        <App select={props.select} breadcrumb={props.breadcrumb}>
             {children}
         </App>
-    )
+    );
 }
