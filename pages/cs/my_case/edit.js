@@ -150,7 +150,7 @@ function render(props) {
     ];
 
     return (
-        <AppCuS select="/cs/my_case">
+        <AppCuS select="/cs/my_case" breadcrumb={breadcrumb}>
             <Head>
                 <title>Chỉnh sửa</title>
             </Head>
