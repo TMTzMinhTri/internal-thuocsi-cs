@@ -139,8 +139,18 @@ function render(props) {
         setExpanded(!expanded);
     };
 
+    let breadcrumb = [
+        {
+            name: "Danh sách yêu cầu",
+            link: "/cs/all_case",
+        },
+        {
+            name: "Chỉnh sửa yêu cầu"
+        },
+    ];
+
     return (
-        <AppCS select="/cs/all_case">
+        <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
             <Head>
                 <title>Chỉnh sửa</title>
             </Head>

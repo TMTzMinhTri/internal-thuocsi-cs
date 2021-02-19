@@ -150,12 +150,11 @@ function render(props) {
             link: "/cs/all_case",
         },
         {
-            name: "Thêm yêu cầu mới",
-            link: "/cs/all_case/new",
+            name: "Thêm yêu cầu mới"
         },
     ];
     return (
-        <AppCS select="/cs/all_case/new" breadcrumb={breadcrumb}>
+        <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
             <Head>
                 <title>Thêm yêu cầu mới</title>
             </Head>
