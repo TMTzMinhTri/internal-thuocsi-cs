@@ -3,7 +3,7 @@ import Head from "next/head";
 import { MyCard, MyCardContent, MyCardHeader } from "@thuocsi/nextjs-components/my-card/my-card";
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
-import AppCuS from "pages/_layout";
+import AppCS from "pages/_layout";
 import styles from "./request.module.css";
 import RichTextField from "@thuocsi/nextjs-components/editor/rich-text-field/index";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -140,7 +140,7 @@ function render(props) {
     };
 
     return (
-        <AppCuS select="/cs/all_case">
+        <AppCS select="/cs/all_case">
             <Head>
                 <title>Chỉnh sửa</title>
             </Head>
@@ -302,6 +302,6 @@ function render(props) {
                     </form>
                 </MyCard>
             </div>
-        </AppCuS>
+        </AppCS>
     );
 }

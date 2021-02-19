@@ -1,4 +1,4 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip } from "@material-ui/core";
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip, Chip } from "@material-ui/core";
 
 import { faPlus, faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,7 +13,7 @@ import { red } from "@material-ui/core/colors";
 
 import Head from "next/head";
 import { doWithLoggedInUser, renderWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
-import AppCuS from "pages/_layout";
+import AppCS from "pages/_layout";
 import styles from "./request.module.css";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
@@ -148,15 +148,11 @@ function render(props) {
     let breadcrumb = [
         {
             name: "Danh sách yêu cầu",
-            link: "/cs/all_case",
-        },
-        {
-            name: "Thêm yêu cầu mới",
         },
     ];
 
     return (
-        <AppCuS select="/cs/all_case" breadcrumb={breadcrumb}>
+        <AppCS select="/cs/all_case">
             <Head>
                 <title>Danh sách yêu cầu của khách hàng</title>
             </Head>
@@ -164,12 +160,12 @@ function render(props) {
                 <MyCard>
                     <MyCardHeader title="Danh sách yêu cầu">
                         <Button variant="contained" color="primary" onClick={ShowHideFilter} className={styles.cardButton} style={{ marginRight: "10px" }}>
-                            <FontAwesomeIcon icon={faFilter} style={{ paddingRight: "2px" }} />
+                            <FontAwesomeIcon icon={faFilter} style={{ marginRight: 8 }} />
                             Bộ lọc
                         </Button>
                         <Link href="/cs/all_case/new">
                             <Button variant="contained" color="primary" className={styles.cardButton}>
-                                <FontAwesomeIcon icon={faPlus} style={{ paddingRight: "2px" }} />
+                                <FontAwesomeIcon icon={faPlus} style={{ marginRight: 8 }} />
                                 Thêm yêu cầu
                             </Button>
                         </Link>
@@ -288,7 +284,7 @@ function render(props) {
                     </form>
                 </MyCard>
             </div>
-            
+
             <TableContainer component={Paper}>
                 <Table size="small" aria-label="a dense table">
                     <colgroup>
@@ -330,10 +326,14 @@ function render(props) {
                                     <TableCell align="left">{row.number}</TableCell>
                                     <TableCell align="left">SO18487</TableCell>
                                     <TableCell align="left">62532</TableCell>
-                                    <TableCell align="left">Sai sản phẩm</TableCell>
+                                    <TableCell align="left">
+                                        <Chip size="small" label={"Sai sản phẩm"} />
+                                    </TableCell>
                                     <TableCell align="left">Hộp bị móp góc phải</TableCell>
                                     <TableCell align="center">Nguyễn Văn A</TableCell>
-                                    <TableCell align="center">Chưa xử lý</TableCell>
+                                    <TableCell align="center">
+                                        <Chip size="small" label={"Chưa xử lý"} />
+                                    </TableCell>
                                     <TableCell align="center">ct</TableCell>
                                     <TableCell align="center">ct</TableCell>
                                     <TableCell align="center">
@@ -366,6 +366,6 @@ function render(props) {
                     )}
                 </Table>
             </TableContainer>
-        </AppCuS>
+        </AppCS>
     );
 }

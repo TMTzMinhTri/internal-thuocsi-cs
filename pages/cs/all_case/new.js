@@ -1,27 +1,10 @@
-import {
-    Button,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    FormControl,
-    FormLabel,
-    TextField,
-    IconButton,
-    Typography,
-    Grid,
-    Tooltip,
-} from "@material-ui/core";
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip, Chip } from "@material-ui/core";
 import { MyCard, MyCardContent, MyCardHeader } from "@thuocsi/nextjs-components/my-card/my-card";
 import MyTablePagination from "@thuocsi/nextjs-components/my-pagination/my-pagination";
 
-
 import Head from "next/head";
 import { doWithLoggedInUser, renderWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
-import AppCuS from "pages/_layout";
+import AppCS from "pages/_layout";
 import styles from "./request.module.css";
 import RichTextField from "@thuocsi/nextjs-components/editor/rich-text-field/index";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -135,6 +118,11 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+// function handleClick(event) {
+//     event.preventDefault();
+//     console.info("You clicked a breadcrumb.");
+// }
+
 function render(props) {
     const { register, handleSubmit, errors, reset, control, getValues, setValue } = useForm({
         defaultValues: {
@@ -156,8 +144,18 @@ function render(props) {
         setExpanded(!expanded);
     };
 
+    let breadcrumb = [
+        {
+            name: "Danh sách yêu cầu",
+            link: "/cs/all_case",
+        },
+        {
+            name: "Thêm yêu cầu mới",
+            link: "/cs/all_case/new",
+        },
+    ];
     return (
-        <AppCuS select="/cs/all_case">
+        <AppCS select="/cs/all_case/new" breadcrumb={breadcrumb}>
             <Head>
                 <title>Thêm yêu cầu mới</title>
             </Head>
@@ -259,7 +257,9 @@ function render(props) {
                                         <TableCell align="center">{row.number}</TableCell>
                                         <TableCell align="center">SO18487</TableCell>
                                         <TableCell align="center">62532</TableCell>
-                                        <TableCell align="left">Sai sản phẩm</TableCell>
+                                        <TableCell align="left">
+                                            <Chip size="small" label={"Sai sản phẩm"} />
+                                        </TableCell>
                                         <TableCell align="left">Hộp bị móp góc phải</TableCell>
                                         <TableCell align="center">Nguyễn Văn A</TableCell>
                                         <TableCell align="center">ct</TableCell>
@@ -280,18 +280,18 @@ function render(props) {
                             </TableBody>
                         )}
                         {data.count > 0 ? (
-                        <MyTablePagination
-                            labelUnit="yêu cầu"
-                            count={data.count}
-                            rowsPerPage={10}
-                            page={2}
-                            onChangePage={(event, page, rowsPerPage) => {
-                                Router.push(`/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`);
-                            }}
-                        />
-                    ) : (
-                        <div />
-                    )}
+                            <MyTablePagination
+                                labelUnit="yêu cầu"
+                                count={data.count}
+                                rowsPerPage={10}
+                                page={2}
+                                onChangePage={(event, page, rowsPerPage) => {
+                                    Router.push(`/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`);
+                                }}
+                            />
+                        ) : (
+                            <div />
+                        )}
                     </Table>
                 </TableContainer>
 
@@ -366,6 +366,6 @@ function render(props) {
                     </FormControl>
                 </Paper>
             </div>
-        </AppCuS>
+        </AppCS>
     );
 }

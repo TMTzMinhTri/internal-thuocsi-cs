@@ -1,23 +1,6 @@
-import {
-    Button,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    FormControl,
-    FormLabel,
-    TextField,
-    IconButton,
-    Typography,
-    Grid,
-    Tooltip,
-} from "@material-ui/core";
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip, Chip } from "@material-ui/core";
 import { MyCard, MyCardContent, MyCardHeader } from "@thuocsi/nextjs-components/my-card/my-card";
 import MyTablePagination from "@thuocsi/nextjs-components/my-pagination/my-pagination";
-
 
 import Head from "next/head";
 import { doWithLoggedInUser, renderWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
@@ -259,7 +242,9 @@ function render(props) {
                                         <TableCell align="center">{row.number}</TableCell>
                                         <TableCell align="center">SO18487</TableCell>
                                         <TableCell align="center">62532</TableCell>
-                                        <TableCell align="left">Sai sản phẩm</TableCell>
+                                        <TableCell align="left">
+                                            <Chip size="small" label={"Sai sản phẩm"} />
+                                        </TableCell>
                                         <TableCell align="left">Hộp bị móp góc phải</TableCell>
                                         <TableCell align="center">Nguyễn Văn A</TableCell>
                                         <TableCell align="center">ct</TableCell>
@@ -280,18 +265,18 @@ function render(props) {
                             </TableBody>
                         )}
                         {data.count > 0 ? (
-                        <MyTablePagination
-                            labelUnit="yêu cầu"
-                            count={data.count}
-                            rowsPerPage={10}
-                            page={2}
-                            onChangePage={(event, page, rowsPerPage) => {
-                                Router.push(`/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`);
-                            }}
-                        />
-                    ) : (
-                        <div />
-                    )}
+                            <MyTablePagination
+                                labelUnit="yêu cầu"
+                                count={data.count}
+                                rowsPerPage={10}
+                                page={2}
+                                onChangePage={(event, page, rowsPerPage) => {
+                                    Router.push(`/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`);
+                                }}
+                            />
+                        ) : (
+                            <div />
+                        )}
                     </Table>
                 </TableContainer>
 

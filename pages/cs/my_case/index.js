@@ -1,4 +1,4 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip } from "@material-ui/core";
+import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip, Chip } from "@material-ui/core";
 
 import { faPlus, faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -288,7 +288,7 @@ function render(props) {
                     </form>
                 </MyCard>
             </div>
-            
+
             <TableContainer component={Paper}>
                 <Table size="small" aria-label="a dense table">
                     <colgroup>
@@ -330,10 +330,14 @@ function render(props) {
                                     <TableCell align="left">{row.number}</TableCell>
                                     <TableCell align="left">SO18487</TableCell>
                                     <TableCell align="left">62532</TableCell>
-                                    <TableCell align="left">Sai sản phẩm</TableCell>
+                                    <TableCell align="left">
+                                        <Chip size="small" label={"Sai sản phẩm"} />
+                                    </TableCell>
                                     <TableCell align="left">Hộp bị móp góc phải</TableCell>
                                     <TableCell align="center">Nguyễn Văn A</TableCell>
-                                    <TableCell align="center">Chưa xử lý</TableCell>
+                                    <TableCell align="center">
+                                        <Chip size="small" label={"Chưa xử lý"} />
+                                    </TableCell>
                                     <TableCell align="center">ct</TableCell>
                                     <TableCell align="center">ct</TableCell>
                                     <TableCell align="center">
