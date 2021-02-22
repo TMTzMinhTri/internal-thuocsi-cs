@@ -141,8 +141,12 @@ function render(props) {
 
     let breadcrumb = [
         {
+            name: "Trang chủ",
+            link: "/cs",
+        },
+        {
             name: "Danh sách yêu cầu của tôi",
-            link: "/cs/all_case",
+            link: "/cs/my_case",
         },
         {
             name: "Thêm yêu cầu mới cho tôi",

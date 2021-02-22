@@ -145,10 +145,18 @@ function render(props) {
         }
     };
 
-    
+    let breadcrumb = [
+        {
+            name: "Trang chủ",
+            link: "/cs"
+        },
+        {
+            name: "Danh sách yêu cầu của tôi",
+        },
+    ];
 
     return (
-        <AppCuS select="/cs/all_case">
+        <AppCuS select="/cs/all_case" breadcrumb={breadcrumb}>
             <Head>
                 <title>Danh sách yêu cầu của khách hàng</title>
             </Head>
