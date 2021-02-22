@@ -78,8 +78,18 @@ function render(props) {
         setData(props)
     }, [props])
 
+    let breadcrumb = [
+        {
+            name: "Trang chủ",
+            link: "/cs"
+        },
+        {
+            name: "Danh sách file",
+        },
+    ];
+
     return (
-        <AppCuS select="/cs/list_file">
+        <AppCuS select="/cs/list_file" breadcrumb={breadcrumb}>
             <Head>
                 <title>Danh sách file</title>
             </Head>
