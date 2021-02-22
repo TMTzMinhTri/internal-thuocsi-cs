@@ -1,5 +1,5 @@
 {
-    "name": "@thuocsi/internal-content",
+    "name": "@thuocsi/internal-cs",
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -15,7 +15,6 @@
         "@fortawesome/react-fontawesome": "^0.1.14",
         "@material-ui/core": "4.11.2",
         "@material-ui/lab": "^4.0.0-alpha.57",
-        "@syncfusion/ej2-react-querybuilder": "18.4.33",
         "@thuocsi/nextjs-components": "git+https://gitlab.com/thuocsi.vn-sdk/nextjs-components.git#v0.1.30",
         "cross-env": "^7.0.3",
         "draft-js": "^0.11.7",
@@ -25,11 +24,11 @@
         "next": "^10.0.7",
         "next-compose-plugins": "^2.2.1",
         "next-transpile-modules": "^4.1.0",
-        "react": "^16.14.0",
-        "react-cropper": "^2.1.6",
-        "react-dom": "^16.14.0",
+        "react": "16.13.1",
+        "react-cropper": "^2.1.7",
+        "react-dom": "16.13.1",
         "react-draft-wysiwyg": "^1.14.5",
-        "react-hook-form": "^6.15.1",
+        "react-hook-form": "^6.15.3",
         "react-select": "^3.2.0"
     },
     "devDependencies": {
