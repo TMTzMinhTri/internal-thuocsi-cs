@@ -147,14 +147,18 @@ function render(props) {
 
     let breadcrumb = [
         {
-            name: "Danh sách yêu cầu",
+            name: "Trang chủ",
+            link: "/cs"
+        },
+        {
+            name: "Danh sách tất cả phiếu yêu cầu",
         },
     ];
 
     return (
-        <AppCS select="/cs/all_case">
+        <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
             <Head>
-                <title>Danh sách yêu cầu của khách hàng</title>
+                <title>Danh sách tất cả phiếu yêu cầu</title>
             </Head>
             <div className={styles.grid}>
                 <MyCard>
