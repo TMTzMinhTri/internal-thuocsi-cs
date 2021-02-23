@@ -6,16 +6,25 @@ import Head from "next/head";
 import { doWithLoggedInUser, renderWithLoggedInUser } from "@thuocsi/nextjs-components/lib/login";
 import AppCS from "pages/_layout";
 import styles from "./request.module.css";
+import { reasons } from "components/global"
 import RichTextField from "@thuocsi/nextjs-components/editor/rich-text-field/index";
+import { actionErrorText, unknownErrorText } from "components/commonErrors";
+import { useToast } from "@thuocsi/nextjs-components/toast/useToast";
+import Router, { useRouter } from "next/router";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { makeStyles } from "@material-ui/core/styles";
 import { useForm } from "react-hook-form";
 import { red } from "@material-ui/core/colors";
+import { getOrderClient } from "client/order";
 import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
+import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
 import Link from "next/link";
 import EditIcon from "@material-ui/icons/Edit";
 
 import React, { useEffect, useState } from "react";
+import { getAccountClient } from "client/account";
+import { getCustomerClient } from "client/customer";
+import { getTicketClient } from "client/ticket";
 
 export async function getServerSideProps(ctx) {
     return await doWithLoggedInUser(ctx, (ctx) => {
@@ -26,50 +35,16 @@ export async function getServerSideProps(ctx) {
 export async function loadRequestData(ctx) {
     let data = {
         props: {
-            data: [
-                {
-                    number: "20691",
-                    soNumber: "SO18481",
-                    orderNumber: "62531",
-                    error: "sai sản phẩ1",
-                    note: "Hộp bị méo gó1",
-                    client: "Nguyễn Văn 1",
-                    status: "Chưa xử l1",
-                    createdPerson: "c1",
-                    updatedPerson: "c1",
-                },
-                {
-                    number: "20692",
-                    soNumber: "SO18482",
-                    orderNumber: "62532",
-                    error: "sai sản phẩ2",
-                    note: "Hộp bị méo gó2",
-                    client: "Nguyễn Văn 2",
-                    status: "Chưa xử l2",
-                    createdPerson: "c2",
-                    updatedPerson: "c2",
-                },
-                {
-                    number: "20692",
-                    soNumber: "SO18482",
-                    orderNumber: "62532",
-                    error: "sai sản phẩ2",
-                    note: "Hộp bị méo gó2",
-                    client: "Nguyễn Văn 2",
-                    status: "Chưa xử l2",
-                    createdPerson: "c2",
-                    updatedPerson: "c2",
-                },
-            ],
-            count: 3,
-            status: [
-                {
-                    id: 1,
-                    name: "Chưa xử lý",
-                },
-            ],
+            listDepartment: []
         },
     };
+
+    const accountClient = getAccountClient(ctx, {})
+    const listDepartment = await accountClient.getListDepartment(0, 20, "")
+    if (listDepartment.status === "OK") {
+        data.props.listDepartment = listDepartment.data.map(department => ({ ...department, value: department.code, label: department.name }))
+    }
+
 
     return data;
 }
@@ -131,18 +106,93 @@ function render(props) {
         mode: "onChange",
     });
 
-    let [data, setData] = useState(props);
+    const [data, setData] = useState(props)
+    const [orderData, setOrderData] = useState()
+    const [listTicket, setListTicket] = useState([])
+    const [search, setSearch] = useState()
 
     useEffect(() => {
         setData(props);
     }, [props]);
 
     const classes = useStyles();
+    const { error, success } = useToast();
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
+
+    async function handleChange(event) {
+        const value = event.target.value;
+        setSearch(value);
+    }
+
+    const onSearchOrder = async () => {
+        let orderClient = getOrderClient()
+        let resp = await orderClient.getOrderByOrderNoFromClient(search)
+        if (resp.status !== 'OK') {
+            if (resp.status === 'NOT_FOUND') {
+                return { props: { data: [], count: 0, message: 'Không tìm thấy đơn hàng' } }
+            }
+            return { props: { data: [], count: 0, message: resp.message } }
+        }
+        setOrderData(resp.data[0])
+        setValue("customerName", resp.data[0].customerName || "")
+
+        const customerClient = getCustomerClient()
+        const respCustomer = await customerClient.getListBankAccount(resp.data[0].customerID)
+        if (respCustomer.status === "OK") {
+            setValue("bank", respCustomer.data[0].bank)
+            setValue("bankCode", respCustomer.data[0].bankCode)
+            setValue("bankBranch", respCustomer.data[0].bankBranch)
+        }
+
+        const ticketClient = getTicketClient()
+        const respTicket = await ticketClient.getTicketBySaleOrderCode(resp.data[0].orderNo)
+        if (respTicket.status === "OK") {
+            setListTicket(respTicket.data)
+            console.log(respTicket)
+        }
+    }
+
+    const onSubmit = async (formData) => {
+        try {
+            const ticketClient = getTicketClient()
+            const ticketResp = await ticketClient.createTicket({
+                saleOrderCode: orderData.orderNo,
+                saleOrderID: orderData.orderId,
+                customerID: orderData.customerID,
+                departmentCode: formData.departmentCode.code,
+                reasons: formData.reasons.map(reason => ({ code: reason.value, name: reason.label })),
+                returnCode: formData.returnCode,
+                cashback: +formData.cashback,
+                note: formData.note,
+                assignUser: formData.assignUser.code
+            })
+            if (ticketResp.status !== "OK") {
+                error(ticketResp.message ?? actionErrorText);
+                return
+            } else {
+                const customerClient = getCustomerClient()
+                const customerResp = await customerClient.updateBankCustomer({
+                    bank: formData.bank,
+                    bankCode: formData.bankCode,
+                    bankBranch: formData.bankBranch,
+                    customerID: orderData.customerID,
+                })
+                if (customerResp.status !== "OK") {
+                    error(customerResp.message ?? actionErrorText);
+                } else {
+                    success("Tạo yêu cầu thành công");
+                    Router.push("/cs/all_case")
+                }
+            }
+
+        } catch (err) {
+            error(err ?? unknownErrorText)
+        }
+    }
 
     let breadcrumb = [
         {
@@ -157,6 +207,7 @@ function render(props) {
             name: "Thêm yêu cầu mới"
         },
     ];
+
     return (
         <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
             <Head>
@@ -170,204 +221,225 @@ function render(props) {
                             <FormControl size="small">
                                 <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
                                     <Grid item xs={12} sm={12} md={7}>
-                                        <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Nhập Mã SO" />
+                                        <TextField variant="outlined" name="orderNo" error={!!errors.orderNo}
+                                            helperText={errors.orderNo?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })} onChange={handleChange} size="small" type="text" fullWidth placeholder="Nhập Mã SO" />
                                     </Grid>
                                     <Grid item xs={12} sm={12} md={5}>
-                                        <Button variant="contained" color="primary">
+                                        <Button variant="contained" color="primary" onClick={() => onSearchOrder()}>
                                             Tìm kiếm
                                         </Button>
                                     </Grid>
                                 </Grid>
                             </FormControl>
                         </MyCardContent>
-                    </form>
-                </MyCard>
 
-                <Paper className={`${styles.search}`}>
-                    <FormControl size="small">
-                        <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Tên khách hàng:
+                        <Paper className={`${styles.search}`}>
+                            <FormControl size="small">
+                                <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Tên khách hàng:
                                     </FormLabel>
-                                </Typography>
-                                <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Trấn Thành" />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Số tài khoản:
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth name="customerName" error={!!errors.customerName}
+                                            helperText={errors.customerName?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Số tài khoản:
                                     </FormLabel>
-                                </Typography>
-                                <TextField variant="outlined" size="small" type="text" fullWidth placeholder="0987654321" />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Ngân hàng:
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bankCode" error={!!errors.bankCode}
+                                            helperText={errors.bankCode?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Ngân hàng:
                                     </FormLabel>
-                                </Typography>
-                                <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Dong A Bank" />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Chi nhánh:
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bank" error={!!errors.bank}
+                                            helperText={errors.bank?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Chi nhánh:
                                     </FormLabel>
-                                </Typography>
-                                <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Tân Phú" />
-                            </Grid>
-                        </Grid>
-                    </FormControl>
-                </Paper>
+                                        </Typography>
+                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bankBranch" error={!!errors.bankBranch}
+                                            helperText={errors.bankBranch?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })} />
+                                    </Grid>
+                                </Grid>
+                            </FormControl>
+                        </Paper>
 
-                <TableContainer component={Paper}>
-                    <Table size="small" aria-label="a dense table">
-                        <colgroup>
-                            <col width="5%" />
-                            <col width="5%" />
-                            <col width="5%" />
-                            <col width="15%" />
-                            <col width="15%" />
-                            <col width="20%" />
-                            <col width="15%" />
-                            <col width="15%" />
-                        </colgroup>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="center">#</TableCell>
-                                <TableCell align="center">SO#</TableCell>
-                                <TableCell align="center">Order#</TableCell>
-                                <TableCell align="left">Lỗi</TableCell>
-                                <TableCell align="left">Mô tả</TableCell>
-                                <TableCell align="center">Khách hàng</TableCell>
-                                <TableCell align="center">Người tạo</TableCell>
-                                <TableCell align="center">Người cập nhật</TableCell>
-                                <TableCell align="center">Thao tác</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        {data.count <= 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={5} align="left">
-                                    {ErrorCode["NOT_FOUND_TABLE"]}
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            <TableBody>
-                                {data.data.map((row, i) => (
-                                    <TableRow key={i}>
-                                        <TableCell align="center">{row.number}</TableCell>
-                                        <TableCell align="center">SO18487</TableCell>
-                                        <TableCell align="center">62532</TableCell>
-                                        <TableCell align="left">
-                                            <Chip size="small" label={"Sai sản phẩm"} />
-                                        </TableCell>
-                                        <TableCell align="left">Hộp bị móp góc phải</TableCell>
-                                        <TableCell align="center">Nguyễn Văn A</TableCell>
-                                        <TableCell align="center">ct</TableCell>
-                                        <TableCell align="center">ct</TableCell>
-                                        <TableCell align="center">
-                                            <Link href={`/cs/all_case/edit`}>
-                                                <a>
-                                                    <Tooltip title="Cập nhật thông tin của yêu cầu">
-                                                        <IconButton>
-                                                            <EditIcon fontSize="small" />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </a>
-                                            </Link>
+                        <TableContainer component={Paper}>
+                            <Table size="small" aria-label="a dense table">
+                                <colgroup>
+                                    <col width="5%" />
+                                    <col width="5%" />
+                                    <col width="5%" />
+                                    <col width="15%" />
+                                    <col width="15%" />
+                                    <col width="20%" />
+                                    <col width="15%" />
+                                    <col width="15%" />
+                                </colgroup>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell align="center">#</TableCell>
+                                        <TableCell align="center">SO#</TableCell>
+                                        <TableCell align="center">Order#</TableCell>
+                                        <TableCell align="left">Lỗi</TableCell>
+                                        <TableCell align="left">Mô tả</TableCell>
+                                        <TableCell align="center">Khách hàng</TableCell>
+                                        <TableCell align="center">Người tạo</TableCell>
+                                        <TableCell align="center">Người cập nhật</TableCell>
+                                        <TableCell align="center">Thao tác</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                {listTicket.length <= 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={5} align="left">
+                                            Không có yêu cầu nào cả
                                         </TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        )}
-                        {data.count > 0 ? (
-                            <MyTablePagination
-                                labelUnit="yêu cầu"
-                                count={data.count}
-                                rowsPerPage={10}
-                                page={2}
-                                onChangePage={(event, page, rowsPerPage) => {
-                                    Router.push(`/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`);
-                                }}
-                            />
-                        ) : (
-                            <div />
-                        )}
-                    </Table>
-                </TableContainer>
+                                ) : (
+                                        <TableBody>
+                                            {listTicket.map((row, i) => (
+                                                <TableRow key={i}>
+                                                    <TableCell align="center">{row.code}</TableCell>
+                                                    <TableCell align="center">{row.saleOrderCode}</TableCell>
+                                                    <TableCell align="center">{row.saleOrderID}</TableCell>
+                                                    <TableCell align="left">
+                                                        {row.reasons.map(reason => <Chip size="small" label={reason.name} />)}
+                                                    </TableCell>
+                                                    <TableCell align="left">{row.note}</TableCell>
+                                                    <TableCell align="center">{orderData.customerName}</TableCell>
+                                                    <TableCell align="center">{row.createdBy}</TableCell>
+                                                    <TableCell align="center">{row.createdBy}</TableCell>
+                                                    <TableCell align="center">
+                                                        <Link href={`/cs/all_case/edit`}>
+                                                            <a>
+                                                                <Tooltip title="Cập nhật thông tin của yêu cầu">
+                                                                    <IconButton>
+                                                                        <EditIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </a>
+                                                        </Link>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    )}
+                                {/* {data.count > 0 ? (
+                                    <MyTablePagination
+                                        labelUnit="yêu cầu"
+                                        count={data.count}
+                                        rowsPerPage={10}
+                                        page={2}
+                                        onChangePage={(event, page, rowsPerPage) => {
+                                            Router.push(`/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`);
+                                        }}
+                                    />
+                                ) : (
+                                        <div />
+                                    )} */}
+                            </Table>
+                        </TableContainer>
 
-                <Paper className={`${styles.search}`}>
-                    <FormControl size="small">
-                        <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Chọn lý do: <span style={{ color: "red" }}>(*)</span>
+                        <Paper className={`${styles.search}`}>
+                            <FormControl size="small">
+                                <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Chọn lý do: <span style={{ color: "red" }}>(*)</span>
+                                            </FormLabel>
+                                        </Typography>
+                                        <MuiMultipleAuto required name="reasons" options={reasons} placeholder="Chọn" errors={errors} control={control}></MuiMultipleAuto>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Chọn bộ phận tiếp nhận: <span style={{ color: "red" }}>(*)</span>
+                                            </FormLabel>
+                                        </Typography>
+                                        <MuiSingleAuto required options={props.listDepartment} placeholder="Chọn" name="departmentCode" errors={errors} control={control}></MuiSingleAuto>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Chọn người tiếp nhận: <span style={{ color: "red" }}>(*)</span>
+                                            </FormLabel>
+                                        </Typography>
+                                        <MuiSingleAuto options={props.listDepartment} required placeholder="Chọn" name="assignUser" errors={errors} control={control}></MuiSingleAuto>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Mã giao hàng tiết kiệm: (Mã return)
                                     </FormLabel>
-                                </Typography>
-                                <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Chọn bộ phận tiếp nhận: <span style={{ color: "red" }}>(*)</span>
+                                        </Typography>
+                                        <TextField name="returnCode"
+                                            inputRef={register} variant="outlined" size="small" type="text" fullWidth placeholder="0" />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={6}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Số tiền trả lại:
                                     </FormLabel>
-                                </Typography>
-                                <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Chọn người tiếp nhận: <span style={{ color: "red" }}>(*)</span>
-                                    </FormLabel>
-                                </Typography>
-                                <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Mã giao hàng tiết kiệm: (Mã return)
-                                    </FormLabel>
-                                </Typography>
-                                <TextField variant="outlined" size="small" type="text" fullWidth placeholder="0" />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={6}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Số tiền trả lại:
-                                    </FormLabel>
-                                </Typography>
-                                <TextField variant="outlined" size="small" type="number" fullWidth placeholder="0" />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={6}>
-                                <Typography gutterBottom>
-                                    <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                        Ghi chú (hàng trả về): <span style={{ color: "red" }}>(*)</span>
-                                    </FormLabel>
-                                </Typography>
-                                <TextField variant="outlined" size="small" type="text" fullWidth placeholder="Ghi chú..." />
-                            </Grid>
-                            <Grid item container xs={12} justify="flex-end" spacing={1}>
-                                <Grid item>
-                                    <Link href="#">
-                                        <Button variant="contained" color="primary">
-                                            Lưu
+                                        </Typography>
+                                        <TextField name="cashback" inputRef={register} variant="outlined" size="small" type="number" fullWidth placeholder="0" />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={6}>
+                                        <Typography gutterBottom>
+                                            <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
+                                                Ghi chú (hàng trả về): <span style={{ color: "red" }}>(*)</span>
+                                            </FormLabel>
+                                        </Typography>
+                                        <TextField name="note" error={!!errors.note}
+                                            helperText={errors.note?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })} variant="outlined" size="small" type="text" fullWidth placeholder="Ghi chú..." />
+                                    </Grid>
+                                    <Grid item container xs={12} justify="flex-end" spacing={1}>
+                                        <Grid item>
+                                            <Link href="/cs/all_case">
+                                                <Button variant="contained" color="default">
+                                                    Quay lại
                                         </Button>
-                                    </Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link href="#">
-                                        <Button variant="contained" color="default">
-                                            Hủy bỏ
+                                            </Link>
+                                        </Grid>
+                                        <Grid item>
+                                            <Link href="#">
+                                                <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
+                                                    Lưu
                                         </Button>
-                                    </Link>
+                                            </Link>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </Grid>
-                    </FormControl>
-                </Paper>
+                            </FormControl>
+                        </Paper>
+                    </form>
+                </MyCard>
             </div>
         </AppCS>
     );
