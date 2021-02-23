@@ -8,27 +8,6 @@ class OrderClient extends APIClient {
         super(ctx, data)
     }
 
-    getOrder(offset, limit, q) {
-        return this.callFromNextJS(
-            "GET",
-            `${URI}/order/list`,
-            {
-                q: q,
-                offset: offset,
-                limit: limit,
-                // getTotal: true
-            })
-    }
-
-    getOrderByOrderNo(orderNo) {
-        return this.callFromNextJS(
-            "GET",
-            `${URI}/order`,
-            {
-                order_no: orderNo
-            })
-    }
-
     getOrderByOrderNoFromClient(orderNo) {
         return this.callFromClient(
             "GET",
@@ -38,48 +17,6 @@ class OrderClient extends APIClient {
             })
     }
 
-    getOrderItemByOrderNo(orderNo) {
-        return this.callFromNextJS(
-            "GET",
-            `${URI}/order-item`,
-            {
-                order_no: orderNo
-            })
-    }
-
-    updateOrder(data) {
-        return this.callFromClient(
-            "PUT",
-            `${URI}/order`,
-            data
-        )
-    }
-
-    updateOrderItem(data) {
-        return this.callFromClient(
-            "PUT",
-            `${URI}/order-item`,
-            data
-        )
-    }
-
-    removeOrderItem(orderItemNo) {
-        return this.callFromClient(
-            'PUT',
-            `${URI}/order-item/remove`,
-            {
-                orderItemNo
-            }
-        )
-    }
-
-    // updateStatus(data) {
-    //     return this.callFromClient(
-    //         "PUT",
-    //         `${URI}/account/approve`,
-    //         data
-    //     )
-    // }
 }
 
 export function getOrderClient(ctx, data) {

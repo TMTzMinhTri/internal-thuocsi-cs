@@ -8,6 +8,9 @@ import AppCS from "pages/_layout";
 import styles from "./request.module.css";
 import { reasons } from "components/global"
 import RichTextField from "@thuocsi/nextjs-components/editor/rich-text-field/index";
+import { actionErrorText, unknownErrorText } from "components/commonErrors";
+import { useToast } from "@thuocsi/nextjs-components/toast/useToast";
+import Router, { useRouter } from "next/router";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { makeStyles } from "@material-ui/core/styles";
 import { useForm } from "react-hook-form";
@@ -20,6 +23,8 @@ import EditIcon from "@material-ui/icons/Edit";
 
 import React, { useEffect, useState } from "react";
 import { getAccountClient } from "client/account";
+import { getCustomerClient } from "client/customer";
+import { getTicketClient } from "client/ticket";
 
 export async function getServerSideProps(ctx) {
     return await doWithLoggedInUser(ctx, (ctx) => {
@@ -30,58 +35,16 @@ export async function getServerSideProps(ctx) {
 export async function loadRequestData(ctx) {
     let data = {
         props: {
-            data: [
-                {
-                    number: "20691",
-                    soNumber: "SO18481",
-                    orderNumber: "62531",
-                    error: "sai sản phẩ1",
-                    note: "Hộp bị méo gó1",
-                    client: "Nguyễn Văn 1",
-                    status: "Chưa xử l1",
-                    createdPerson: "c1",
-                    updatedPerson: "c1",
-                },
-                {
-                    number: "20692",
-                    soNumber: "SO18482",
-                    orderNumber: "62532",
-                    error: "sai sản phẩ2",
-                    note: "Hộp bị méo gó2",
-                    client: "Nguyễn Văn 2",
-                    status: "Chưa xử l2",
-                    createdPerson: "c2",
-                    updatedPerson: "c2",
-                },
-                {
-                    number: "20692",
-                    soNumber: "SO18482",
-                    orderNumber: "62532",
-                    error: "sai sản phẩ2",
-                    note: "Hộp bị méo gó2",
-                    client: "Nguyễn Văn 2",
-                    status: "Chưa xử l2",
-                    createdPerson: "c2",
-                    updatedPerson: "c2",
-                },
-            ],
-            count: 3,
-            status: [
-                {
-                    id: 1,
-                    name: "Chưa xử lý",
-                },
-            ],
             listDepartment: []
         },
     };
 
-    const client = getAccountClient(ctx, {})
-    const listDepartment = await client.getListDepartment(0, 20, "")
+    const accountClient = getAccountClient(ctx, {})
+    const listDepartment = await accountClient.getListDepartment(0, 20, "")
     if (listDepartment.status === "OK") {
         data.props.listDepartment = listDepartment.data.map(department => ({ ...department, value: department.code, label: department.name }))
-        console.log(data.props.listDepartment)
     }
+
 
     return data;
 }
@@ -143,10 +106,9 @@ function render(props) {
         mode: "onChange",
     });
 
-    const [data, setData] = useState(props);
-    const [customerInf, setCustomerInf] = useState({
-        bankCode: "", name: "", bank: "", bankBranch: ""
-    })
+    const [data, setData] = useState(props)
+    const [orderData, setOrderData] = useState()
+    const [listTicket, setListTicket] = useState([])
     const [search, setSearch] = useState()
 
     useEffect(() => {
@@ -154,6 +116,7 @@ function render(props) {
     }, [props]);
 
     const classes = useStyles();
+    const { error, success } = useToast();
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
@@ -174,16 +137,62 @@ function render(props) {
             }
             return { props: { data: [], count: 0, message: resp.message } }
         }
-        // setCustomerInf({
-        //     bankCode: resp.data[0].bankCode || "", name: resp.data[0].customerName, bank: resp.data[0].bank || "", bankBranch: resp.data[0].bankBranch || ""
-        // })
-        setValue("customerName", resp.data[0].customerName || "", { shouldValidate: true })
-        setValue("bank", resp.data[0].bank || "")
-        setValue("bankCode", resp.data[0].bankCode || "")
-        setValue("bankBranch", resp.data[0].bankBranch || "")
+        setOrderData(resp.data[0])
+        setValue("customerName", resp.data[0].customerName || "")
+
+        const customerClient = getCustomerClient()
+        const respCustomer = await customerClient.getListBankAccount(resp.data[0].customerID)
+        if (respCustomer.status === "OK") {
+            setValue("bank", respCustomer.data[0].bank)
+            setValue("bankCode", respCustomer.data[0].bankCode)
+            setValue("bankBranch", respCustomer.data[0].bankBranch)
+        }
+
+        const ticketClient = getTicketClient()
+        const respTicket = await ticketClient.getTicketBySaleOrderCode(resp.data[0].orderNo)
+        if (respTicket.status === "OK") {
+            setListTicket(respTicket.data)
+            console.log(respTicket)
+        }
     }
 
-    const onSubmit = (data) => console.log(data)
+    const onSubmit = async (formData) => {
+        try {
+            const ticketClient = getTicketClient()
+            const ticketResp = await ticketClient.createTicket({
+                saleOrderCode: orderData.orderNo,
+                saleOrderID: orderData.orderId,
+                customerID: orderData.customerID,
+                departmentCode: formData.departmentCode.code,
+                reasons: formData.reasons.map(reason => ({ code: reason.value, name: reason.label })),
+                returnCode: formData.returnCode,
+                cashback: +formData.cashback,
+                note: formData.note,
+                assignUser: formData.assignUser.code
+            })
+            if (ticketResp.status !== "OK") {
+                error(ticketResp.message ?? actionErrorText);
+                return
+            } else {
+                const customerClient = getCustomerClient()
+                const customerResp = await customerClient.updateBankCustomer({
+                    bank: formData.bank,
+                    bankCode: formData.bankCode,
+                    bankBranch: formData.bankBranch,
+                    customerID: orderData.customerID,
+                })
+                if (customerResp.status !== "OK") {
+                    error(customerResp.message ?? actionErrorText);
+                } else {
+                    success("Tạo yêu cầu thành công");
+                    Router.push("/cs/all_case")
+                }
+            }
+
+        } catch (err) {
+            error(err ?? unknownErrorText)
+        }
+    }
 
     let breadcrumb = [
         {
@@ -198,7 +207,7 @@ function render(props) {
             name: "Thêm yêu cầu mới"
         },
     ];
-    console.log(props.listDepartment)
+
     return (
         <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
             <Head>
@@ -212,7 +221,10 @@ function render(props) {
                             <FormControl size="small">
                                 <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
                                     <Grid item xs={12} sm={12} md={7}>
-                                        <TextField variant="outlined" onChange={handleChange} size="small" type="text" fullWidth placeholder="Nhập Mã SO" />
+                                        <TextField variant="outlined" name="orderNo" error={!!errors.orderNo}
+                                            helperText={errors.orderNo?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })} onChange={handleChange} size="small" type="text" fullWidth placeholder="Nhập Mã SO" />
                                     </Grid>
                                     <Grid item xs={12} sm={12} md={5}>
                                         <Button variant="contained" color="primary" onClick={() => onSearchOrder()}>
@@ -236,7 +248,6 @@ function render(props) {
                                             helperText={errors.customerName?.message} inputRef={register({
                                                 required: "Vui lòng nhập thông tin"
                                             })}
-                                        // value={customerInf.name} 
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
@@ -245,7 +256,10 @@ function render(props) {
                                                 Số tài khoản:
                                     </FormLabel>
                                         </Typography>
-                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bankCode" inputRef={register}
+                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bankCode" error={!!errors.bankCode}
+                                            helperText={errors.bankCode?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
@@ -254,7 +268,10 @@ function render(props) {
                                                 Ngân hàng:
                                     </FormLabel>
                                         </Typography>
-                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bank" inputRef={register} />
+                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bank" error={!!errors.bank}
+                                            helperText={errors.bank?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })} />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
                                         <Typography gutterBottom>
@@ -262,7 +279,10 @@ function render(props) {
                                                 Chi nhánh:
                                     </FormLabel>
                                         </Typography>
-                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bankBranch" inputRef={register} />
+                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bankBranch" error={!!errors.bankBranch}
+                                            helperText={errors.bankBranch?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })} />
                                     </Grid>
                                 </Grid>
                             </FormControl>
@@ -293,26 +313,26 @@ function render(props) {
                                         <TableCell align="center">Thao tác</TableCell>
                                     </TableRow>
                                 </TableHead>
-                                {data.count <= 0 ? (
+                                {listTicket.length <= 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={5} align="left">
-                                            {ErrorCode["NOT_FOUND_TABLE"]}
+                                            Không có yêu cầu nào cả
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                         <TableBody>
-                                            {data.data.map((row, i) => (
+                                            {listTicket.map((row, i) => (
                                                 <TableRow key={i}>
-                                                    <TableCell align="center">{row.number}</TableCell>
-                                                    <TableCell align="center">SO18487</TableCell>
-                                                    <TableCell align="center">62532</TableCell>
+                                                    <TableCell align="center">{row.code}</TableCell>
+                                                    <TableCell align="center">{row.saleOrderCode}</TableCell>
+                                                    <TableCell align="center">{row.saleOrderID}</TableCell>
                                                     <TableCell align="left">
-                                                        <Chip size="small" label={"Sai sản phẩm"} />
+                                                        {row.reasons.map(reason => <Chip size="small" label={reason.name} />)}
                                                     </TableCell>
-                                                    <TableCell align="left">Hộp bị móp góc phải</TableCell>
-                                                    <TableCell align="center">Nguyễn Văn A</TableCell>
-                                                    <TableCell align="center">ct</TableCell>
-                                                    <TableCell align="center">ct</TableCell>
+                                                    <TableCell align="left">{row.note}</TableCell>
+                                                    <TableCell align="center">{orderData.customerName}</TableCell>
+                                                    <TableCell align="center">{row.createdBy}</TableCell>
+                                                    <TableCell align="center">{row.createdBy}</TableCell>
                                                     <TableCell align="center">
                                                         <Link href={`/cs/all_case/edit`}>
                                                             <a>
@@ -328,7 +348,7 @@ function render(props) {
                                             ))}
                                         </TableBody>
                                     )}
-                                {data.count > 0 ? (
+                                {/* {data.count > 0 ? (
                                     <MyTablePagination
                                         labelUnit="yêu cầu"
                                         count={data.count}
@@ -340,7 +360,7 @@ function render(props) {
                                     />
                                 ) : (
                                         <div />
-                                    )}
+                                    )} */}
                             </Table>
                         </TableContainer>
 
@@ -369,7 +389,7 @@ function render(props) {
                                                 Chọn người tiếp nhận: <span style={{ color: "red" }}>(*)</span>
                                             </FormLabel>
                                         </Typography>
-                                        <MuiSingleAuto options={props.listDepartment} placeholder="Chọn" name="receiver" errors={errors} control={control}></MuiSingleAuto>
+                                        <MuiSingleAuto options={props.listDepartment} required placeholder="Chọn" name="assignUser" errors={errors} control={control}></MuiSingleAuto>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
                                         <Typography gutterBottom>
@@ -377,7 +397,8 @@ function render(props) {
                                                 Mã giao hàng tiết kiệm: (Mã return)
                                     </FormLabel>
                                         </Typography>
-                                        <TextField name="returnCode" variant="outlined" size="small" type="text" fullWidth placeholder="0" />
+                                        <TextField name="returnCode"
+                                            inputRef={register} variant="outlined" size="small" type="text" fullWidth placeholder="0" />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={6}>
                                         <Typography gutterBottom>
@@ -385,7 +406,7 @@ function render(props) {
                                                 Số tiền trả lại:
                                     </FormLabel>
                                         </Typography>
-                                        <TextField name="cashback" variant="outlined" size="small" type="number" fullWidth placeholder="0" />
+                                        <TextField name="cashback" inputRef={register} variant="outlined" size="small" type="number" fullWidth placeholder="0" />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={6}>
                                         <Typography gutterBottom>
@@ -393,7 +414,10 @@ function render(props) {
                                                 Ghi chú (hàng trả về): <span style={{ color: "red" }}>(*)</span>
                                             </FormLabel>
                                         </Typography>
-                                        <TextField name="note" variant="outlined" size="small" type="text" fullWidth placeholder="Ghi chú..." />
+                                        <TextField name="note" error={!!errors.note}
+                                            helperText={errors.note?.message} inputRef={register({
+                                                required: "Vui lòng nhập thông tin"
+                                            })} variant="outlined" size="small" type="text" fullWidth placeholder="Ghi chú..." />
                                     </Grid>
                                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                                         <Grid item>
