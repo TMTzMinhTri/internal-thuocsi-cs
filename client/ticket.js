@@ -18,6 +18,10 @@ class TicketClient extends APIClient {
         return this.callFromClient("GET", `${URI}/tasks`, { sale_order_code: code })
     }
 
+    getTicketByFilter(formData) {
+        return this.callFromClient("POST", `${URI}/tasks/list`, formData)
+    }
+
 }
 
 

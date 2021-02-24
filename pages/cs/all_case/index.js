@@ -20,6 +20,7 @@ import {
 import clsx from "clsx";
 import Drawer from "@material-ui/core/Drawer";
 import Router, { useRouter } from "next/router";
+import { formatUTCTime } from "components/global"
 import {
   ErrorCode,
   formatEllipsisText,
@@ -57,6 +58,7 @@ import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
 import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
 import { reasons } from "components/global";
 import { getAccountClient } from "client/account";
+import { getTicketClient } from "client/ticket";
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
@@ -95,19 +97,19 @@ export async function loadRequestData(ctx) {
 
   // const accountClient = getAccountClient();
   const accountResp = await accountClient.getListEmployee(0, 20, "");
-  console.log(accountResp.data)
+
   let abcs = []
   if (accountResp.status === "OK") {
-    
-      accountResp.data.map((account) => (
-        
-        abcs.push({
-          value: account.username,
-          label: account.fullname,
-        })
-      ))
+
+    accountResp.data.map((account) => (
+
+      abcs.push({
+        value: account.username,
+        label: account.fullname,
+      })
+    ))
   }
-  console.log("debug here",abcs)
+
   data.props.abcs = abcs
 
   return data;
@@ -255,6 +257,21 @@ function render(props) {
       setListAssignUser([{ value: "", label: "" }]);
     }
   };
+
+  const onSubmit = async (formData) => {
+    console.log(formData)
+    const ticketClient = getTicketClient()
+    const ticketResp = await ticketClient.getTicketByFilter({
+      saleOrderCode: formData.saleOrderCode,
+      saleOrderID: formData.saleOrderID,
+      status: formData.status,
+      reasons: formData.Reasons,
+      assignUser: formData.assignUser,
+      createdTime: formData.createdTime,
+      lastUpdatedTime: formData.lastUpdatedTime
+    })
+
+  }
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -594,7 +611,7 @@ function render(props) {
     },
   ];
 
-  
+
 
   return (
     <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
@@ -673,6 +690,8 @@ function render(props) {
                           </FormLabel>
                         </Typography>
                         <TextField
+                          name="saleOrderCode"
+                          inputRef={register}
                           variant="outlined"
                           size="small"
                           type="text"
@@ -690,6 +709,8 @@ function render(props) {
                           </FormLabel>
                         </Typography>
                         <TextField
+                          name="saleOrderID"
+                          inputRef={register}
                           variant="outlined"
                           size="small"
                           type="text"
@@ -697,7 +718,7 @@ function render(props) {
                           placeholder="Nhập Order ID"
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
+                      {/* <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
                           <FormLabel
                             component="legend"
@@ -713,7 +734,7 @@ function render(props) {
                           fullWidth
                           placeholder="Nhập Số Điện Thoại"
                         />
-                      </Grid>
+                      </Grid> */}
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
                           <FormLabel
@@ -765,7 +786,7 @@ function render(props) {
                           control={control}
                         ></MuiSingleAuto>
                       </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
+                      {/* <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
                           <FormLabel
                             component="legend"
@@ -781,7 +802,7 @@ function render(props) {
                           errors={errors}
                           control={control}
                         ></MuiSingleAuto>
-                      </Grid>
+                      </Grid> */}
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
                           <FormLabel
@@ -792,6 +813,8 @@ function render(props) {
                           </FormLabel>
                         </Typography>
                         <TextField
+                          name="createdTime"
+                          inputRef={register}
                           variant="outlined"
                           size="small"
                           fullWidth
@@ -808,6 +831,8 @@ function render(props) {
                           </FormLabel>
                         </Typography>
                         <TextField
+                          name="lastUpdatedTime"
+                          inputRef={register}
                           variant="outlined"
                           size="small"
                           fullWidth
@@ -830,7 +855,7 @@ function render(props) {
                         </Grid>
                         <Grid item>
                           <Link href="/cs/all_case/new">
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
                               Tìm kiếm
                             </Button>
                           </Link>
