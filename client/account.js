@@ -30,6 +30,16 @@ class AccountClient extends APIClient {
         })
     }
 
+    getListEmployee(offset,limit,q) {
+        return this.callFromNextJS("GET",
+            `${URI}/employee/all`, {
+                q:q,
+            offset: offset,
+            limit: limit,
+            getTotal: true,
+        })
+    }
+
 }
 
 export function getAccountClient(ctx, data) {

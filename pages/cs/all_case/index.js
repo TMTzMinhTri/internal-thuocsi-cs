@@ -20,9 +20,13 @@ import {
 import clsx from "clsx";
 import Drawer from "@material-ui/core/Drawer";
 import Router, { useRouter } from "next/router";
-import { ErrorCode, formatEllipsisText, formatMessageError, formatUrlSearch } from "components/global";
+import {
+  ErrorCode,
+  formatEllipsisText,
+  formatMessageError,
+  formatUrlSearch,
+} from "components/global";
 import { getOrderClient } from "client/order";
-
 
 import { faPlus, faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -50,6 +54,11 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import MyTablePagination from "@thuocsi/nextjs-components/my-pagination/my-pagination";
 import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
+import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
+import { reasons } from "components/global";
+import { getAccountClient } from "client/account";
+
+const LIMIT = 20;
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
@@ -75,6 +84,33 @@ export async function loadRequestData(ctx) {
     return { props: { data: [], count: 0, message: data.props.message } };
   }
   data.props.count = data.props.total;
+
+  const accountClient = getAccountClient(ctx, {});
+  const listDepartment = await accountClient.getListDepartment(0, 20, "");
+  if (listDepartment.status === "OK") {
+    data.props.listDepartment = listDepartment.data.map((department) => ({
+      ...department,
+      value: department.code,
+      label: department.name,
+    }));
+  }
+
+  // const accountClient = getAccountClient();
+  const accountResp = await accountClient.getListEmployee(0, 20, "");
+  let accountInfo = []
+  if (accountResp.status === "OK") {
+    
+      accountResp.data.map((account) => (
+        
+        accountInfo.push({
+          value: account.username,
+          label: account.fullname,
+        })
+      ))
+  }
+  
+  data.props.accountInfo = accountInfo
+
   return data;
 }
 
@@ -154,7 +190,12 @@ function render(props) {
   }
 
   let [data, setData] = useState(props);
+  const [listAssignUser, setListAssignUser] = useState([...props.accountInfo]);
+let limit =parseInt(router.query.limit) || 20
+let page = parseInt(router.query.page) || 0
 
+
+  
   useEffect(() => {
     setData(props);
     setSearch(formatUrlSearch(q));
@@ -521,6 +562,22 @@ function render(props) {
     </div>
   );
 
+  const listStatus = [
+    {
+      value: "NEW",
+      label: "Mới",
+    },
+    {
+      value: "PENDING",
+      label: "Đang chờ",
+    },
+    {
+      value: "COMPLETED",
+      label: "Hoàn tất",
+    },
+  ];
+
+  
 
   return (
     <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
@@ -650,12 +707,12 @@ function render(props) {
                           </FormLabel>
                         </Typography>
                         <MuiSingleAuto
+                          options={listStatus}
                           placeholder="Chọn"
-                          name="trạng thái"
-                          fullWidth
+                          name="orderStatus"
                           errors={errors}
                           control={control}
-                        ></MuiSingleAuto>
+                        />
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -666,13 +723,13 @@ function render(props) {
                             Lý do:
                           </FormLabel>
                         </Typography>
-                        <MuiSingleAuto
+                        <MuiMultipleAuto
+                          name="reasons"
+                          options={reasons}
                           placeholder="Chọn"
-                          name="lý do"
-                          fullWidth
                           errors={errors}
                           control={control}
-                        ></MuiSingleAuto>
+                        ></MuiMultipleAuto>
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -684,9 +741,9 @@ function render(props) {
                           </FormLabel>
                         </Typography>
                         <MuiSingleAuto
+                          options={listAssignUser}
                           placeholder="Chọn"
-                          name="người tiếp nhận"
-                          fullWidth
+                          name="assignUser"
                           errors={errors}
                           control={control}
                         ></MuiSingleAuto>
@@ -855,12 +912,12 @@ function render(props) {
           {data.count > 0 ? (
             <MyTablePagination
               labelUnit="yêu cầu"
-              count={data.count}
-              rowsPerPage={10}
-              page={2}
+              count={props.count}
+              rowsPerPage={limit}
+              page={page}
               onChangePage={(event, page, rowsPerPage) => {
                 Router.push(
-                  `/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`
+                  `/cs/all_case?page=${page}&limit=${rowsPerPage}&q=${search}`
                 );
               }}
             />
@@ -870,6 +927,5 @@ function render(props) {
         </Table>
       </TableContainer>
     </AppCS>
-
   );
 }
