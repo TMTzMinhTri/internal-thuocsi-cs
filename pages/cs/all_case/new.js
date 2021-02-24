@@ -218,7 +218,7 @@ function render(props) {
             link: "/cs",
         },
         {
-            name: "Danh sách tất cả phiếu yêu cầu",
+            name: "DS yêu cầu cá nhân",
             link: "/cs/all_case",
         },
         {
