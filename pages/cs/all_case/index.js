@@ -564,15 +564,15 @@ let page = parseInt(router.query.page) || 0
 
   const listStatus = [
     {
-      value: "New",
+      value: "NEW",
       label: "Mới",
     },
     {
-      value: "Pending",
+      value: "PENDING",
       label: "Đang chờ",
     },
     {
-      value: "Completed",
+      value: "COMPLETED",
       label: "Hoàn tất",
     },
   ];

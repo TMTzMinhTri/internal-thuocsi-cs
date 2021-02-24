@@ -34,8 +34,8 @@ class AccountClient extends APIClient {
         return this.callFromNextJS("GET",
             `${URI}/employee/all`, {
                 q:q,
-            offset: 0,
-            limit: 20,
+            offset: offset,
+            limit: limit,
             getTotal: true,
         })
     }
