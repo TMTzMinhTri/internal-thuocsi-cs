@@ -20,9 +20,13 @@ import {
 import clsx from "clsx";
 import Drawer from "@material-ui/core/Drawer";
 import Router, { useRouter } from "next/router";
-import { ErrorCode, formatEllipsisText, formatMessageError, formatUrlSearch } from "components/global";
+import {
+  ErrorCode,
+  formatEllipsisText,
+  formatMessageError,
+  formatUrlSearch,
+} from "components/global";
 import { getOrderClient } from "client/order";
-
 
 import { faPlus, faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -50,6 +54,9 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import MyTablePagination from "@thuocsi/nextjs-components/my-pagination/my-pagination";
 import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
+import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
+import { reasons } from "components/global";
+import { getAccountClient } from "client/account";
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
@@ -72,9 +79,37 @@ export async function loadRequestData(ctx) {
   data.props = await _client.getListOrder(offset, limit, q);
 
   if (data.props.status !== "OK") {
-      return { props: { data: [], count: 0, message: data.props.message } };
+    return { props: { data: [], count: 0, message: data.props.message } };
   }
   data.props.count = data.props.total;
+
+  const accountClient = getAccountClient(ctx, {});
+  const listDepartment = await accountClient.getListDepartment(0, 20, "");
+  if (listDepartment.status === "OK") {
+    data.props.listDepartment = listDepartment.data.map((department) => ({
+      ...department,
+      value: department.code,
+      label: department.name,
+    }));
+  }
+
+  // const accountClient = getAccountClient();
+  const accountResp = await accountClient.getListEmployee(0, 20, "");
+  console.log(accountResp.data)
+  let abcs = []
+  if (accountResp.status === "OK") {
+    
+      accountResp.data.map((account) => (
+        
+        abcs.push({
+          value: account.username,
+          label: account.fullname,
+        })
+      ))
+  }
+  console.log("debug here",abcs)
+  data.props.abcs = abcs
+
   return data;
 }
 
@@ -154,7 +189,9 @@ function render(props) {
   }
 
   let [data, setData] = useState(props);
+  const [listAssignUser, setListAssignUser] = useState([...props.abcs]);
 
+  console.log("listAssignUser", listAssignUser)
   useEffect(() => {
     setData(props);
     setSearch(formatUrlSearch(q));
@@ -197,6 +234,27 @@ function render(props) {
   const [state, setState] = React.useState({
     right: false,
   });
+
+  const updateListAssignUser = async (department) => {
+    if (department) {
+      const accountClient = getAccountClient();
+      const accountResp = await accountClient.getListEmployeeByDepartment(
+        department.code
+      );
+      if (accountResp.status === "OK") {
+        setListAssignUser(
+          accountResp.data.map((account) => ({
+            value: account.email,
+            label: account.username,
+          }))
+        );
+      } else {
+        setListAssignUser([{ value: "", label: "" }]);
+      }
+    } else {
+      setListAssignUser([{ value: "", label: "" }]);
+    }
+  };
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -521,7 +579,23 @@ function render(props) {
     </div>
   );
 
+  const listStatus = [
+    {
+      value: "new",
+      label: "Mới",
+    },
+    {
+      value: "pending",
+      label: "Đang chờ",
+    },
+    {
+      value: "completed",
+      label: "Hoàn tất",
+    },
+  ];
+
   
+
   return (
     <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
       <Head>
@@ -650,12 +724,12 @@ function render(props) {
                           </FormLabel>
                         </Typography>
                         <MuiSingleAuto
+                          options={listStatus}
                           placeholder="Chọn"
-                          name="trạng thái"
-                          fullWidth
+                          name="orderStatus"
                           errors={errors}
                           control={control}
-                        ></MuiSingleAuto>
+                        />
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -666,13 +740,13 @@ function render(props) {
                             Lý do:
                           </FormLabel>
                         </Typography>
-                        <MuiSingleAuto
+                        <MuiMultipleAuto
+                          name="reasons"
+                          options={reasons}
                           placeholder="Chọn"
-                          name="lý do"
-                          fullWidth
                           errors={errors}
                           control={control}
-                        ></MuiSingleAuto>
+                        ></MuiMultipleAuto>
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -684,9 +758,9 @@ function render(props) {
                           </FormLabel>
                         </Typography>
                         <MuiSingleAuto
+                          options={listAssignUser}
                           placeholder="Chọn"
-                          name="người tiếp nhận"
-                          fullWidth
+                          name="assignUser"
                           errors={errors}
                           control={control}
                         ></MuiSingleAuto>
@@ -813,11 +887,9 @@ function render(props) {
                   <TableCell align="left">{row.saleOrderCode}</TableCell>
                   <TableCell align="left">{row.saleOrderID}</TableCell>
                   <TableCell align="left">
-                    {
-                      row.reasons.map((reason)=>
-                         <Chip size="small" label={reason.name} />
-                      )
-                    }
+                    {row.reasons.map((reason) => (
+                      <Chip size="small" label={reason.name} />
+                    ))}
                   </TableCell>
                   <TableCell align="left">{row.note}</TableCell>
                   <TableCell align="center">{row.customerID}</TableCell>
@@ -870,6 +942,5 @@ function render(props) {
         </Table>
       </TableContainer>
     </AppCS>
-  
   );
 }
