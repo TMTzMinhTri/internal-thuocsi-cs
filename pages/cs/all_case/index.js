@@ -58,6 +58,8 @@ import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
 import { reasons } from "components/global";
 import { getAccountClient } from "client/account";
 
+const LIMIT = 20;
+
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
     return loadRequestData(ctx);
@@ -190,6 +192,9 @@ function render(props) {
 
   let [data, setData] = useState(props);
   const [listAssignUser, setListAssignUser] = useState([...props.abcs]);
+let limit =parseInt(router.query.limit) || 20
+let page = parseInt(router.query.page) || 0
+
 
   console.log("listAssignUser", listAssignUser)
   useEffect(() => {
@@ -929,12 +934,12 @@ function render(props) {
           {data.count > 0 ? (
             <MyTablePagination
               labelUnit="yêu cầu"
-              count={data.count}
-              rowsPerPage={10}
-              page={2}
+              count={props.count}
+              rowsPerPage={limit}
+              page={page}
               onChangePage={(event, page, rowsPerPage) => {
                 Router.push(
-                  `/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`
+                  `/cs/all_case?page=${page}&limit=${rowsPerPage}&q=${search}`
                 );
               }}
             />
