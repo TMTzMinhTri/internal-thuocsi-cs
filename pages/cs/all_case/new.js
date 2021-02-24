@@ -79,6 +79,9 @@ const useStyles = makeStyles((theme) => ({
     root: {
         maxWidth: 800,
     },
+    muiDrawerRoot: {
+        boxShadow: 'none'
+    },
     media: {
         height: 0,
         paddingTop: "56.25%", // 16:9
@@ -90,17 +93,14 @@ const useStyles = makeStyles((theme) => ({
             duration: theme.transitions.duration.shortest,
         }),
     },
+    BackdropProps: {
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
     expandOpen: {
         transform: "rotate(180deg)",
     },
-    avatar: {
-        backgroundColor: red[800],
-    },
     list: {
         width: "70vw",
-    },
-    fullList: {
-        width: "auto",
     },
 }));
 
@@ -172,7 +172,9 @@ function render(props) {
         const ticketClient = getTicketClient()
         const respTicket = await ticketClient.getTicketBySaleOrderCode(resp.data[0].orderNo)
         if (respTicket.status === "OK") {
-            setListTicket(respTicket.data)
+            let a = []
+            a.push(respTicket.data[0])
+            setListTicket(a)
         }
     }
 
@@ -594,8 +596,18 @@ function render(props) {
                                                                         </Tooltip>
                                                                     </a>
                                                                     <Drawer
-                                                                        style={{
-                                                                            background: 'white'
+                                                                        ModalProps={{
+                                                                            BackdropProps: {
+                                                                                classes: {
+                                                                                    root: classes.BackdropProps
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                        PaperProps={{
+                                                                            classes: {
+                                                                                elevation16: classes.muiDrawerRoot
+
+                                                                            }
                                                                         }}
                                                                         anchor={anchor}
                                                                         open={state[anchor]}
@@ -705,6 +717,6 @@ function render(props) {
                     </form>
                 </MyCard>
             </div>
-        </AppCS>
+        </AppCS >
     );
 }

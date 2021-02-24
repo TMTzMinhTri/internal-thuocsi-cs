@@ -20,7 +20,7 @@ import {
 import clsx from "clsx";
 import Drawer from "@material-ui/core/Drawer";
 import Router, { useRouter } from "next/router";
-import { formatUTCTime } from "components/global"
+import { formatDateTime, formatUTCTime } from "components/global"
 import {
   ErrorCode,
   formatEllipsisText,
@@ -193,7 +193,6 @@ function render(props) {
   let [data, setData] = useState(props);
   const [listAssignUser, setListAssignUser] = useState([...props.abcs]);
 
-  console.log("listAssignUser", listAssignUser)
   useEffect(() => {
     setData(props);
     setSearch(formatUrlSearch(q));
@@ -259,16 +258,16 @@ function render(props) {
   };
 
   const onSubmit = async (formData) => {
-    console.log(formData)
     const ticketClient = getTicketClient()
+    console.log(formData.createdTime)
     const ticketResp = await ticketClient.getTicketByFilter({
       saleOrderCode: formData.saleOrderCode,
-      saleOrderID: formData.saleOrderID,
+      saleOrderID: +formData.saleOrderID,
       status: formData.status,
       reasons: formData.Reasons,
-      assignUser: formData.assignUser,
-      createdTime: formData.createdTime,
-      lastUpdatedTime: formData.lastUpdatedTime
+      assignUser: formData.assignUser?.value,
+      createdTime: formData.createdTime ? new Date(formatUTCTime(formData.createdTime)).toISOString() : null,
+      lastUpdatedTime: formData.lastUpdatedTime ? new Date(formatUTCTime(formData.lastUpdatedTime)).toISOString() : null
     })
 
   }
