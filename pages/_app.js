@@ -23,13 +23,13 @@ export var theme = createMuiTheme({
 
 const menu = [{
     key: "ALLCASE",
-    name: "Danh sách tất cả phiếu yêu cầu",
+    name: "DS phiếu yêu cầu",
     link: "/cs/all_case",
     icon: faList
 }, 
 {
     key: "MYCASE",
-    name: "Danh sách phiếu yêu cầu của tôi",
+    name: "DS yêu cầu cá nhân",
     link: "/cs/my_case",
     icon: faList
 }, 
