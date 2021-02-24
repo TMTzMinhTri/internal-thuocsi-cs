@@ -97,20 +97,19 @@ export async function loadRequestData(ctx) {
 
   // const accountClient = getAccountClient();
   const accountResp = await accountClient.getListEmployee(0, 20, "");
-  console.log(accountResp.data)
-  let abcs = []
+  let accountInfo = []
   if (accountResp.status === "OK") {
     
       accountResp.data.map((account) => (
         
-        abcs.push({
+        accountInfo.push({
           value: account.username,
           label: account.fullname,
         })
       ))
   }
-  console.log("debug here",abcs)
-  data.props.abcs = abcs
+  
+  data.props.accountInfo = accountInfo
 
   return data;
 }
@@ -191,12 +190,12 @@ function render(props) {
   }
 
   let [data, setData] = useState(props);
-  const [listAssignUser, setListAssignUser] = useState([...props.abcs]);
+  const [listAssignUser, setListAssignUser] = useState([...props.accountInfo]);
 let limit =parseInt(router.query.limit) || 20
 let page = parseInt(router.query.page) || 0
 
 
-  console.log("listAssignUser", listAssignUser)
+  
   useEffect(() => {
     setData(props);
     setSearch(formatUrlSearch(q));
@@ -239,27 +238,6 @@ let page = parseInt(router.query.page) || 0
   const [state, setState] = React.useState({
     right: false,
   });
-
-  const updateListAssignUser = async (department) => {
-    if (department) {
-      const accountClient = getAccountClient();
-      const accountResp = await accountClient.getListEmployeeByDepartment(
-        department.code
-      );
-      if (accountResp.status === "OK") {
-        setListAssignUser(
-          accountResp.data.map((account) => ({
-            value: account.email,
-            label: account.username,
-          }))
-        );
-      } else {
-        setListAssignUser([{ value: "", label: "" }]);
-      }
-    } else {
-      setListAssignUser([{ value: "", label: "" }]);
-    }
-  };
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -586,15 +564,15 @@ let page = parseInt(router.query.page) || 0
 
   const listStatus = [
     {
-      value: "new",
+      value: "New",
       label: "Mới",
     },
     {
-      value: "pending",
+      value: "Pending",
       label: "Đang chờ",
     },
     {
-      value: "completed",
+      value: "Completed",
       label: "Hoàn tất",
     },
   ];
