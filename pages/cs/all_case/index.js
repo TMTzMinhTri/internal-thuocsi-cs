@@ -72,7 +72,7 @@ export async function loadRequestData(ctx) {
   data.props = await _client.getListOrder(offset, limit, q);
 
   if (data.props.status !== "OK") {
-      return { props: { data: [], count: 0, message: data.props.message } };
+    return { props: { data: [], count: 0, message: data.props.message } };
   }
   data.props.count = data.props.total;
   return data;
@@ -521,7 +521,7 @@ function render(props) {
     </div>
   );
 
-  
+
   return (
     <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
       <Head>
@@ -806,52 +806,52 @@ function render(props) {
               </TableCell>
             </TableRow>
           ) : (
-            <TableBody>
-              {data.data.map((row, i) => (
-                <TableRow key={i}>
-                  <TableCell align="left">{row.code}</TableCell>
-                  <TableCell align="left">{row.saleOrderCode}</TableCell>
-                  <TableCell align="left">{row.saleOrderID}</TableCell>
-                  <TableCell align="left">
-                    {
-                      row.reasons.map((reason)=>
-                         <Chip size="small" label={reason.name} />
-                      )
-                    }
-                  </TableCell>
-                  <TableCell align="left">{row.note}</TableCell>
-                  <TableCell align="center">{row.customerID}</TableCell>
-                  {/* <TableCell align="center">
+              <TableBody>
+                {data.data.map((row, i) => (
+                  <TableRow key={i}>
+                    <TableCell align="center">{row.code}</TableCell>
+                    <TableCell align="center">{row.saleOrderCode}</TableCell>
+                    <TableCell align="center">{row.saleOrderID}</TableCell>
+                    <TableCell align="left">
+                      {
+                        row.reasons.map((reason) =>
+                          <Chip style={{ margin: '3px' }} size="small" label={reason.name} />
+                        )
+                      }
+                    </TableCell>
+                    <TableCell align="left">{row.note}</TableCell>
+                    <TableCell align="center">{row.customerID}</TableCell>
+                    {/* <TableCell align="center">
                     <Chip size="small" label={"Chưa xử lý"} />
                   </TableCell>
                   <TableCell align="center">ct</TableCell>
                   <TableCell align="center">ct</TableCell> */}
-                  <TableCell align="center">
-                    <div>
-                      {["right"].map((anchor) => (
-                        <React.Fragment key={anchor}>
-                          <a onClick={toggleDrawer(anchor, true)}>
-                            <Tooltip title="Cập nhật thông tin của yêu cầu">
-                              <IconButton>
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </a>
-                          <Drawer
-                            anchor={anchor}
-                            open={state[anchor]}
-                            onClose={toggleDrawer(anchor, false)}
-                          >
-                            {list(anchor)}
-                          </Drawer>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          )}
+                    <TableCell align="center">
+                      <div>
+                        {["right"].map((anchor) => (
+                          <React.Fragment key={anchor}>
+                            <a onClick={toggleDrawer(anchor, true)}>
+                              <Tooltip title="Cập nhật thông tin của yêu cầu">
+                                <IconButton>
+                                  <EditIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </a>
+                            <Drawer
+                              anchor={anchor}
+                              open={state[anchor]}
+                              onClose={toggleDrawer(anchor, false)}
+                            >
+                              {list(anchor)}
+                            </Drawer>
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           {data.count > 0 ? (
             <MyTablePagination
               labelUnit="yêu cầu"
@@ -865,11 +865,11 @@ function render(props) {
               }}
             />
           ) : (
-            <div />
-          )}
+              <div />
+            )}
         </Table>
       </TableContainer>
     </AppCS>
-  
+
   );
 }

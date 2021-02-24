@@ -110,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
 // }
 
 function render(props) {
-    const { register, handleSubmit, errors, reset, control, getValues, setValue } = useForm({
+    const { register, handleSubmit, errors, reset, control, getValues, clearErrors, setValue } = useForm({
         defaultValues: {
             imageUrls: [],
         },
@@ -144,6 +144,7 @@ function render(props) {
         let orderClient = getOrderClient()
         let resp = await orderClient.getOrderByOrderNoFromClient(search)
         if (resp.status !== 'OK') {
+            setOrderData(null)
             setListTicket([])
             setCustomerInf({ bank: "", bankCode: "", bankBranch: "" })
             setValue("bank", "")
@@ -164,6 +165,7 @@ function render(props) {
             setValue("bank", respCustomer.data[0].bank)
             setValue("bankCode", respCustomer.data[0].bankCode)
             setValue("bankBranch", respCustomer.data[0].bankBranch)
+            clearErrors()
             setCustomerInf(respCustomer.data[0])
         }
 
@@ -263,7 +265,7 @@ function render(props) {
             >
                 <div className={styles.grid}>
                     <MyCard>
-                        <MyCardHeader title="Chỉnh sửa yêu cầu"></MyCardHeader>
+                        <MyCardHeader title="Thông tin yêu cầu"></MyCardHeader>
                         <form key={row.code}>
                             <MyCardContent>
                                 <FormControl size="small">
@@ -341,7 +343,7 @@ function render(props) {
                                             </Typography>
                                             <TextField value={customerInf.bankBranch} variant="outlined" size="small" type="text" fullWidth />
                                         </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
+                                        <Grid item xs={12} sm={6} md={6}>
                                             <Typography gutterBottom>
                                                 <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
                                                     Nguyên nhân:
@@ -482,7 +484,7 @@ function render(props) {
                                                 Tên khách hàng:
                                     </FormLabel>
                                         </Typography>
-                                        <TextField variant="outlined" size="small" type="text" fullWidth name="customerName" error={!!errors.customerName}
+                                        <TextField disabled={!orderData} variant="outlined" size="small" type="text" fullWidth name="customerName" error={!!errors.customerName}
                                             helperText={errors.customerName?.message} inputRef={register({
                                                 required: "Vui lòng nhập thông tin"
                                             })}
@@ -494,7 +496,7 @@ function render(props) {
                                                 Số tài khoản:
                                     </FormLabel>
                                         </Typography>
-                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bankCode" error={!!errors.bankCode}
+                                        <TextField disabled={!orderData} variant="outlined" size="small" type="text" fullWidth name="bankCode" error={!!errors.bankCode}
                                             helperText={errors.bankCode?.message} inputRef={register({
                                                 required: "Vui lòng nhập thông tin"
                                             })}
@@ -506,7 +508,7 @@ function render(props) {
                                                 Ngân hàng:
                                     </FormLabel>
                                         </Typography>
-                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bank" error={!!errors.bank}
+                                        <TextField disabled={!orderData} variant="outlined" size="small" type="text" fullWidth name="bank" error={!!errors.bank}
                                             helperText={errors.bank?.message} inputRef={register({
                                                 required: "Vui lòng nhập thông tin"
                                             })} />
@@ -517,7 +519,7 @@ function render(props) {
                                                 Chi nhánh:
                                     </FormLabel>
                                         </Typography>
-                                        <TextField variant="outlined" size="small" type="text" fullWidth name="bankBranch" error={!!errors.bankBranch}
+                                        <TextField disabled={!orderData} variant="outlined" size="small" type="text" fullWidth name="bankBranch" error={!!errors.bankBranch}
                                             helperText={errors.bankBranch?.message} inputRef={register({
                                                 required: "Vui lòng nhập thông tin"
                                             })} />
@@ -547,7 +549,7 @@ function render(props) {
                                         <TableCell align="left">Mô tả</TableCell>
                                         <TableCell align="center">Khách hàng</TableCell>
                                         <TableCell align="center">Người tạo</TableCell>
-                                        <TableCell align="center">Người cập nhật</TableCell>
+                                        <TableCell align="center">Ngày tạo</TableCell>
                                         <TableCell align="center">Thao tác</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -565,12 +567,12 @@ function render(props) {
                                                     <TableCell align="center">{row.saleOrderCode}</TableCell>
                                                     <TableCell align="center">{row.saleOrderID}</TableCell>
                                                     <TableCell align="left">
-                                                        {row.reasons.map(reason => <Chip size="small" label={reason.name} />)}
+                                                        {row.reasons.map(reason => <Chip style={{ margin: '3px' }} size="small" label={reason.name} />)}
                                                     </TableCell>
                                                     <TableCell align="left">{row.note}</TableCell>
                                                     <TableCell align="center">{orderData.customerName}</TableCell>
                                                     <TableCell align="center">{row.createdBy}</TableCell>
-                                                    <TableCell align="center">{row.createdBy}</TableCell>
+                                                    <TableCell align="center">{formatDateTime(row.createdTime)}</TableCell>
                                                     <TableCell align="center">
                                                         {/* <Link href={`/cs/all_case/edit`}>
                                                             <a>
@@ -593,7 +595,7 @@ function render(props) {
                                                                     </a>
                                                                     <Drawer
                                                                         style={{
-                                                                            background: 'rgba(88, 153, 131, 0.8)'
+                                                                            background: 'white'
                                                                         }}
                                                                         anchor={anchor}
                                                                         open={state[anchor]}
