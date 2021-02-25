@@ -15,6 +15,25 @@ export const reasons = [
     },
 ]
 
+export const department = [
+    {
+        value: "TECH",
+        label: "Công nghệ"
+    },
+    {
+        value: "HEADQUARTER",
+        label: "Trụ sở chính"
+    },
+    {
+        value: "FA",
+        label: "Kế toán"
+    },
+    {
+        value: "WAREHOUSE",
+        label: "Kho"
+    }
+]
+
 export function formatDateTime(datetime) {
     if (datetime) {
         return moment(datetime).utcOffset('+0700').format("DD-MM-YYYY HH:mm:ss")
@@ -63,4 +82,24 @@ export function formatUrlSearch(str) {
         .replace(/[&]/, '%26')
         .replace(/[+]/, '%2B')
         .replace(/[#]/, '%23');
+}
+
+export function formatUTCTime(time) {
+    let result = "";
+    let date = new Date(time);
+    let year = date.getUTCFullYear();
+    let month =
+        date.getMonth() + 1 < 10
+            ? ("0" + (date.getMonth() + 1)).slice(-2)
+            : date.getMonth() + 1;
+    let day =
+        date.getDate() < 10 ? ("0" + date.getDate()).slice(-2) : date.getDate();
+    let hour =
+        date.getHours() < 10 ? ("0" + date.getHours()).slice(-2) : date.getHours();
+    let minute =
+        date.getMinutes() < 10
+            ? ("0" + date.getMinutes()).slice(-2)
+            : date.getMinutes();
+    result = year + "-" + month + "-" + day + "T" + hour + ":" + minute;
+    return result;
 }

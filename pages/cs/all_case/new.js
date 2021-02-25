@@ -9,6 +9,7 @@ import styles from "./request.module.css";
 import { reasons } from "components/global"
 import RichTextField from "@thuocsi/nextjs-components/editor/rich-text-field/index";
 import { actionErrorText, unknownErrorText } from "components/commonErrors";
+import { List } from "container/cs/list"
 import { useToast } from "@thuocsi/nextjs-components/toast/useToast";
 import Router, { useRouter } from "next/router";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
@@ -79,6 +80,9 @@ const useStyles = makeStyles((theme) => ({
     root: {
         maxWidth: 800,
     },
+    muiDrawerRoot: {
+        boxShadow: 'none'
+    },
     media: {
         height: 0,
         paddingTop: "56.25%", // 16:9
@@ -90,17 +94,14 @@ const useStyles = makeStyles((theme) => ({
             duration: theme.transitions.duration.shortest,
         }),
     },
+    BackdropProps: {
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
     expandOpen: {
         transform: "rotate(180deg)",
     },
-    avatar: {
-        backgroundColor: red[800],
-    },
     list: {
         width: "70vw",
-    },
-    fullList: {
-        width: "auto",
     },
 }));
 
@@ -118,7 +119,6 @@ function render(props) {
     });
 
     const [state, setState] = React.useState({
-        right: false,
     });
 
     const [orderData, setOrderData] = useState()
@@ -242,7 +242,7 @@ function render(props) {
         }
     }
 
-    const toggleDrawer = (anchor, open) => (event) => {
+    const toggleDrawer = (anchor, open) => {
         if (
             event.type === "keydown" &&
             (event.key === "Tab" || event.key === "Shift")
@@ -252,201 +252,6 @@ function render(props) {
 
         setState({ ...state, [anchor]: open });
     };
-
-    const list = ({ anchor, row, customerInf, orderData }) => {
-        return (
-            <div
-                className={clsx(classes.list, {
-                    [classes.fullList]: anchor === "top" || anchor === "bottom",
-                })}
-                role="presentation"
-                onClick={toggleDrawer(anchor, false)}
-                onKeyDown={toggleDrawer(anchor, false)}
-            >
-                <div className={styles.grid}>
-                    <MyCard>
-                        <MyCardHeader title="Thông tin yêu cầu"></MyCardHeader>
-                        <form key={row.code}>
-                            <MyCardContent>
-                                <FormControl size="small">
-                                    <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
-                                        <Grid item xs={12} sm={6} md={6}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Ngày tạo: {formatDateTime(row.createdTime)}
-                                                </FormLabel>
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px", fontSize: "40px" }}>
-                                                    {row.code} - {row.saleOrderCode}
-                                                </FormLabel>
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Gía đơn hàng: <span style={{ color: "green" }}>{formatNumber(orderData.totalPrice)} đ</span>
-                                                </FormLabel>
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Số lượng sản phẩm: 37
-                                                </FormLabel>
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Người tạo: <span style={{ color: "grey" }}>{row.createdBy}</span>
-                                                </FormLabel>
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Ngày mua: <span style={{ color: "grey" }}>{formatDateTime(orderData.createdTime)}</span>
-                                                </FormLabel>
-                                                {/* <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Trạng thái đơn hàng: <span style={{ color: "red" }}>Hoàn tất</span>
-                                                </FormLabel> */}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={6}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    User ID: {row.customerID}
-                                                </FormLabel>
-                                                {/* <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Tên doanh nghiệp: QUẦY THUỐC PHƯƠNG LAN
-                                                </FormLabel>
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Họ tên khách hàng: NGUYỄN PHƯƠNG LAN
-                                                </FormLabel> */}
-                                                <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
-                                                    Số điện thoại: {orderData.customerPhone}
-                                                </FormLabel>
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Tên khách hàng:
-                                                </FormLabel>
-                                            </Typography>
-                                            <TextField value={orderData.customerName} variant="outlined" size="small" type="text" fullWidth />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Số tài khoản:
-                                                </FormLabel>
-                                            </Typography>
-                                            <TextField value={customerInf.bankCode} variant="outlined" size="small" type="text" fullWidth />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Ngân hàng:
-                                                </FormLabel>
-                                            </Typography>
-                                            <TextField value={customerInf.bank} value={row.code} variant="outlined" size="small" type="text" fullWidth />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Chi nhánh:
-                                                </FormLabel>
-                                            </Typography>
-                                            <TextField value={customerInf.bankBranch} variant="outlined" size="small" type="text" fullWidth />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={6}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Nguyên nhân:
-                                                </FormLabel>
-                                            </Typography>
-                                            <Autocomplete
-                                                options={[]}
-                                                size="small"
-                                                multiple
-                                                value={row.reasons.map(reason => reason.name)}
-                                                renderInput={(params) =>
-                                                    <TextField
-                                                        variant="outlined"
-                                                        style={{ width: '100%' }}
-                                                        {...params} />}
-                                            />
-
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Chọn bộ phận tiếp nhận:
-                                                </FormLabel>
-                                            </Typography>
-                                            <Autocomplete
-                                                options={[]}
-                                                size="small"
-                                                value={row.departmentCode}
-                                                renderInput={(params) =>
-                                                    <TextField
-                                                        variant="outlined"
-                                                        style={{ width: '100%' }}
-                                                        {...params} />}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Chọn người tiếp nhận:
-                                                </FormLabel>
-                                            </Typography>
-                                            <Autocomplete
-                                                options={[]}
-                                                size="small"
-                                                value={row.assignUser}
-                                                renderInput={(params) =>
-                                                    <TextField
-                                                        variant="outlined"
-                                                        style={{ width: '100%' }}
-                                                        {...params} />}
-                                            />
-                                        </Grid>
-                                        {/* <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Chọn trạng thái:
-                                                </FormLabel>
-                                            </Typography>
-                                            <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
-                                        </Grid> */}
-                                        <Grid item xs={12} sm={6} md={6}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Mã trả hàng:
-                                                </FormLabel>
-                                            </Typography>
-                                            <TextField value={row.returnCode} variant="outlined" size="small" type="text" fullWidth placeholder="0" />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={6}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Số tiền chuyển lại khách:
-                                                </FormLabel>
-                                            </Typography>
-                                            <TextField value={row.cashback} variant="outlined" size="small" type="number" fullWidth placeholder="0" />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={6}>
-                                            <Typography gutterBottom>
-                                                <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                    Mô tả
-                                                </FormLabel>
-                                            </Typography>
-                                            <TextField value={row.note} variant="outlined" size="small" type="text" fullWidth placeholder="Ghi chú..." />
-                                        </Grid>
-                                        <Grid item container xs={12} justify="flex-end" spacing={1}>
-                                            <Grid item>
-                                                <Link href="#">
-                                                    <Button variant="contained" color="default">
-                                                        Quay lại
-                                                    </Button>
-                                                </Link>
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                </FormControl>
-                            </MyCardContent>
-                        </form>
-                    </MyCard>
-                </div>
-            </div>
-        );
-    }
-
 
     return (
         <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
@@ -584,9 +389,9 @@ function render(props) {
                                                             </a>
                                                         </Link> */}
                                                         <div>
-                                                            {["right"].map((anchor) => (
+                                                            {[`right${row.code}`].map((anchor) => (
                                                                 <React.Fragment key={anchor}>
-                                                                    <a onClick={toggleDrawer(anchor, true)}>
+                                                                    <a onClick={() => toggleDrawer(anchor, true)}>
                                                                         <Tooltip title="Cập nhật thông tin của yêu cầu">
                                                                             <IconButton>
                                                                                 <EditIcon fontSize="small" />
@@ -594,14 +399,24 @@ function render(props) {
                                                                         </Tooltip>
                                                                     </a>
                                                                     <Drawer
-                                                                        style={{
-                                                                            background: 'white'
+                                                                        ModalProps={{
+                                                                            BackdropProps: {
+                                                                                classes: {
+                                                                                    root: classes.BackdropProps
+                                                                                }
+                                                                            }
                                                                         }}
-                                                                        anchor={anchor}
+                                                                        PaperProps={{
+                                                                            classes: {
+                                                                                elevation16: classes.muiDrawerRoot
+
+                                                                            }
+                                                                        }}
+                                                                        anchor="right"
                                                                         open={state[anchor]}
-                                                                        onClose={toggleDrawer(anchor, false)}
+                                                                        onClose={() => toggleDrawer(anchor, false)}
                                                                     >
-                                                                        {list({ anchor, row, customerInf, orderData })}
+                                                                        <List resetData={onSearchOrder} toggleDrawer={toggleDrawer} anchor={anchor} listDepartment={props.listDepartment} row={row} customerInf={customerInf} orderData={orderData} />
                                                                     </Drawer>
                                                                 </React.Fragment>
                                                             ))}
@@ -705,6 +520,6 @@ function render(props) {
                     </form>
                 </MyCard>
             </div>
-        </AppCS>
+        </AppCS >
     );
 }

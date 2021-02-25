@@ -20,6 +20,7 @@ import {
 import clsx from "clsx";
 import Drawer from "@material-ui/core/Drawer";
 import Router, { useRouter } from "next/router";
+import { formatDateTime, formatUTCTime } from "components/global"
 import {
   ErrorCode,
   formatEllipsisText,
@@ -57,6 +58,7 @@ import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
 import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
 import { reasons } from "components/global";
 import { getAccountClient } from "client/account";
+import { getTicketClient } from "client/ticket";
 
 const LIMIT = 20;
 
@@ -99,16 +101,14 @@ export async function loadRequestData(ctx) {
   const accountResp = await accountClient.getListEmployee(0, 20, "");
   let accountInfo = []
   if (accountResp.status === "OK") {
-    
-      accountResp.data.map((account) => (
-        
-        accountInfo.push({
-          value: account.username,
-          label: account.fullname,
-        })
-      ))
+    accountResp.data.map((account) => (
+      accountInfo.push({
+        value: account.username,
+        label: account.fullname,
+      })
+    ))
   }
-  
+
   data.props.accountInfo = accountInfo
 
   return data;
@@ -191,11 +191,9 @@ function render(props) {
 
   let [data, setData] = useState(props);
   const [listAssignUser, setListAssignUser] = useState([...props.accountInfo]);
-let limit =parseInt(router.query.limit) || 20
-let page = parseInt(router.query.page) || 0
+  let limit = parseInt(router.query.limit) || 20
+  let page = parseInt(router.query.page) || 0
 
-
-  
   useEffect(() => {
     setData(props);
     setSearch(formatUrlSearch(q));
@@ -238,6 +236,45 @@ let page = parseInt(router.query.page) || 0
   const [state, setState] = React.useState({
     right: false,
   });
+
+  const updateListAssignUser = async (department) => {
+    if (department) {
+      const accountClient = getAccountClient();
+      const accountResp = await accountClient.getListEmployeeByDepartment(
+        department.code
+      );
+      if (accountResp.status === "OK") {
+        setListAssignUser(
+          accountResp.data.map((account) => ({
+            value: account.email,
+            label: account.username,
+          }))
+        );
+      } else {
+        setListAssignUser([{ value: "", label: "" }]);
+      }
+    } else {
+      setListAssignUser([{ value: "", label: "" }]);
+    }
+  };
+
+  const onSubmit = async (formData) => {
+    const ticketClient = getTicketClient()
+    const ticketResp = await ticketClient.getTicketByFilter({
+      saleOrderCode: formData.saleOrderCode,
+      saleOrderID: +formData.saleOrderID,
+      status: formData.status,
+      reasons: formData.Reasons,
+      assignUser: formData.assignUser?.value,
+      createdTime: formData.createdTime ? new Date(formatUTCTime(formData.createdTime)).toISOString() : null,
+      lastUpdatedTime: formData.lastUpdatedTime ? new Date(formatUTCTime(formData.lastUpdatedTime)).toISOString() : null
+    })
+    if (ticketResp.status === "OK") {
+      setData(ticketResp)
+    } else {
+      setData({ data: [] })
+    }
+  }
 
   const toggleDrawer = (anchor, open) => (event) => {
     if (
@@ -577,7 +614,7 @@ let page = parseInt(router.query.page) || 0
     },
   ];
 
-  
+
 
   return (
     <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
@@ -633,11 +670,14 @@ let page = parseInt(router.query.page) || 0
                           variant="outlined"
                           size="small"
                           type="text"
+                          name="saleOrderCode"
+                          inputRef={register}
                           fullWidth
                           placeholder="Nhập Mã SO"
                           onKeyPress={(event) => {
                             if (event.key === "Enter") {
-                              onSearch();
+                              event.preventDefault()
+                              onSubmit(getValues());
                             }
                           }}
                         />
@@ -656,6 +696,8 @@ let page = parseInt(router.query.page) || 0
                           </FormLabel>
                         </Typography>
                         <TextField
+                          name="saleOrderCode"
+                          inputRef={register}
                           variant="outlined"
                           size="small"
                           type="text"
@@ -673,28 +715,13 @@ let page = parseInt(router.query.page) || 0
                           </FormLabel>
                         </Typography>
                         <TextField
+                          name="saleOrderID"
+                          inputRef={register}
                           variant="outlined"
                           size="small"
                           type="text"
                           fullWidth
                           placeholder="Nhập Order ID"
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Typography gutterBottom>
-                          <FormLabel
-                            component="legend"
-                            style={{ fontWeight: "bold", color: "black" }}
-                          >
-                            Số điện thoại:
-                          </FormLabel>
-                        </Typography>
-                        <TextField
-                          variant="outlined"
-                          size="small"
-                          type="text"
-                          fullWidth
-                          placeholder="Nhập Số Điện Thoại"
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
@@ -754,27 +781,12 @@ let page = parseInt(router.query.page) || 0
                             component="legend"
                             style={{ fontWeight: "bold", color: "black" }}
                           >
-                            Người tạo:
-                          </FormLabel>
-                        </Typography>
-                        <MuiSingleAuto
-                          placeholder="Chọn"
-                          name="người tạo"
-                          fullWidth
-                          errors={errors}
-                          control={control}
-                        ></MuiSingleAuto>
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Typography gutterBottom>
-                          <FormLabel
-                            component="legend"
-                            style={{ fontWeight: "bold", color: "black" }}
-                          >
                             Ngày bắt đầu:
                           </FormLabel>
                         </Typography>
                         <TextField
+                          name="createdTime"
+                          inputRef={register}
                           variant="outlined"
                           size="small"
                           fullWidth
@@ -791,6 +803,8 @@ let page = parseInt(router.query.page) || 0
                           </FormLabel>
                         </Typography>
                         <TextField
+                          name="lastUpdatedTime"
+                          inputRef={register}
                           variant="outlined"
                           size="small"
                           fullWidth
@@ -813,7 +827,7 @@ let page = parseInt(router.query.page) || 0
                         </Grid>
                         <Grid item>
                           <Link href="/cs/all_case/new">
-                            <Button variant="contained" color="primary">
+                            <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
                               Tìm kiếm
                             </Button>
                           </Link>
