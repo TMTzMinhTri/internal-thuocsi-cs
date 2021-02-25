@@ -34,6 +34,23 @@ export const department = [
     }
 ]
 
+
+export const listStatus = [
+    {
+        value: "NEW",
+        label: "Mới",
+    },
+    {
+        value: "PENDING",
+        label: "Đang chờ",
+    },
+    {
+        value: "COMPLETED",
+        label: "Hoàn tất",
+    },
+];
+
+
 export function formatDateTime(datetime) {
     if (datetime) {
         return moment(datetime).utcOffset('+0700').format("DD-MM-YYYY HH:mm:ss")

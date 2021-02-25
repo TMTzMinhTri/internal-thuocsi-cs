@@ -188,7 +188,7 @@ function render(props) {
                 returnCode: formData.returnCode,
                 cashback: +formData.cashback,
                 note: formData.note,
-                assignUser: formData.assignUser.value
+                assignUser: formData.assignUser.value.toString(),
             })
             if (ticketResp.status !== "OK") {
                 error(ticketResp.message ?? actionErrorText);
@@ -233,7 +233,14 @@ function render(props) {
             const accountClient = getAccountClient()
             const accountResp = await accountClient.getListEmployeeByDepartment(department.code)
             if (accountResp.status === "OK") {
-                setListAssignUser(accountResp.data.map(account => ({ value: account.email, label: account.username })))
+                // cheat to err data
+                let tmpData = [];
+                accountResp.data.map(account => {
+                    if (account && account.username) {
+                        tmpData.push({ value: account.username, label: account.username })
+                    }
+                })
+                setListAssignUser(tmpData)
             } else {
                 setListAssignUser([{ value: "", label: "" }])
             }
@@ -243,13 +250,6 @@ function render(props) {
     }
 
     const toggleDrawer = (anchor, open) => {
-        if (
-            event.type === "keydown" &&
-            (event.key === "Tab" || event.key === "Shift")
-        ) {
-            return;
-        }
-
         setState({ ...state, [anchor]: open });
     };
 
@@ -416,7 +416,7 @@ function render(props) {
                                                                         open={state[anchor]}
                                                                         onClose={() => toggleDrawer(anchor, false)}
                                                                     >
-                                                                        <List resetData={onSearchOrder} toggleDrawer={toggleDrawer} anchor={anchor} listDepartment={props.listDepartment} row={row} customerInf={customerInf} orderData={orderData} />
+                                                                        <List resetData={onSearchOrder} toggleDrawer={toggleDrawer} anchor={anchor} listDepartment={props.listDepartment} row={row} />
                                                                     </Drawer>
                                                                 </React.Fragment>
                                                             ))}
