@@ -260,7 +260,6 @@ function render(props) {
 
   const onSubmit = async (formData) => {
     const ticketClient = getTicketClient()
-    console.log(formData.createdTime)
     const ticketResp = await ticketClient.getTicketByFilter({
       saleOrderCode: formData.saleOrderCode,
       saleOrderID: +formData.saleOrderID,
@@ -270,7 +269,11 @@ function render(props) {
       createdTime: formData.createdTime ? new Date(formatUTCTime(formData.createdTime)).toISOString() : null,
       lastUpdatedTime: formData.lastUpdatedTime ? new Date(formatUTCTime(formData.lastUpdatedTime)).toISOString() : null
     })
-
+    if (ticketResp.status === "OK") {
+      setData(ticketResp)
+    } else {
+      setData({ data: [] })
+    }
   }
 
   const toggleDrawer = (anchor, open) => (event) => {
@@ -667,11 +670,14 @@ function render(props) {
                           variant="outlined"
                           size="small"
                           type="text"
+                          name="saleOrderCode"
+                          inputRef={register}
                           fullWidth
                           placeholder="Nhập Mã SO"
                           onKeyPress={(event) => {
                             if (event.key === "Enter") {
-                              onSearch();
+                              event.preventDefault()
+                              onSubmit(getValues());
                             }
                           }}
                         />
@@ -718,23 +724,6 @@ function render(props) {
                           placeholder="Nhập Order ID"
                         />
                       </Grid>
-                      {/* <Grid item xs={12} sm={6} md={4}>
-                        <Typography gutterBottom>
-                          <FormLabel
-                            component="legend"
-                            style={{ fontWeight: "bold", color: "black" }}
-                          >
-                            Số điện thoại:
-                          </FormLabel>
-                        </Typography>
-                        <TextField
-                          variant="outlined"
-                          size="small"
-                          type="text"
-                          fullWidth
-                          placeholder="Nhập Số Điện Thoại"
-                        />
-                      </Grid> */}
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
                           <FormLabel
@@ -786,23 +775,6 @@ function render(props) {
                           control={control}
                         ></MuiSingleAuto>
                       </Grid>
-                      {/* <Grid item xs={12} sm={6} md={4}>
-                        <Typography gutterBottom>
-                          <FormLabel
-                            component="legend"
-                            style={{ fontWeight: "bold", color: "black" }}
-                          >
-                            Người tạo:
-                          </FormLabel>
-                        </Typography>
-                        <MuiSingleAuto
-                          placeholder="Chọn"
-                          name="người tạo"
-                          fullWidth
-                          errors={errors}
-                          control={control}
-                        ></MuiSingleAuto>
-                      </Grid> */}
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
                           <FormLabel

@@ -119,7 +119,6 @@ function render(props) {
     });
 
     const [state, setState] = React.useState({
-        right: false,
     });
 
     const [orderData, setOrderData] = useState()
@@ -173,10 +172,7 @@ function render(props) {
         const ticketClient = getTicketClient()
         const respTicket = await ticketClient.getTicketBySaleOrderCode(resp.data[0].orderNo)
         if (respTicket.status === "OK") {
-            let a = []
-            a.push(respTicket.data[0])
-            a.push(respTicket.data[1])
-            setListTicket(a)
+            setListTicket(respTicket.data)
         }
     }
 
@@ -246,7 +242,7 @@ function render(props) {
         }
     }
 
-    const toggleDrawer = (anchor, open) => (event) => {
+    const toggleDrawer = (anchor, open) => {
         if (
             event.type === "keydown" &&
             (event.key === "Tab" || event.key === "Shift")
@@ -393,9 +389,9 @@ function render(props) {
                                                             </a>
                                                         </Link> */}
                                                         <div>
-                                                            {["right"].map((anchor) => (
+                                                            {[`right${row.code}`].map((anchor) => (
                                                                 <React.Fragment key={anchor}>
-                                                                    <a onClick={toggleDrawer(anchor, true)}>
+                                                                    <a onClick={() => toggleDrawer(anchor, true)}>
                                                                         <Tooltip title="Cập nhật thông tin của yêu cầu">
                                                                             <IconButton>
                                                                                 <EditIcon fontSize="small" />
@@ -416,11 +412,11 @@ function render(props) {
 
                                                                             }
                                                                         }}
-                                                                        anchor={anchor}
+                                                                        anchor="right"
                                                                         open={state[anchor]}
-                                                                        onClose={toggleDrawer(anchor, false)}
+                                                                        onClose={() => toggleDrawer(anchor, false)}
                                                                     >
-                                                                        <List anchor={anchor} listDepartment={props.listDepartment} row={row} customerInf={customerInf} listAssignUser={props.accountInfo} orderData={orderData} />
+                                                                        <List resetData={onSearchOrder} toggleDrawer={toggleDrawer} anchor={anchor} listDepartment={props.listDepartment} row={row} customerInf={customerInf} orderData={orderData} />
                                                                     </Drawer>
                                                                 </React.Fragment>
                                                             ))}

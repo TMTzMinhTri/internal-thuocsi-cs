@@ -15,6 +15,25 @@ export const reasons = [
     },
 ]
 
+export const department = [
+    {
+        value: "TECH",
+        label: "Công nghệ"
+    },
+    {
+        value: "HEADQUARTER",
+        label: "Trụ sở chính"
+    },
+    {
+        value: "FA",
+        label: "Kế toán"
+    },
+    {
+        value: "WAREHOUSE",
+        label: "Kho"
+    }
+]
+
 export function formatDateTime(datetime) {
     if (datetime) {
         return moment(datetime).utcOffset('+0700').format("DD-MM-YYYY HH:mm:ss")

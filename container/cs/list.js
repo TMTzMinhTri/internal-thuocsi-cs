@@ -1,8 +1,11 @@
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip, Chip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { reasons } from "components/global"
 import { formatNumber, formatDateTime } from "components/global"
+import Router from "next/router";
+import { useToast } from "@thuocsi/nextjs-components/toast/useToast";
+import { actionErrorText, unknownErrorText } from "components/commonErrors";
 import { MyCard, MyCardContent, MyCardHeader } from "@thuocsi/nextjs-components/my-card/my-card";
 import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
 import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
@@ -12,8 +15,11 @@ import { useForm } from "react-hook-form";
 
 
 import clsx from "clsx";
+import { getAccountClient } from "client/account";
+import { getTicketClient } from "client/ticket";
+import { getCustomerClient } from "client/customer";
 
-export const List = ({ anchor, row, customerInf, orderData, listAssignUser, listDepartment }) => {
+export const List = ({ anchor, row, customerInf, orderData, listDepartment, resetData, toggleDrawer }) => {
     const {
         register,
         handleSubmit,
@@ -28,8 +34,8 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
             bank: customerInf.bank,
             bankBranch: customerInf.bankBranch,
             reasons: row.reasons.map(reason => ({ value: reason.code, label: reason.name })),
-            departmentCode: row.departmentCode,
-            assignUser: row.assignUser,
+            departmentCode: { value: row.departmentCode, label: listDepartment.filter(department => department.value === row.departmentCode)[0].label },
+            // assignUser: row.assignUser,
             returnCode: row.returnCode,
             note: row.note,
             cashback: row.cashback,
@@ -37,9 +43,12 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
         mode: "onSubmit",
     });
 
-    const onSubmit = (data) => console.log(data)
-    
-    const [listAssignUser,setListAssignUser] = useState()
+    const [state, setState] = React.useState({
+    });
+
+    const { error, success } = useToast();
+    const [listAssignUser, setListAssignUser] = useState([{ value: "", label: "" }])
+    const [custData, setCustData] = useState()
 
     const useStyles = makeStyles((theme) => ({
         muiDrawerRoot: {
@@ -54,27 +63,51 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
     }));
 
     const classes = useStyles();
-    const [state, setState] = useState({
-        right: false,
-    });
 
-    const toggleDrawer = (anchor, open) => (event) => {
-        if (
-            event.type === "keydown" &&
-            (event.key === "Tab" || event.key === "Shift")
-        ) {
-            return;
+
+    const onSubmit = async (formData) => {
+        try {
+            const ticketClient = getTicketClient()
+            const ticketResp = await ticketClient.updateTicket({
+                code: row.code,
+                departmentCode: formData.departmentCode.code,
+                reasons: formData.reasons.map(reason => ({ code: reason.value, name: reason.label })),
+                returnCode: formData.returnCode,
+                cashback: +formData.cashback,
+                note: formData.note,
+                assignUser: formData.assignUser.value
+            })
+            if (ticketResp.status !== "OK") {
+                error(ticketResp.message ?? actionErrorText);
+                return
+            } else {
+                const customerClient = getCustomerClient()
+                const customerResp = await customerClient.updateBankCustomer({
+                    bank: formData.bank,
+                    bankCode: formData.bankCode,
+                    bankBranch: formData.bankBranch,
+                    customerID: orderData.customerID,
+                })
+                if (customerResp.status !== "OK") {
+                    error(customerResp.message ?? actionErrorText);
+                } else {
+                    success("Cập nhật yêu cầu thành công");
+                    // toggleDrawer(anchor, false)
+                    resetData(orderData.orderNo)
+                }
+            }
+        } catch (err) {
+            error(err ?? unknownErrorText)
         }
+    }
 
-        setState({ ...state, [anchor]: open });
-    };
-
-    const updateListAssignUser = department => {
-        if (department) {
+    const updateListAssignUser = async (departmentCode) => {
+        if (departmentCode) {
             const accountClient = getAccountClient()
-            const accountResp = await accountClient.getListEmployeeByDepartment(department.code)
+            const accountResp = await accountClient.getListEmployeeByDepartment(departmentCode)
             if (accountResp.status === "OK") {
-                setListAssignUser(accountResp.data.map(account => ({ value: account.email, label: account.username })))
+                setListAssignUser(accountResp.data.map(account => ({ value: account?.username, label: account?.fullname })))
+                console.log(accountResp.data)
             } else {
                 setListAssignUser([{ value: "", label: "" }])
             }
@@ -84,7 +117,19 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
     }
 
     useEffect(() => {
-       
+        (async () => {
+            updateListAssignUser(row.departmentCode)
+            // const accountClient = getAccountClient()
+            // const accountResp = await accountClient.getAccountByUserName(row.assignUser)
+            // if (accountResp.status === "OK") {
+            //     setValue("assignUser", { value: accountResp.data[0].username, label: accountResp.data[0].fullname })
+            // }
+            const customerClient = getCustomerClient()
+            const custResp = await customerClient.getCustomer(orderData.customerID)
+            if (custResp.status === "OK") {
+                setCustData(custResp.data[0])
+            }
+        })();
     }, [])
 
     return (
@@ -93,8 +138,8 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
                 [classes.fullList]: anchor === "top" || anchor === "bottom",
             })}
             role="presentation"
-            onClick={toggleDrawer(anchor, false)}
-            onKeyDown={toggleDrawer(anchor, false)}
+        // onClick={toggleDrawer(anchor, false)}
+        // onKeyDown={toggleDrawer(anchor, false)}
         >
             <div className={styles.grid}>
                 <MyCard>
@@ -129,6 +174,18 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
                                         <Typography gutterBottom>
                                             <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
                                                 User ID: {row.customerID}
+                                            </FormLabel>
+                                            <FormLabel
+                                                component="legend"
+                                                style={{ color: "black", marginBottom: "15px" }}
+                                            >
+                                                Tên doanh nghiệp:
+                                            </FormLabel>
+                                            <FormLabel
+                                                component="legend"
+                                                style={{ color: "black", marginBottom: "15px" }}
+                                            >
+                                                Họ tên khách hàng: {custData?.name}
                                             </FormLabel>
                                             <FormLabel component="legend" style={{ color: "black", marginBottom: "15px" }}>
                                                 Số điện thoại: {orderData.customerPhone}
@@ -185,7 +242,7 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
                                                 Chọn bộ phận tiếp nhận:
                                             </FormLabel>
                                         </Typography>
-                                        <MuiSingleAuto name="departmentCode" onValueChange={(data) => updateListAssignUser(data)} options={listDepartment} required placeholder="Chọn" errors={errors} control={control}></MuiSingleAuto>
+                                        <MuiSingleAuto name="departmentCode" onValueChange={(data) => { updateListAssignUser(data?.code) }} options={listDepartment} required placeholder="Chọn" errors={errors} control={control}></MuiSingleAuto>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={3}>
                                         <Typography gutterBottom>
@@ -193,7 +250,7 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
                                                 Chọn người tiếp nhận:
                                             </FormLabel>
                                         </Typography>
-                                        <MuiSingleAuto name="assignUser" required options={listAssignUser} required placeholder="Chọn" errors={errors} control={control}></MuiSingleAuto>
+                                        <MuiSingleAuto name="assignUser" required options={listAssignUser} placeholder="Chọn" errors={errors} control={control}></MuiSingleAuto>
                                     </Grid>
                                     {/* <Grid item xs={12} sm={6} md={3}>
                                         <Typography gutterBottom>
@@ -225,7 +282,7 @@ export const List = ({ anchor, row, customerInf, orderData, listAssignUser, list
                                                 Mô tả
                                             </FormLabel>
                                         </Typography>
-                                        <TextField name="note" inputRef={register} value={row.note} variant="outlined" size="small" type="text" fullWidth placeholder="Ghi chú..." />
+                                        <TextField name="note" inputRef={register} variant="outlined" size="small" type="text" fullWidth placeholder="Ghi chú..." />
                                     </Grid>
                                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                                         <Grid item>
