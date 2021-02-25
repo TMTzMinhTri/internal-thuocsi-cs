@@ -18,6 +18,7 @@ import {
 } from "@material-ui/core";
 
 import clsx from "clsx";
+import { List } from "container/cs/list"
 import Drawer from "@material-ui/core/Drawer";
 import Router, { useRouter } from "next/router";
 import { formatDateTime, formatUTCTime } from "components/global"
@@ -127,7 +128,10 @@ export function getFirstImage(val) {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // maxWidth: 00,
+    maxWidth: 800,
+  },
+  muiDrawerRoot: {
+    boxShadow: 'none'
   },
   media: {
     height: 0,
@@ -140,17 +144,14 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.shortest,
     }),
   },
+  BackdropProps: {
+    backgroundColor: 'rgba(0,0,0,0.5)'
+  },
   expandOpen: {
     transform: "rotate(180deg)",
   },
-  avatar: {
-    backgroundColor: red[800],
-  },
   list: {
     width: "70vw",
-  },
-  fullList: {
-    width: "auto",
   },
 }));
 
@@ -234,7 +235,6 @@ function render(props) {
   const classes = useStyles();
 
   const [state, setState] = React.useState({
-    right: false,
   });
 
   const updateListAssignUser = async (department) => {
@@ -264,7 +264,7 @@ function render(props) {
       saleOrderCode: formData.saleOrderCode,
       saleOrderID: +formData.saleOrderID,
       status: formData.status,
-      reasons: formData.Reasons,
+      reasons: formData.reasons?.length > 0 ? formData.reasons.map((reason) => ({ code: reason.value, name: reason.label })) : null,
       assignUser: formData.assignUser?.value,
       createdTime: formData.createdTime ? new Date(formatUTCTime(formData.createdTime)).toISOString() : null,
       lastUpdatedTime: formData.lastUpdatedTime ? new Date(formatUTCTime(formData.lastUpdatedTime)).toISOString() : null
@@ -283,321 +283,11 @@ function render(props) {
     ) {
       return;
     }
-
     setState({ ...state, [anchor]: open });
+    console.log(anchor)
   };
 
-  const list = (anchor) => (
-    <div
-      className={clsx(classes.list, {
-        [classes.fullList]: anchor === "top" || anchor === "bottom",
-      })}
-      role="presentation"
-      onClick={toggleDrawer(anchor, false)}
-      onKeyDown={toggleDrawer(anchor, false)}
-    >
-      <div className={styles.grid}>
-        <MyCard>
-          <MyCardHeader title="Chỉnh sửa yêu cầu"></MyCardHeader>
-          <form>
-            <MyCardContent>
-              <FormControl size="small">
-                <Grid
-                  container
-                  spacing={3}
-                  direction="row"
-                  justify="space-between"
-                  alignItems="center"
-                >
-                  <Grid item xs={12} sm={6} md={6}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Ngày tạo: 18/12/2020 13:17
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{
-                          color: "black",
-                          marginBottom: "15px",
-                          fontSize: "40px",
-                        }}
-                      >
-                        SO18487 - 62532
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Gía đơn hàng:
-                        <span style={{ color: "green" }}>2.165.150 đ</span>
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Số lượng sản phẩm: 37
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Người tạo:{" "}
-                        <span style={{ color: "grey" }}>Minh Trí</span>
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Ngày mua:{" "}
-                        <span style={{ color: "grey" }}>26/2/2020</span>
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Trạng thái đơn hàng:{" "}
-                        <span style={{ color: "red" }}>Hoàn tất</span>
-                      </FormLabel>
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        User ID: 5355
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Tên doanh nghiệp: QUẦY THUỐC PHƯƠNG LAN
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Họ tên khách hàng: NGUYỄN PHƯƠNG LAN
-                      </FormLabel>
-                      <FormLabel
-                        component="legend"
-                        style={{ color: "black", marginBottom: "15px" }}
-                      >
-                        Số điện thoại: 0123456789
-                      </FormLabel>
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Tên khách hàng:
-                      </FormLabel>
-                    </Typography>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      fullWidth
-                      placeholder="Trấn Thành"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Số tài khoản:
-                      </FormLabel>
-                    </Typography>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      fullWidth
-                      placeholder="0987654321"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Ngân hàng:
-                      </FormLabel>
-                    </Typography>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      fullWidth
-                      placeholder="Dong A Bank"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Chi nhánh:
-                      </FormLabel>
-                    </Typography>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      fullWidth
-                      placeholder="Tân Phú"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Sai sản phẩm:
-                      </FormLabel>
-                    </Typography>
-                    <MuiSingleAuto
-                      placeholder="Chọn"
-                      name="người tạo"
-                      errors={errors}
-                      control={control}
-                    ></MuiSingleAuto>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Chọn bộ phận tiếp nhận:
-                      </FormLabel>
-                    </Typography>
-                    <MuiSingleAuto
-                      placeholder="Chọn"
-                      name="người tạo"
-                      errors={errors}
-                      control={control}
-                    ></MuiSingleAuto>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Chọn người tiếp nhận:
-                      </FormLabel>
-                    </Typography>
-                    <MuiSingleAuto
-                      placeholder="Chọn"
-                      name="người tạo"
-                      errors={errors}
-                      control={control}
-                    ></MuiSingleAuto>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={3}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Chọn trạng thái:
-                      </FormLabel>
-                    </Typography>
-                    <MuiSingleAuto
-                      placeholder="Chọn"
-                      name="người tạo"
-                      errors={errors}
-                      control={control}
-                    ></MuiSingleAuto>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Mã trả hàng:
-                      </FormLabel>
-                    </Typography>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      fullWidth
-                      placeholder="0"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Số tiền chuyển lại khách:
-                      </FormLabel>
-                    </Typography>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      type="number"
-                      fullWidth
-                      placeholder="0"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={6}>
-                    <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Mô tả
-                      </FormLabel>
-                    </Typography>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      fullWidth
-                      placeholder="Ghi chú..."
-                    />
-                  </Grid>
-                  <Grid item container xs={12} justify="flex-end" spacing={1}>
-                    <Grid item>
-                      <Link href="#">
-                        <Button variant="contained" color="primary">
-                          Lưu
-                        </Button>
-                      </Link>
-                    </Grid>
-                    <Grid item>
-                      <Link href="#">
-                        <Button variant="contained" color="default">
-                          Hủy bỏ
-                        </Button>
-                      </Link>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </FormControl>
-            </MyCardContent>
-          </form>
-        </MyCard>
-      </div>
-    </div>
-  );
+
 
   const listStatus = [
     {
@@ -899,7 +589,8 @@ function render(props) {
                   <TableCell align="center">ct</TableCell> */}
                     <TableCell align="center">
                       <div>
-                        {["right"].map((anchor) => (
+
+                        {[`right${row.code}`].map((anchor) => (
                           <React.Fragment key={anchor}>
                             <a onClick={toggleDrawer(anchor, true)}>
                               <Tooltip title="Cập nhật thông tin của yêu cầu">
@@ -909,11 +600,32 @@ function render(props) {
                               </Tooltip>
                             </a>
                             <Drawer
-                              anchor={anchor}
+                              ModalProps={{
+                                BackdropProps: {
+                                  classes: {
+                                    root: classes.BackdropProps
+                                  }
+                                }
+                              }}
+                              PaperProps={{
+                                classes: {
+                                  elevation16: classes.muiDrawerRoot
+
+                                }
+                              }}
+                              anchor="right"
                               open={state[anchor]}
                               onClose={toggleDrawer(anchor, false)}
                             >
-                              {list(anchor)}
+                              <List
+                                // resetData={onSearchOrder}
+                                idxPage
+                                toggleDrawer={toggleDrawer}
+                                anchor={anchor}
+                                listDepartment={props.listDepartment} row={row}
+                              // customerInf={customerInf}
+                              //  orderData={orderData} 
+                              />
                             </Drawer>
                           </React.Fragment>
                         ))}
