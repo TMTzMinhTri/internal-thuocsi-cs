@@ -21,7 +21,7 @@ import clsx from "clsx";
 import { List } from "container/cs/list"
 import Drawer from "@material-ui/core/Drawer";
 import Router, { useRouter } from "next/router";
-import { formatDateTime, formatUTCTime } from "components/global"
+import { formatDateTime, formatUTCTime, listStatus } from "components/global"
 import {
   ErrorCode,
   formatEllipsisText,
@@ -100,17 +100,17 @@ export async function loadRequestData(ctx) {
 
   // const accountClient = getAccountClient();
   const accountResp = await accountClient.getListEmployee(0, 20, "");
-  let accountInfo = []
+  let tmpData = []
   if (accountResp.status === "OK") {
-    accountResp.data.map((account) => (
-      accountInfo.push({
-        value: account.username,
-        label: account.fullname,
-      })
-    ))
+    // cheat to err data
+    accountResp.data.map(account => {
+      if (account && account.username) {
+        tmpData.push({ value: account.username, label: account.username })
+      }
+    })
   }
 
-  data.props.accountInfo = accountInfo
+  data.props.accountInfo = tmpData
 
   return data;
 }
@@ -237,33 +237,13 @@ function render(props) {
   const [state, setState] = React.useState({
   });
 
-  const updateListAssignUser = async (department) => {
-    if (department) {
-      const accountClient = getAccountClient();
-      const accountResp = await accountClient.getListEmployeeByDepartment(
-        department.code
-      );
-      if (accountResp.status === "OK") {
-        setListAssignUser(
-          accountResp.data.map((account) => ({
-            value: account.email,
-            label: account.username,
-          }))
-        );
-      } else {
-        setListAssignUser([{ value: "", label: "" }]);
-      }
-    } else {
-      setListAssignUser([{ value: "", label: "" }]);
-    }
-  };
 
   const onSubmit = async (formData) => {
     const ticketClient = getTicketClient()
     const ticketResp = await ticketClient.getTicketByFilter({
       saleOrderCode: formData.saleOrderCode,
       saleOrderID: +formData.saleOrderID,
-      status: formData.status,
+      status: formData.status.value,
       reasons: formData.reasons?.length > 0 ? formData.reasons.map((reason) => ({ code: reason.value, name: reason.label })) : null,
       assignUser: formData.assignUser?.value,
       createdTime: formData.createdTime ? new Date(formatUTCTime(formData.createdTime)).toISOString() : null,
@@ -276,34 +256,9 @@ function render(props) {
     }
   }
 
-  const toggleDrawer = (anchor, open) => (event) => {
-    if (
-      event.type === "keydown" &&
-      (event.key === "Tab" || event.key === "Shift")
-    ) {
-      return;
-    }
+  const toggleDrawer = (anchor, open) => {
     setState({ ...state, [anchor]: open });
-    console.log(anchor)
   };
-
-
-
-  const listStatus = [
-    {
-      value: "NEW",
-      label: "Mới",
-    },
-    {
-      value: "PENDING",
-      label: "Đang chờ",
-    },
-    {
-      value: "COMPLETED",
-      label: "Hoàn tất",
-    },
-  ];
-
 
 
   return (
@@ -426,7 +381,7 @@ function render(props) {
                         <MuiSingleAuto
                           options={listStatus}
                           placeholder="Chọn"
-                          name="orderStatus"
+                          name="status"
                           errors={errors}
                           control={control}
                         />
@@ -553,7 +508,7 @@ function render(props) {
               <TableCell align="center">Order#</TableCell>
               <TableCell align="left">Lỗi</TableCell>
               <TableCell align="left">Ghi chú của KH</TableCell>
-              <TableCell align="center">Khách hàng</TableCell>
+              <TableCell align="center">Trạng thái</TableCell>
               {/* <TableCell align="center">Trạng thái</TableCell>
               <TableCell align="center">Người tạo</TableCell>
               <TableCell align="center">Người cập nhật</TableCell> */}
@@ -581,7 +536,7 @@ function render(props) {
                       }
                     </TableCell>
                     <TableCell align="left">{row.note}</TableCell>
-                    <TableCell align="center">{row.customerID}</TableCell>
+                    <TableCell align="center">{listStatus.filter(status => status.value === row.status)[0].label}</TableCell>
                     {/* <TableCell align="center">
                     <Chip size="small" label={"Chưa xử lý"} />
                   </TableCell>
@@ -592,7 +547,7 @@ function render(props) {
 
                         {[`right${row.code}`].map((anchor) => (
                           <React.Fragment key={anchor}>
-                            <a onClick={toggleDrawer(anchor, true)}>
+                            <a onClick={() => toggleDrawer(anchor, true)}>
                               <Tooltip title="Cập nhật thông tin của yêu cầu">
                                 <IconButton>
                                   <EditIcon fontSize="small" />
@@ -615,16 +570,13 @@ function render(props) {
                               }}
                               anchor="right"
                               open={state[anchor]}
-                              onClose={toggleDrawer(anchor, false)}
+                              onClose={() => toggleDrawer(anchor, false)}
                             >
                               <List
-                                // resetData={onSearchOrder}
                                 idxPage
                                 toggleDrawer={toggleDrawer}
                                 anchor={anchor}
                                 listDepartment={props.listDepartment} row={row}
-                              // customerInf={customerInf}
-                              //  orderData={orderData} 
                               />
                             </Drawer>
                           </React.Fragment>

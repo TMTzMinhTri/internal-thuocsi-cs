@@ -1,7 +1,7 @@
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControl, FormLabel, TextField, IconButton, Typography, Grid, Tooltip, Chip } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useState, useEffect } from "react"
-import { reasons } from "components/global"
+import { reasons, listStatus } from "components/global"
 import { formatNumber, formatDateTime } from "components/global"
 import Router from "next/router";
 import { useToast } from "@thuocsi/nextjs-components/toast/useToast";
@@ -20,7 +20,7 @@ import { getTicketClient } from "client/ticket";
 import { getCustomerClient } from "client/customer";
 import { getOrderClient } from "client/order";
 
-export const List = ({ anchor, row, customerInf, orderData, listDepartment, resetData, toggleDrawer, idxPage }) => {
+export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage }) => {
     const {
         register,
         handleSubmit,
@@ -30,13 +30,14 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
         setValue,
     } = useForm({
         defaultValues: {
-            customerName: orderData?.customerName,
-            bankCode: customerInf?.bankCode,
-            bank: customerInf?.bank,
-            bankBranch: customerInf?.bankBranch,
+            // customerName: orderData?.customerName,
+            // bankCode: customerInf?.bankCode,
+            // bank: customerInf?.bank,
+            // bankBranch: customerInf?.bankBranch,
             reasons: row.reasons.map(reason => ({ value: reason.code, label: reason.name })),
             departmentCode: { value: row.departmentCode, label: listDepartment.filter(department => department.value === row.departmentCode)[0].label },
-            // assignUser: row.assignUser,
+            assignUser: row.assignUser,
+            status: { value: row.status, label: listStatus.filter(status => status.value == row.status)[0].label },
             returnCode: row.returnCode,
             note: row.note,
             cashback: row.cashback,
@@ -44,13 +45,13 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
         mode: "onSubmit",
     });
 
-    const [state, setState] = React.useState({
-    });
+
 
     const { error, success } = useToast();
     const [listAssignUser, setListAssignUser] = useState([{ value: "", label: "" }])
     const [custData, setCustData] = useState()
     const [bankData, setBankData] = useState()
+    const [orderData, setOrderData] = useState()
 
     const useStyles = makeStyles((theme) => ({
         muiDrawerRoot: {
@@ -77,7 +78,8 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
                 returnCode: formData.returnCode,
                 cashback: +formData.cashback,
                 note: formData.note,
-                assignUser: formData.assignUser.value
+                assignUser: formData.assignUser.value.toString(),
+                status: formData.status.value,
             })
             if (ticketResp.status !== "OK") {
                 error(ticketResp.message ?? actionErrorText);
@@ -98,7 +100,9 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
                     if (idxPage) {
                         Router.push("/cs/all_case")
                     }
-                    resetData(orderData.orderNo)
+                    else {
+                        resetData(orderData.orderNo)
+                    }
                 }
             }
         } catch (err) {
@@ -111,8 +115,14 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
             const accountClient = getAccountClient()
             const accountResp = await accountClient.getListEmployeeByDepartment(departmentCode)
             if (accountResp.status === "OK") {
-                setListAssignUser(accountResp.data.map(account => ({ value: account?.email, label: account?.username })))
-                console.log(accountResp.data)
+                let tmpData = []
+                // cheat to err data
+                accountResp.data.map(account => {
+                    if (account && account.username) {
+                        tmpData.push({ value: account.username, label: account.username })
+                    }
+                })
+                setListAssignUser(tmpData)
             } else {
                 setListAssignUser([{ value: "", label: "" }])
             }
@@ -123,34 +133,38 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
 
     useEffect(() => {
         (async () => {
-            if (idxPage) {
-                const customerClient = getCustomerClient()
-                const respCustomer = await customerClient.getListBankAccount(row.customerID)
-                if (respCustomer.status === "OK") {
-                    setValue("bank", respCustomer.data[0].bank)
-                    setValue("bankCode", respCustomer.data[0].bankCode)
-                    setValue("bankBranch", respCustomer.data[0].bankBranch)
-                    setBankData(respCustomer.data[0])
-                }
 
-                let orderClient = getOrderClient()
-                let resp = await orderClient.getOrderByOrderNoFromClient(row.saleOrderCode)
-                if (resp.status === 'OK') {
-                    orderData = resp.data[0]
-                    console.log(orderData)
-                }
-            }
             updateListAssignUser(row.departmentCode)
-            // const accountClient = getAccountClient()
-            // const accountResp = await accountClient.getAccountByUserName(row.assignUser)
-            // if (accountResp.status === "OK") {
-            //     setValue("assignUser", { value: accountResp.data[0].username, label: accountResp.data[0].fullname })
-            // }
+
+            // get info bank account
             const customerClient = getCustomerClient()
+            const respCustomer = await customerClient.getListBankAccount(row.customerID)
+            if (respCustomer.status === "OK") {
+                setValue("bank", respCustomer.data[0].bank)
+                setValue("bankCode", respCustomer.data[0].bankCode)
+                setValue("bankBranch", respCustomer.data[0].bankBranch)
+                setBankData(respCustomer.data[0])
+            }
+
+            // get info order 
+            let orderClient = getOrderClient()
+            let resp = await orderClient.getOrderByOrderNoFromClient(row.saleOrderCode)
+            if (resp.status === 'OK') {
+                setOrderData(resp.data[0])
+            }
+
+            // get info assign user
+            const accountClient = getAccountClient()
+            const accountResp = await accountClient.getAccountByUserName(row.assignUser)
+            if (accountResp.status === "OK") {
+                setValue("assignUser", { value: accountResp.data[0].username, label: accountResp.data[0].username })
+            }
+
+            // get info customer
             const custResp = await customerClient.getCustomer(row.customerID)
             if (custResp.status === "OK") {
-
                 setCustData(custResp.data[0])
+                setValue("customerName", custResp.data[0].name)
             }
         })();
     }, [])
@@ -218,7 +232,7 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
                                     <Grid item xs={12} sm={6} md={3}>
                                         <Typography gutterBottom>
                                             <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
-                                                Tên khách hàng: {custData?.username}
+                                                Tên khách hàng:
                                             </FormLabel>
                                         </Typography>
                                         <TextField name="customerName" inputRef={register({ required: "Vui lòng nhập thông tin" })} error={!!errors.customerName} helperText={errors.customerName?.message}
@@ -275,15 +289,15 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
                                         </Typography>
                                         <MuiSingleAuto name="assignUser" required options={listAssignUser} placeholder="Chọn" errors={errors} control={control}></MuiSingleAuto>
                                     </Grid>
-                                    {/* <Grid item xs={12} sm={6} md={3}>
+                                    <Grid item xs={12} sm={6} md={3}>
                                         <Typography gutterBottom>
                                             <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
                                                 Chọn trạng thái:
                                             </FormLabel>
                                         </Typography>
-                                        <MuiSingleAuto placeholder="Chọn" name="người tạo" errors={errors} control={control}></MuiSingleAuto>
-                                    </Grid> */}
-                                    <Grid item xs={12} sm={6} md={6}>
+                                        <MuiSingleAuto placeholder="Chọn" name="status" options={listStatus} errors={errors} control={control}></MuiSingleAuto>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
                                         <Typography gutterBottom>
                                             <FormLabel component="legend" style={{ fontWeight: "bold", color: "black" }}>
                                                 Mã trả hàng:
@@ -310,7 +324,7 @@ export const List = ({ anchor, row, customerInf, orderData, listDepartment, rese
                                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                                         <Grid item>
 
-                                            <Button variant="contained" color="default" onClick={toggleDrawer(anchor, false)}>
+                                            <Button variant="contained" color="default" onClick={() => toggleDrawer(anchor, false)}>
                                                 Quay lại
                                                 </Button>
 
