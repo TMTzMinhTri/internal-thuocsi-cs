@@ -60,6 +60,8 @@ import { reasons } from "components/global";
 import { getAccountClient } from "client/account";
 import { getTicketClient } from "client/ticket";
 
+const LIMIT = 20;
+
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
     return loadRequestData(ctx);
@@ -97,20 +99,17 @@ export async function loadRequestData(ctx) {
 
   // const accountClient = getAccountClient();
   const accountResp = await accountClient.getListEmployee(0, 20, "");
-
-  let abcs = []
+  let accountInfo = []
   if (accountResp.status === "OK") {
-
     accountResp.data.map((account) => (
-
-      abcs.push({
+      accountInfo.push({
         value: account.username,
         label: account.fullname,
       })
     ))
   }
 
-  data.props.abcs = abcs
+  data.props.accountInfo = accountInfo
 
   return data;
 }
@@ -191,7 +190,9 @@ function render(props) {
   }
 
   let [data, setData] = useState(props);
-  const [listAssignUser, setListAssignUser] = useState([...props.abcs]);
+  const [listAssignUser, setListAssignUser] = useState([...props.accountInfo]);
+  let limit = parseInt(router.query.limit) || 20
+  let page = parseInt(router.query.page) || 0
 
   useEffect(() => {
     setData(props);
@@ -597,15 +598,15 @@ function render(props) {
 
   const listStatus = [
     {
-      value: "new",
+      value: "NEW",
       label: "Mới",
     },
     {
-      value: "pending",
+      value: "PENDING",
       label: "Đang chờ",
     },
     {
-      value: "completed",
+      value: "COMPLETED",
       label: "Hoàn tất",
     },
   ];
@@ -953,12 +954,12 @@ function render(props) {
           {data.count > 0 ? (
             <MyTablePagination
               labelUnit="yêu cầu"
-              count={data.count}
-              rowsPerPage={10}
-              page={2}
+              count={props.count}
+              rowsPerPage={limit}
+              page={page}
               onChangePage={(event, page, rowsPerPage) => {
                 Router.push(
-                  `/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`
+                  `/cs/all_case?page=${page}&limit=${rowsPerPage}&q=${search}`
                 );
               }}
             />
