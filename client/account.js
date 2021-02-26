@@ -44,6 +44,16 @@ class AccountClient extends APIClient {
         })
     }
 
+    getListEmployeeFromClient(offset, limit, q) {
+        return this.callFromClient("GET",
+            `${URI}/employee/all`, {
+            search: q,
+            offset: offset,
+            limit: limit,
+            getTotal: true,
+        })
+    }
+
 }
 
 export function getAccountClient(ctx, data) {
