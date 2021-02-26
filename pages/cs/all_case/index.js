@@ -243,7 +243,7 @@ function render(props) {
     const ticketResp = await ticketClient.getTicketByFilter({
       saleOrderCode: formData.saleOrderCode,
       saleOrderID: +formData.saleOrderID,
-      status: formData.status.value,
+      status: formData.status?.value,
       reasons: formData.reasons?.length > 0 ? formData.reasons.map((reason) => ({ code: reason.value, name: reason.label })) : null,
       assignUser: formData.assignUser?.value,
       createdTime: formData.createdTime ? new Date(formatUTCTime(formData.createdTime)).toISOString() : null,
