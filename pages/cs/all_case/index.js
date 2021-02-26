@@ -236,6 +236,21 @@ function render(props) {
   const [state, setState] = React.useState({
   });
 
+  const debounceSearchAssignUser = async (q) => {
+    const accountClient = getAccountClient()
+    const accountResp = await accountClient.getListEmployeeFromClient(0, 20, q);
+    let tmpData = []
+    if (accountResp.status === "OK") {
+      // cheat to err data
+      accountResp.data.map(account => {
+        if (account && account.username) {
+          tmpData.push({ value: account.username, label: account.username })
+        }
+      })
+    }
+    return tmpData
+  }
+
 
   const onSubmit = async (formData) => {
     const ticketClient = getTicketClient()
@@ -413,6 +428,7 @@ function render(props) {
                         </Typography>
                         <MuiSingleAuto
                           options={listAssignUser}
+                          onFieldChange={debounceSearchAssignUser}
                           placeholder="Chọn"
                           name="assignUser"
                           errors={errors}
