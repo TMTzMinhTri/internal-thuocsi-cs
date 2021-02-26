@@ -145,11 +145,11 @@ function render(props) {
             link: "/cs",
         },
         {
-            name: "Danh sách yêu cầu của tôi",
+            name: "DS yêu cầu cá nhân",
             link: "/cs/my_case",
         },
         {
-            name: "Thêm yêu cầu mới cho tôi",
+            name: "Thêm yêu cầu mới",
         },
     ];
 

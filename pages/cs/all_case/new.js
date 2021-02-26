@@ -23,8 +23,6 @@ import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
 import Link from "next/link";
 import EditIcon from "@material-ui/icons/Edit";
 
-
-import clsx from "clsx";
 import Drawer from "@material-ui/core/Drawer";
 
 import React, { useEffect, useState } from "react";
