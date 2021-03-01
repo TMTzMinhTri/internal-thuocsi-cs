@@ -19,7 +19,7 @@ import {
 } from "@material-ui/core";
 import {
   MyCard,
-  MyCardContent,
+  MyCardActions,
   MyCardHeader,
 } from "@thuocsi/nextjs-components/my-card/my-card";
 import MyTablePagination from "@thuocsi/nextjs-components/my-pagination/my-pagination";
@@ -316,7 +316,7 @@ function render(props) {
         <MyCard>
           <MyCardHeader title="Thêm yêu cầu mới"></MyCardHeader>
           <form>
-            <MyCardContent>
+            <MyCardActions>
               <FormControl size="small">
                 <Grid
                   container
@@ -352,7 +352,7 @@ function render(props) {
                   </Grid>
                 </Grid>
               </FormControl>
-            </MyCardContent>
+            </MyCardActions>
           </form>
         </MyCard>
 

@@ -18,26 +18,28 @@ import {
     Drawer,
 } from "@material-ui/core";
 
-import { faPlus, faFilter } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import React, { useEffect, useState } from "react";
 import {
     MyCard,
-    MyCardContent,
+    MyCardActions,
     MyCardHeader,
 } from "@thuocsi/nextjs-components/my-card/my-card";
 
-import EditIcon from "@material-ui/icons/Edit";
-
-import { makeStyles } from "@material-ui/core/styles";
-import { red } from "@material-ui/core/colors";
-
-import Head from "next/head";
 import {
     doWithLoggedInUser,
     renderWithLoggedInUser,
 } from "@thuocsi/nextjs-components/lib/login";
+
+import {
+    ErrorCode,
+    formatUrlSearch,
+} from "components/global";
+
+import { faPlus, faFilter } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from "react";
+import EditIcon from "@material-ui/icons/Edit";
+import { makeStyles } from "@material-ui/core/styles";
+import Head from "next/head";
 import AppCuS from "pages/_layout";
 import styles from "./request.module.css";
 import { useForm } from "react-hook-form";
@@ -46,17 +48,11 @@ import MyTablePagination from "@thuocsi/nextjs-components/my-pagination/my-pagin
 import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
 import { List } from "container/cs/list";
 import { reasons } from "components/global";
-import {
-    ErrorCode,
-    formatEllipsisText,
-    formatMessageError,
-    formatUrlSearch,
-} from "components/global";
 import { getOrderClient } from "client/order";
 import { getAccountClient } from "client/account";
 import { getTicketClient } from "client/ticket";
 import Router, { useRouter } from "next/router";
-import { formatDateTime, formatUTCTime, listStatus } from "components/global";
+import { formatUTCTime, listStatus } from "components/global";
 
 const LIMIT = 20;
 
@@ -109,6 +105,13 @@ export async function loadRequestData(ctx) {
     }
 
     data.props.accountInfo = tmpData;
+
+    const _ticketClient = getTicketClient(ctx, {})
+    const myTicketResp = await _ticketClient.getTicketByAssignUser()
+    data.props.myTicketResp = []
+    if (myTicketResp.status === "OK") {
+        data.props.myTicketResp = myTicketResp.data;
+    }
 
     return data;
 }
@@ -168,30 +171,42 @@ function render(props) {
         },
         mode: "onChange",
     });
+    
+    const classes = useStyles();
 
     let [data, setData] = useState(props);
     const [state, setState] = React.useState({});
-
+    const [myTicketList, setMyTicketList] = useState([]);
+    const [expanded, setExpanded] = React.useState(false);
+    const [showHideFilter, setShowHideResults] = React.useState(false);
+    const [selectedDate, setSelectedDate] = React.useState(
+        new Date("2014-08-18T21:11:54")
+    );
+    let router = useRouter();
+    let q = router.query.q || "";
+    let limit = parseInt(router.query.limit) || 20;
+    let page = parseInt(router.query.page) || 0;
+    const [listAssignUser, setListAssignUser] = useState([
+        ...props.accountInfo,
+    ]);
+    let [search, setSearch] = useState("");
+    
     useEffect(() => {
         setData(props);
         setSearch(formatUrlSearch(q));
+        setMyTicketList(props.myTicketResp)
     }, [props]);
 
-    const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
-    const [selectedDate, setSelectedDate] = React.useState(
-        new Date("2014-08-18T21:11:54")
-    );
 
     const handleDateChange = (date) => {
         setSelectedDate(date);
     };
-    const [showHideFilter, setShowHideResults] = React.useState(false);
+
     const ShowHideFilter = () => {
         if (showHideFilter === false) {
             setShowHideResults(true);
@@ -213,14 +228,6 @@ function render(props) {
     const toggleDrawer = (anchor, open) => {
         setState({ ...state, [anchor]: open });
     };
-    let router = useRouter();
-    let q = router.query.q || "";
-    let limit = parseInt(router.query.limit) || 20;
-    let page = parseInt(router.query.page) || 0;
-    const [listAssignUser, setListAssignUser] = useState([
-        ...props.accountInfo,
-    ]);
-    let [search, setSearch] = useState("");
 
     const onSubmit = async (formData) => {
         const ticketClient = getTicketClient();
@@ -231,9 +238,9 @@ function render(props) {
             reasons:
                 formData.reasons?.length > 0
                     ? formData.reasons.map((reason) => ({
-                          code: reason.value,
-                          name: reason.label,
-                      }))
+                        code: reason.value,
+                        name: reason.label,
+                    }))
                     : null,
             assignUser: formData.assignUser?.value,
             createdTime: formData.createdTime
@@ -241,11 +248,10 @@ function render(props) {
                 : null,
             lastUpdatedTime: formData.lastUpdatedTime
                 ? new Date(
-                      formatUTCTime(formData.lastUpdatedTime)
-                  ).toISOString()
+                    formatUTCTime(formData.lastUpdatedTime)
+                ).toISOString()
                 : null,
         });
-        console.log("ticketResp", ticketResp);
         if (ticketResp.status === "OK") {
             setData(ticketResp);
         } else {
@@ -289,7 +295,7 @@ function render(props) {
                         </Link>
                     </MyCardHeader>
                     <form>
-                        <MyCardContent>
+                        <MyCardActions>
                             <FormControl size="small">
                                 <Grid
                                     container
@@ -521,7 +527,7 @@ function render(props) {
                                     ) : null}
                                 </Grid>
                             </FormControl>
-                        </MyCardContent>
+                        </MyCardActions>
                     </form>
                 </MyCard>
             </div>
@@ -551,115 +557,115 @@ function render(props) {
                             <TableCell align="center">Thao tác</TableCell>
                         </TableRow>
                     </TableHead>
-                    {data.count <= 0 ? (
+                    {myTicketList.length <= 0 ? (
                         <TableRow>
                             <TableCell colSpan={5} align="left">
                                 {ErrorCode["NOT_FOUND_TABLE"]}
                             </TableCell>
                         </TableRow>
                     ) : (
-                        <TableBody>
-                            {data.data.map((row, i) => (
-                                <TableRow key={i}>
-                                    <TableCell align="left">
-                                        {row.code}
-                                    </TableCell>
-                                    <TableCell align="left">
-                                        {row.saleOrderCode}
-                                    </TableCell>
-                                    <TableCell align="left">
-                                        {row.saleOrderID}
-                                    </TableCell>
-                                    <TableCell align="left">
-                                        {row.reasons.map((reason) => (
+                            <TableBody>
+                                {myTicketList.map((row, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell align="left">
+                                            {row.code}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            {row.saleOrderCode}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            {row.saleOrderID}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            {row.reasons.map((reason) => (
+                                                <Chip
+                                                    style={{ margin: "3px" }}
+                                                    size="small"
+                                                    label={reason.name}
+                                                />
+                                            ))}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            {row.note}
+                                        </TableCell>
+                                        <TableCell align="center">
                                             <Chip
-                                                style={{ margin: "3px" }}
                                                 size="small"
-                                                label={reason.name}
+                                                label={
+                                                    listStatus.filter(
+                                                        (status) =>
+                                                            status.value ===
+                                                            row.status
+                                                    )[0].label
+                                                }
                                             />
-                                        ))}
-                                    </TableCell>
-                                    <TableCell align="left">
-                                        {row.note}
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <Chip
-                                            size="small"
-                                            label={
-                                                listStatus.filter(
-                                                    (status) =>
-                                                        status.value ===
-                                                        row.status
-                                                )[0].label
-                                            }
-                                        />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <div>
-                                            {[`right${row.code}`].map(
-                                                (anchor) => (
-                                                    <React.Fragment
-                                                        key={anchor}
-                                                    >
-                                                        <a
-                                                            onClick={() =>
-                                                                toggleDrawer(
-                                                                    anchor,
-                                                                    true
-                                                                )
-                                                            }
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <div>
+                                                {[`right${row.code}`].map(
+                                                    (anchor) => (
+                                                        <React.Fragment
+                                                            key={anchor}
                                                         >
-                                                            <Tooltip title="Cập nhật thông tin của yêu cầu">
-                                                                <IconButton>
-                                                                    <EditIcon fontSize="small" />
-                                                                </IconButton>
-                                                            </Tooltip>
-                                                        </a>
-                                                        <Drawer
-                                                            ModalProps={{
-                                                                BackdropProps: {
-                                                                    classes: {
-                                                                        root:
-                                                                            classes.BackdropProps,
+                                                            <a
+                                                                onClick={() =>
+                                                                    toggleDrawer(
+                                                                        anchor,
+                                                                        true
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Tooltip title="Cập nhật thông tin của yêu cầu">
+                                                                    <IconButton>
+                                                                        <EditIcon fontSize="small" />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </a>
+                                                            <Drawer
+                                                                ModalProps={{
+                                                                    BackdropProps: {
+                                                                        classes: {
+                                                                            root:
+                                                                                classes.BackdropProps,
+                                                                        },
                                                                     },
-                                                                },
-                                                            }}
-                                                            PaperProps={{
-                                                                classes: {
-                                                                    elevation16:
-                                                                        classes.muiDrawerRoot,
-                                                                },
-                                                            }}
-                                                            anchor="right"
-                                                            open={state[anchor]}
-                                                            onClose={() =>
-                                                                toggleDrawer(
-                                                                    anchor,
-                                                                    false
-                                                                )
-                                                            }
-                                                        >
-                                                            <List
-                                                                idxPage
-                                                                toggleDrawer={
-                                                                    toggleDrawer
+                                                                }}
+                                                                PaperProps={{
+                                                                    classes: {
+                                                                        elevation16:
+                                                                            classes.muiDrawerRoot,
+                                                                    },
+                                                                }}
+                                                                anchor="right"
+                                                                open={state[anchor]}
+                                                                onClose={() =>
+                                                                    toggleDrawer(
+                                                                        anchor,
+                                                                        false
+                                                                    )
                                                                 }
-                                                                anchor={anchor}
-                                                                listDepartment={
-                                                                    props.listDepartment
-                                                                }
-                                                                row={row}
-                                                            />
-                                                        </Drawer>
-                                                    </React.Fragment>
-                                                )
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    )}
+                                                            >
+                                                                <List
+                                                                    idxPage
+                                                                    toggleDrawer={
+                                                                        toggleDrawer
+                                                                    }
+                                                                    anchor={anchor}
+                                                                    listDepartment={
+                                                                        props.listDepartment
+                                                                    }
+                                                                    row={row}
+                                                                />
+                                                            </Drawer>
+                                                        </React.Fragment>
+                                                    )
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        )}
                     {data.count > 0 ? (
                         <MyTablePagination
                             labelUnit="yêu cầu"
@@ -673,8 +679,8 @@ function render(props) {
                             }}
                         />
                     ) : (
-                        <div />
-                    )}
+                            <div />
+                        )}
                 </Table>
             </TableContainer>
         </AppCuS>
