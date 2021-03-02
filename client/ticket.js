@@ -26,6 +26,10 @@ class TicketClient extends APIClient {
         return this.callFromClient("POST", `${URI}/tasks/list`, formData)
     }
 
+    getTicketByAssignUser() {
+        return this.callFromNextJS("GET", `${URI}/me/tasks/list`)
+    }
+
 }
 
 
