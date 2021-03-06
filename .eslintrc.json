@@ -31,18 +31,11 @@
     "import/resolver": {
       "alias": {
         "map": [
-          ["components", "./src/components"],
-          ["hooks", "./src/hooks"],
-          ["constants", "./src/constants"],
-          ["clients", "./src/clients"],
-          ["pages", "./src/pages"],
-          ["styles", "./src/styles"],
-          ["utils", "./src/utils"],
-          ["context", "./src/context"],
-          ["i18n-lib", "./src/i18n-lib"],
-          ["sysconfig", "./src/sysconfig"],
-          ["HOC","./src/HOC"],
-          ["services", "./src/services"]
+          ["client", "./client"],
+          ["components", "./components"],
+          ["container", "./container"],
+          ["pages", "./pages"],
+          ["public","./public"]
         ]
       }
     }
@@ -58,7 +51,9 @@
     "react/jsx-one-expression-per-line": "off",
     "object-curly-newline": "off",
     "implicit-arrow-linebreak": "off",
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }]
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "no-useless-constructor": "off",
+
   },
   "plugins": []
 }

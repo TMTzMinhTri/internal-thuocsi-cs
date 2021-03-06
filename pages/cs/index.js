@@ -1,7 +1,7 @@
 export function getServerSideProps() {
   return {
     redirect: {
-      destination: '/cs/all_case',
+      destination: '/cs/all-case',
       permanent: true,
     },
   };

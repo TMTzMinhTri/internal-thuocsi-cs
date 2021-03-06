@@ -1,10 +1,11 @@
+import React, { useEffect, useState } from 'react';
 import { Button, FormControl, FormLabel, TextField, Typography, Grid } from '@material-ui/core';
 import Head from 'next/head';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCS from 'pages/_layout';
-import styles from './request.module.css';
+
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
@@ -12,9 +13,7 @@ import { red } from '@material-ui/core/colors';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import Link from 'next/link';
 
-import React, { useEffect, useState } from 'react';
-
-const LIMIT = 20;
+import styles from './request.module.css';
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
@@ -145,7 +144,7 @@ function render(props) {
     },
     {
       name: 'Danh sách tất cả phiếu yêu cầu',
-      link: '/cs/all_case',
+      link: '/cs/all-case',
     },
     {
       name: 'Chỉnh sửa yêu cầu',
@@ -153,7 +152,7 @@ function render(props) {
   ];
 
   return (
-    <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
+    <AppCS select="/cs/all-case" breadcrumb={breadcrumb}>
       <Head>
         <title>Chỉnh sửa</title>
       </Head>

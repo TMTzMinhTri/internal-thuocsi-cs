@@ -143,7 +143,7 @@ function render(props) {
     },
     {
       name: 'Danh sách yêu cầu của tôi',
-      link: '/cs/my_case',
+      link: '/cs/my-case',
     },
     {
       name: 'Sửa yêu cầu dành cho tôi',
@@ -151,7 +151,7 @@ function render(props) {
   ];
 
   return (
-    <AppCuS select="/cs/my_case" breadcrumb={breadcrumb}>
+    <AppCuS select="/cs/my-case" breadcrumb={breadcrumb}>
       <Head>
         <title>Chỉnh sửa</title>
       </Head>

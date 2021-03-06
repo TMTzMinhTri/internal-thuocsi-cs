@@ -1,24 +1,14 @@
-import {
-  faCapsules,
-  faCube,
-  faCubes,
-  faFeather,
-  faIndustry,
-  faMapMarked,
-  faTags,
-  faList,
-  faFile,
-} from '@fortawesome/free-solid-svg-icons';
+import { faList, faFile } from '@fortawesome/free-solid-svg-icons';
 import { Backdrop, CircularProgress, createMuiTheme, ThemeProvider } from '@material-ui/core';
 import Layout from '@thuocsi/nextjs-components/layout/layout';
 import Loader from '@thuocsi/nextjs-components/loader/loader';
 import { ToastProvider } from '@thuocsi/nextjs-components/toast/providers/ToastProvider';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
-import styles from './global.css';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import styles from './global.css';
 
-export var theme = createMuiTheme({
+export const theme = createMuiTheme({
   palette: {
     primary: {
       main: '#00b46e',
@@ -32,19 +22,19 @@ const menu = [
   {
     key: 'ALLCASE',
     name: 'DS phiếu yêu cầu',
-    link: '/cs/all_case',
+    link: '/cs/all-case',
     icon: faList,
   },
   {
     key: 'MYCASE',
     name: 'DS yêu cầu cá nhân',
-    link: '/cs/my_case',
+    link: '/cs/my-case',
     icon: faList,
   },
   {
     key: 'LISTFILE',
     name: 'Danh sách file',
-    link: '/cs/list_file',
+    link: '/cs/list-file',
     icon: faFile,
   },
 ];
@@ -55,8 +45,8 @@ export default function App(props) {
   const [showBackdrop, setShowBackdrop] = React.useState(false);
 
   useEffect(() => {
-    let routeChangeStart = () => setShowBackdrop(true);
-    let routeChangeComplete = () => setShowBackdrop(false);
+    const routeChangeStart = () => setShowBackdrop(true);
+    const routeChangeComplete = () => setShowBackdrop(false);
 
     router.events.on('routeChangeStart', routeChangeStart);
     router.events.on('routeChangeComplete', routeChangeComplete);
@@ -92,14 +82,13 @@ export default function App(props) {
             </Backdrop>
           </Layout>
         </ToastProvider>
-        <Loader show={showLoader}></Loader>
-      </ThemeProvider>
-    );
-  } else {
-    return (
-      <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
+        <Loader show={showLoader} />
       </ThemeProvider>
     );
   }
+  return (
+    <ThemeProvider theme={theme}>
+      <Component {...pageProps} />
+    </ThemeProvider>
+  );
 }

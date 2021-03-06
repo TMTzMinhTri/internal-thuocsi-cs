@@ -236,7 +236,7 @@ function render(props) {
           error(customerResp.message ?? actionErrorText);
         } else {
           success('Tạo yêu cầu thành công');
-          Router.push('/cs/all_case');
+          Router.push('/cs/all-case');
         }
       }
     } catch (err) {
@@ -251,7 +251,7 @@ function render(props) {
     },
     {
       name: 'DS yêu cầu cá nhân',
-      link: '/cs/all_case',
+      link: '/cs/all-case',
     },
     {
       name: 'Thêm yêu cầu mới',
@@ -284,7 +284,7 @@ function render(props) {
   };
 
   return (
-    <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
+    <AppCS select="/cs/all-case" breadcrumb={breadcrumb}>
       <Head>
         <title>Thêm yêu cầu mới</title>
       </Head>
@@ -467,7 +467,7 @@ function render(props) {
                         <TableCell align="center">{row.createdBy}</TableCell>
                         <TableCell align="center">{formatDateTime(row.createdTime)}</TableCell>
                         <TableCell align="center">
-                          {/* <Link href={`/cs/all_case/edit`}>
+                          {/* <Link href={`/cs/all-case/edit`}>
                                                             <a>
                                                                 <Tooltip title="Cập nhật thông tin của yêu cầu">
                                                                     <IconButton>
@@ -644,7 +644,7 @@ function render(props) {
                   </Grid>
                   <Grid item container xs={12} justify="flex-end" spacing={1}>
                     <Grid item>
-                      <Link href="/cs/all_case/new">
+                      <Link href="/cs/all-case/new">
                         <Button variant="contained" color="default">
                           Quay lại
                         </Button>

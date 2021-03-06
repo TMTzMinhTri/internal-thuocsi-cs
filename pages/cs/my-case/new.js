@@ -156,7 +156,7 @@ function render(props) {
     },
     {
       name: 'DS yêu cầu cá nhân',
-      link: '/cs/my_case',
+      link: '/cs/my-case',
     },
     {
       name: 'Thêm yêu cầu mới',
@@ -245,7 +245,7 @@ function render(props) {
           error(customerResp.message ?? actionErrorText);
         } else {
           success('Tạo yêu cầu thành công');
-          Router.push('/cs/all_case');
+          Router.push('/cs/all-case');
         }
       }
     } catch (err) {
@@ -284,7 +284,7 @@ function render(props) {
   };
 
   return (
-    <AppCuS select="/cs/my_case" breadcrumb={breadcrumb}>
+    <AppCuS select="/cs/my-case" breadcrumb={breadcrumb}>
       <Head>
         <title>Thêm yêu cầu mới</title>
       </Head>
