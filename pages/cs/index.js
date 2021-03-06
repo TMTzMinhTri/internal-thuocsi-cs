@@ -1,12 +1,12 @@
 export function getServerSideProps() {
-    return {
-        redirect: {
-            destination: '/cs/all_case',
-            permanent: true,
-        }
-    }
+  return {
+    redirect: {
+      destination: '/cs/all_case',
+      permanent: true,
+    },
+  };
 }
 
-const CSPage = () => {}
+const CSPage = () => {};
 
 export default CSPage;
