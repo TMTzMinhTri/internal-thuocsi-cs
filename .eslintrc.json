@@ -52,8 +52,7 @@
     "object-curly-newline": "off",
     "implicit-arrow-linebreak": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "no-useless-constructor": "off",
-
+    "no-useless-constructor": "off"
   },
   "plugins": []
 }

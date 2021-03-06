@@ -94,7 +94,6 @@ export async function loadRequestData(ctx) {
 }
 
 export async function getServerSideProps(ctx) {
-  console.log('get server side props ');
   const res = await doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
   return res;
 }
