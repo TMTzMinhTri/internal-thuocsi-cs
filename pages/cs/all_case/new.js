@@ -15,44 +15,37 @@ import {
   Grid,
   Tooltip,
   Chip,
-} from "@material-ui/core";
-import {
-  MyCard,
-  MyCardContent,
-  MyCardHeader,
-} from "@thuocsi/nextjs-components/my-card/my-card";
-import MyTablePagination from "@thuocsi/nextjs-components/my-pagination/my-pagination";
-import Autocomplete from "@material-ui/lab/Autocomplete";
-import Head from "next/head";
-import {
-  doWithLoggedInUser,
-  renderWithLoggedInUser,
-} from "@thuocsi/nextjs-components/lib/login";
-import AppCS from "pages/_layout";
-import styles from "./request.module.css";
-import { reasons } from "components/global";
-import RichTextField from "@thuocsi/nextjs-components/editor/rich-text-field/index";
-import { actionErrorText, unknownErrorText } from "components/commonErrors";
-import { List } from "container/cs/list";
-import { useToast } from "@thuocsi/nextjs-components/toast/useToast";
-import Router, { useRouter } from "next/router";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { makeStyles } from "@material-ui/core/styles";
-import { useForm } from "react-hook-form";
-import { red } from "@material-ui/core/colors";
-import { getOrderClient } from "client/order";
-import { formatNumber, formatDateTime } from "components/global";
-import MuiSingleAuto from "@thuocsi/nextjs-components/muiauto/single";
-import MuiMultipleAuto from "@thuocsi/nextjs-components/muiauto/multiple";
-import Link from "next/link";
-import EditIcon from "@material-ui/icons/Edit";
+} from '@material-ui/core';
+import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
+import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import Head from 'next/head';
+import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
+import AppCS from 'pages/_layout';
+import styles from './request.module.css';
+import { reasons } from 'components/global';
+import RichTextField from '@thuocsi/nextjs-components/editor/rich-text-field/index';
+import { actionErrorText, unknownErrorText } from 'components/commonErrors';
+import { List } from 'container/cs/list';
+import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
+import Router, { useRouter } from 'next/router';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import { makeStyles } from '@material-ui/core/styles';
+import { useForm } from 'react-hook-form';
+import { red } from '@material-ui/core/colors';
+import { getOrderClient } from 'client/order';
+import { formatNumber, formatDateTime } from 'components/global';
+import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
+import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
+import Link from 'next/link';
+import EditIcon from '@material-ui/icons/Edit';
 
-import Drawer from "@material-ui/core/Drawer";
+import Drawer from '@material-ui/core/Drawer';
 
-import React, { useEffect, useState } from "react";
-import { getAccountClient } from "client/account";
-import { getCustomerClient } from "client/customer";
-import { getTicketClient } from "client/ticket";
+import React, { useEffect, useState } from 'react';
+import { getAccountClient } from 'client/account';
+import { getCustomerClient } from 'client/customer';
+import { getTicketClient } from 'client/ticket';
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
@@ -68,8 +61,8 @@ export async function loadRequestData(ctx) {
   };
 
   const accountClient = getAccountClient(ctx, {});
-  const listDepartment = await accountClient.getListDepartment(0, 20, "");
-  if (listDepartment.status === "OK") {
+  const listDepartment = await accountClient.getListDepartment(0, 20, '');
+  if (listDepartment.status === 'OK') {
     data.props.listDepartment = listDepartment.data.map((department) => ({
       ...department,
       value: department.code,
@@ -94,11 +87,11 @@ export function getFirstImage(val) {
 export function formatEllipsisText(text, len = 100) {
   if (text) {
     if (text.length > 50) {
-      return text.substring(0, len) + "...";
+      return text.substring(0, len) + '...';
     }
     return text;
   }
-  return "-";
+  return '-';
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -106,27 +99,27 @@ const useStyles = makeStyles((theme) => ({
     maxWidth: 800,
   },
   muiDrawerRoot: {
-    boxShadow: "none",
+    boxShadow: 'none',
   },
   media: {
     height: 0,
-    paddingTop: "56.25%", // 16:9
+    paddingTop: '56.25%', // 16:9
   },
   expand: {
-    transform: "rotate(0deg)",
-    marginLeft: "auto",
-    transition: theme.transitions.create("transform", {
+    transform: 'rotate(0deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
       duration: theme.transitions.duration.shortest,
     }),
   },
   BackdropProps: {
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   expandOpen: {
-    transform: "rotate(180deg)",
+    transform: 'rotate(180deg)',
   },
   list: {
-    width: "70vw",
+    width: '70vw',
   },
 }));
 
@@ -149,21 +142,19 @@ function render(props) {
     defaultValues: {
       imageUrls: [],
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   const [state, setState] = React.useState({});
 
   const [orderData, setOrderData] = useState();
   const [listTicket, setListTicket] = useState([]);
-  const [listAssignUser, setListAssignUser] = useState([
-    { value: "", label: "" },
-  ]);
+  const [listAssignUser, setListAssignUser] = useState([{ value: '', label: '' }]);
   const [search, setSearch] = useState();
   const [customerInf, setCustomerInf] = useState({
-    bank: "",
-    bankCode: "",
-    bankBranch: "",
+    bank: '',
+    bankCode: '',
+    bankBranch: '',
   });
 
   const classes = useStyles();
@@ -182,41 +173,37 @@ function render(props) {
   const onSearchOrder = async () => {
     let orderClient = getOrderClient();
     let resp = await orderClient.getOrderByOrderNoFromClient(search);
-    if (resp.status !== "OK") {
+    if (resp.status !== 'OK') {
       setOrderData(null);
       setListTicket([]);
-      setCustomerInf({ bank: "", bankCode: "", bankBranch: "" });
-      setValue("bank", "");
-      setValue("customerName", "");
-      setValue("bankCode", "");
-      setValue("bankBranch", "");
-      if (resp.status === "NOT_FOUND") {
+      setCustomerInf({ bank: '', bankCode: '', bankBranch: '' });
+      setValue('bank', '');
+      setValue('customerName', '');
+      setValue('bankCode', '');
+      setValue('bankBranch', '');
+      if (resp.status === 'NOT_FOUND') {
         return {
-          props: { data: [], count: 0, message: "Không tìm thấy đơn hàng" },
+          props: { data: [], count: 0, message: 'Không tìm thấy đơn hàng' },
         };
       }
       return { props: { data: [], count: 0, message: resp.message } };
     }
     setOrderData(resp.data[0]);
-    setValue("customerName", resp.data[0].customerName || "");
+    setValue('customerName', resp.data[0].customerName || '');
 
     const customerClient = getCustomerClient();
-    const respCustomer = await customerClient.getListBankAccount(
-      resp.data[0].customerID
-    );
-    if (respCustomer.status === "OK") {
-      setValue("bank", respCustomer.data[0].bank);
-      setValue("bankCode", respCustomer.data[0].bankCode);
-      setValue("bankBranch", respCustomer.data[0].bankBranch);
+    const respCustomer = await customerClient.getListBankAccount(resp.data[0].customerID);
+    if (respCustomer.status === 'OK') {
+      setValue('bank', respCustomer.data[0].bank);
+      setValue('bankCode', respCustomer.data[0].bankCode);
+      setValue('bankBranch', respCustomer.data[0].bankBranch);
       clearErrors();
       setCustomerInf(respCustomer.data[0]);
     }
 
     const ticketClient = getTicketClient();
-    const respTicket = await ticketClient.getTicketBySaleOrderCode(
-      resp.data[0].orderNo
-    );
-    if (respTicket.status === "OK") {
+    const respTicket = await ticketClient.getTicketBySaleOrderCode(resp.data[0].orderNo);
+    if (respTicket.status === 'OK') {
       setListTicket(respTicket.data);
     }
   };
@@ -238,7 +225,7 @@ function render(props) {
         note: formData.note,
         assignUser: formData.assignUser.value.toString(),
       });
-      if (ticketResp.status !== "OK") {
+      if (ticketResp.status !== 'OK') {
         error(ticketResp.message ?? actionErrorText);
         return;
       } else {
@@ -249,11 +236,11 @@ function render(props) {
           bankBranch: formData.bankBranch,
           customerID: orderData.customerID,
         });
-        if (customerResp.status !== "OK") {
+        if (customerResp.status !== 'OK') {
           error(customerResp.message ?? actionErrorText);
         } else {
-          success("Tạo yêu cầu thành công");
-          Router.push("/cs/all_case");
+          success('Tạo yêu cầu thành công');
+          Router.push('/cs/all_case');
         }
       }
     } catch (err) {
@@ -263,25 +250,23 @@ function render(props) {
 
   let breadcrumb = [
     {
-      name: "Trang chủ",
-      link: "/cs",
+      name: 'Trang chủ',
+      link: '/cs',
     },
     {
-      name: "DS yêu cầu cá nhân",
-      link: "/cs/all_case",
+      name: 'DS yêu cầu cá nhân',
+      link: '/cs/all_case',
     },
     {
-      name: "Thêm yêu cầu mới",
+      name: 'Thêm yêu cầu mới',
     },
   ];
 
   const updateListAssignUser = async (department) => {
     if (department) {
       const accountClient = getAccountClient();
-      const accountResp = await accountClient.getListEmployeeByDepartment(
-        department.code
-      );
-      if (accountResp.status === "OK") {
+      const accountResp = await accountClient.getListEmployeeByDepartment(department.code);
+      if (accountResp.status === 'OK') {
         // cheat to err data
         let tmpData = [];
         accountResp.data.map((account) => {
@@ -291,10 +276,10 @@ function render(props) {
         });
         setListAssignUser(tmpData);
       } else {
-        setListAssignUser([{ value: "", label: "" }]);
+        setListAssignUser([{ value: '', label: '' }]);
       }
     } else {
-      setListAssignUser([{ value: "", label: "" }]);
+      setListAssignUser([{ value: '', label: '' }]);
     }
   };
 
@@ -327,7 +312,7 @@ function render(props) {
                       error={!!errors.orderNo}
                       helperText={errors.orderNo?.message}
                       inputRef={register({
-                        required: "Vui lòng nhập thông tin",
+                        required: 'Vui lòng nhập thông tin',
                       })}
                       onChange={handleChange}
                       size="small"
@@ -337,11 +322,7 @@ function render(props) {
                     />
                   </Grid>
                   <Grid item xs={12} sm={12} md={5}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => onSearchOrder()}
-                    >
+                    <Button variant="contained" color="primary" onClick={() => onSearchOrder()}>
                       Tìm kiếm
                     </Button>
                   </Grid>
@@ -360,10 +341,7 @@ function render(props) {
                 >
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
                         Tên khách hàng:
                       </FormLabel>
                     </Typography>
@@ -377,16 +355,13 @@ function render(props) {
                       error={!!errors.customerName}
                       helperText={errors.customerName?.message}
                       inputRef={register({
-                        required: "Vui lòng nhập thông tin",
+                        required: 'Vui lòng nhập thông tin',
                       })}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
                         Số tài khoản:
                       </FormLabel>
                     </Typography>
@@ -400,16 +375,13 @@ function render(props) {
                       error={!!errors.bankCode}
                       helperText={errors.bankCode?.message}
                       inputRef={register({
-                        required: "Vui lòng nhập thông tin",
+                        required: 'Vui lòng nhập thông tin',
                       })}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
                         Ngân hàng:
                       </FormLabel>
                     </Typography>
@@ -423,16 +395,13 @@ function render(props) {
                       error={!!errors.bank}
                       helperText={errors.bank?.message}
                       inputRef={register({
-                        required: "Vui lòng nhập thông tin",
+                        required: 'Vui lòng nhập thông tin',
                       })}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
                         Chi nhánh:
                       </FormLabel>
                     </Typography>
@@ -446,7 +415,7 @@ function render(props) {
                       error={!!errors.bankBranch}
                       helperText={errors.bankBranch?.message}
                       inputRef={register({
-                        required: "Vui lòng nhập thông tin",
+                        required: 'Vui lòng nhập thông tin',
                       })}
                     />
                   </Grid>
@@ -490,27 +459,17 @@ function render(props) {
                     {listTicket.map((row, i) => (
                       <TableRow key={i}>
                         <TableCell align="center">{row.code}</TableCell>
-                        <TableCell align="center">
-                          {row.saleOrderCode}
-                        </TableCell>
+                        <TableCell align="center">{row.saleOrderCode}</TableCell>
                         <TableCell align="center">{row.saleOrderID}</TableCell>
                         <TableCell align="left">
                           {row.reasons.map((reason) => (
-                            <Chip
-                              style={{ margin: "3px" }}
-                              size="small"
-                              label={reason.name}
-                            />
+                            <Chip style={{ margin: '3px' }} size="small" label={reason.name} />
                           ))}
                         </TableCell>
                         <TableCell align="left">{row.note}</TableCell>
-                        <TableCell align="center">
-                          {orderData.customerName}
-                        </TableCell>
+                        <TableCell align="center">{orderData.customerName}</TableCell>
                         <TableCell align="center">{row.createdBy}</TableCell>
-                        <TableCell align="center">
-                          {formatDateTime(row.createdTime)}
-                        </TableCell>
+                        <TableCell align="center">{formatDateTime(row.createdTime)}</TableCell>
                         <TableCell align="center">
                           {/* <Link href={`/cs/all_case/edit`}>
                                                             <a>
@@ -591,11 +550,8 @@ function render(props) {
                 >
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Chọn lý do: <span style={{ color: "red" }}>(*)</span>
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
+                        Chọn lý do: <span style={{ color: 'red' }}>(*)</span>
                       </FormLabel>
                     </Typography>
                     <MuiMultipleAuto
@@ -609,12 +565,8 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Chọn bộ phận tiếp nhận:{" "}
-                        <span style={{ color: "red" }}>(*)</span>
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
+                        Chọn bộ phận tiếp nhận: <span style={{ color: 'red' }}>(*)</span>
                       </FormLabel>
                     </Typography>
                     <MuiSingleAuto
@@ -629,12 +581,8 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Chọn người tiếp nhận:{" "}
-                        <span style={{ color: "red" }}>(*)</span>
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
+                        Chọn người tiếp nhận: <span style={{ color: 'red' }}>(*)</span>
                       </FormLabel>
                     </Typography>
                     <MuiSingleAuto
@@ -648,10 +596,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
                         Mã giao hàng tiết kiệm: (Mã return)
                       </FormLabel>
                     </Typography>
@@ -667,10 +612,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={6}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
                         Số tiền trả lại:
                       </FormLabel>
                     </Typography>
@@ -686,12 +628,8 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={6}>
                     <Typography gutterBottom>
-                      <FormLabel
-                        component="legend"
-                        style={{ fontWeight: "bold", color: "black" }}
-                      >
-                        Ghi chú (hàng trả về):{" "}
-                        <span style={{ color: "red" }}>(*)</span>
+                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
+                        Ghi chú (hàng trả về): <span style={{ color: 'red' }}>(*)</span>
                       </FormLabel>
                     </Typography>
                     <TextField
@@ -699,7 +637,7 @@ function render(props) {
                       error={!!errors.note}
                       helperText={errors.note?.message}
                       inputRef={register({
-                        required: "Vui lòng nhập thông tin",
+                        required: 'Vui lòng nhập thông tin',
                       })}
                       variant="outlined"
                       size="small"
