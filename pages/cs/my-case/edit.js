@@ -1,37 +1,18 @@
-import {
-  Button,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  FormControl,
-  FormLabel,
-  TextField,
-  IconButton,
-  Typography,
-  Grid,
-  Tooltip,
-} from '@material-ui/core';
+import { Button, FormControl, FormLabel, TextField, Typography, Grid } from '@material-ui/core';
 import Head from 'next/head';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCuS from 'pages/_layout';
 import styles from './request.module.css';
-import RichTextField from '@thuocsi/nextjs-components/editor/rich-text-field/index';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { red } from '@material-ui/core/colors';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import Link from 'next/link';
 
 import React, { useEffect, useState } from 'react';
-
-const LIMIT = 20;
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {

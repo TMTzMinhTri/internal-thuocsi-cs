@@ -13,10 +13,10 @@ This file have 2 ways to use:
 + POST method: receive submitted login data (username/password)
 */
 export async function getServerSideProps(ctx) {
-  let returnObject = { props: {} };
+  const returnObject = { props: {} };
   if (ctx.req && ctx.req.method === 'POST') {
     // read form data
-    let body = await parseBody(ctx.req, '1kb');
+    const body = await parseBody(ctx.req, '1kb');
 
     // call backend API
     const response = await fetch(`${process.env.API_HOST}/core/account/v1/authentication`, {
@@ -36,9 +36,9 @@ export async function getServerSideProps(ctx) {
 
     // if OK, do set cookie & redirect page to relative target
     if (result.status === APIStatus.OK) {
-      let data = result.data[0];
-      let url = body.url || '/';
-      let res = ctx.res;
+      const data = result.data[0];
+      const url = body.url || '/';
+      const res = ctx.res;
       res.setHeader('set-cookie', `session_token=${data.bearerToken}; Path=/; HttpOnly`);
       res.setHeader('location', url);
       res.statusCode = 302;

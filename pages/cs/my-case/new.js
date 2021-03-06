@@ -18,18 +18,14 @@ import {
   Drawer,
 } from '@material-ui/core';
 import { MyCard, MyCardActions, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
 
 import Head from 'next/head';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCuS from 'pages/_layout';
 import styles from './request.module.css';
-import RichTextField from '@thuocsi/nextjs-components/editor/rich-text-field/index';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
-import { red } from '@material-ui/core/colors';
-import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import Link from 'next/link';
 import EditIcon from '@material-ui/icons/Edit';
 import React, { useEffect, useState } from 'react';
@@ -45,8 +41,7 @@ import { List } from 'container/cs/list';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
-
-const LIMIT = 20;
+import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
