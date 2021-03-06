@@ -12,33 +12,33 @@ This file have 2 ways to use:
 + GET method: display login page with login form
 + POST method: receive submitted login data (username/password)
 */
-export async function getServerSideProps(ctx) {
-  let returnObject = { props: {} };
-  if (ctx.req && ctx.req.method === 'POST') {
+export async function getServerSideProps({ req, query, res }) {
+  const returnObject = { props: {} };
+  if (req && req.method === 'POST') {
     // read form data
-    let body = await parseBody(ctx.req, '1kb');
+    const body = await parseBody(req, '1kb');
 
+    const { username, password } = body;
     // call backend API
     const response = await fetch(`${process.env.API_HOST}/core/account/v1/authentication`, {
       method: 'POST',
       contentType: 'application/json',
       body: JSON.stringify({
-        username: body.username,
-        password: body.password,
+        username,
+        password,
         type: 'EMPLOYEE',
       }),
       headers: {
-        'User-Agent': ctx.req.headers['user-agent'],
-        'X-Forwarded-For': ctx.req.headers['x-forwarded-for'],
+        'User-Agent': req.headers['user-agent'],
+        'X-Forwarded-For': req.headers['x-forwarded-for'],
       },
     });
     const result = await response.json();
 
     // if OK, do set cookie & redirect page to relative target
     if (result.status === APIStatus.OK) {
-      let data = result.data[0];
-      let url = body.url || '/';
-      let res = ctx.res;
+      const data = result.data[0];
+      const url = body.url || '/';
       res.setHeader('set-cookie', `session_token=${data.bearerToken}; Path=/; HttpOnly`);
       res.setHeader('location', url);
       res.statusCode = 302;
@@ -47,7 +47,7 @@ export async function getServerSideProps(ctx) {
 
     returnObject.props.url = body.url;
   } else {
-    returnObject.props.url = ctx.query.url || '/';
+    returnObject.props.url = query.url || '/';
   }
   return returnObject;
 }
@@ -60,7 +60,7 @@ LoginForm has basic inputs of authentication flow:
 + Username / password input
 + Submit button
 */
-export default function LoginPage(props) {
+export default function LoginPage({ url }) {
   return (
     <div>
       <Head>
@@ -69,7 +69,7 @@ export default function LoginPage(props) {
       <Paper className={styles.loginForm}>
         <h1>Đăng nhập</h1>
         <form method="POST" action="/login">
-          <input type="hidden" name="url" value={props.url} />
+          <input type="hidden" name="url" value={url} />
           <Box>
             <TextField
               id="username"
@@ -79,7 +79,7 @@ export default function LoginPage(props) {
                 shrink: true,
               }}
               style={{ margin: 12, width: 280 }}
-              autoFocus={true}
+              autoFocus
               name="username"
             />
           </Box>

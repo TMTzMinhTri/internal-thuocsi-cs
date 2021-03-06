@@ -18,18 +18,14 @@ import {
   Drawer,
 } from '@material-ui/core';
 import { MyCard, MyCardActions, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
 
 import Head from 'next/head';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCuS from 'pages/_layout';
 import styles from './request.module.css';
-import RichTextField from '@thuocsi/nextjs-components/editor/rich-text-field/index';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
-import { red } from '@material-ui/core/colors';
-import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import Link from 'next/link';
 import EditIcon from '@material-ui/icons/Edit';
 import React, { useEffect, useState } from 'react';
@@ -45,8 +41,7 @@ import { List } from 'container/cs/list';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
-
-const LIMIT = 20;
+import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
@@ -161,7 +156,7 @@ function render(props) {
     },
     {
       name: 'DS yêu cầu cá nhân',
-      link: '/cs/my_case',
+      link: '/cs/my-case',
     },
     {
       name: 'Thêm yêu cầu mới',
@@ -250,7 +245,7 @@ function render(props) {
           error(customerResp.message ?? actionErrorText);
         } else {
           success('Tạo yêu cầu thành công');
-          Router.push('/cs/all_case');
+          Router.push('/cs/all-case');
         }
       }
     } catch (err) {
@@ -289,7 +284,7 @@ function render(props) {
   };
 
   return (
-    <AppCuS select="/cs/my_case" breadcrumb={breadcrumb}>
+    <AppCuS select="/cs/my-case" breadcrumb={breadcrumb}>
       <Head>
         <title>Thêm yêu cầu mới</title>
       </Head>

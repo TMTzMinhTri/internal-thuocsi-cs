@@ -1,6 +1,6 @@
 import { APIClient } from '@thuocsi/nextjs-components/lib/utils';
+
 const URI = `/marketplace/customer/v1`;
-// const URI = ``
 
 class CustomerClient extends APIClient {
   constructor(ctx, data) {

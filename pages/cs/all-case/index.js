@@ -36,7 +36,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Head from 'next/head';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCS from 'pages/_layout';
-import styles from './request.module.css';
+
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
@@ -44,18 +44,11 @@ import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { getAccountClient } from 'client/account';
 import { getTicketClient } from 'client/ticket';
-
-const LIMIT = 20;
-
-export async function getServerSideProps(ctx) {
-  return await doWithLoggedInUser(ctx, (ctx) => {
-    return loadRequestData(ctx);
-  });
-}
+import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
   // setup data
-  let data = { props: {} };
+  const data = { props: {} };
 
   // Fetch data from external API
   let query = ctx.query;
@@ -64,7 +57,8 @@ export async function loadRequestData(ctx) {
   let limit = query.limit || 20;
   let offset = page * limit;
 
-  let _client = getOrderClient(ctx, {});
+  const _client = getOrderClient(ctx, {});
+
   data.props = await _client.getListOrder(offset, limit, q);
 
   if (data.props.status !== 'OK') {
@@ -84,10 +78,10 @@ export async function loadRequestData(ctx) {
 
   // const accountClient = getAccountClient();
   const accountResp = await accountClient.getListEmployee(0, 20, '');
-  let tmpData = [];
+  const tmpData = [];
   if (accountResp.status === 'OK') {
     // cheat to err data
-    accountResp.data.map((account) => {
+    accountResp.data.forEach((account) => {
       if (account && account.username) {
         tmpData.push({ value: account.username, label: account.username });
       }
@@ -99,8 +93,9 @@ export async function loadRequestData(ctx) {
   return data;
 }
 
-export default function TicketPage(props) {
-  return renderWithLoggedInUser(props, render);
+export async function getServerSideProps(ctx) {
+  const res = await doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
+  return res;
 }
 
 export function getFirstImage(val) {
@@ -140,36 +135,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function render(props) {
-  const { register, handleSubmit, errors, reset, control, getValues, setValue } = useForm({
+  const { register, handleSubmit, errors, control, getValues } = useForm({
     defaultValues: {
       imageUrls: [],
     },
     mode: 'onChange',
   });
 
-  let router = useRouter();
-  let [search, setSearch] = useState('');
-  let q = router.query.q || '';
+  const router = useRouter();
+  const [search, setSearch] = useState('');
+  const q = router.query.q || '';
 
-  async function handleChange(e) {
-    const value = e.target.value;
-    setSearch(value);
-  }
-
-  async function onSearch() {
-    q = formatUrlSearch(search);
-    router.push(`?q=${q}`);
-  }
-
-  function onClearTextSearch() {
-    setSearch('');
-    Router.push(`/cs/all_case`);
-  }
-
-  let [data, setData] = useState(props);
+  const [data, setData] = useState(props);
   const [listAssignUser, setListAssignUser] = useState([...props.accountInfo]);
-  let limit = parseInt(router.query.limit) || 20;
-  let page = parseInt(router.query.page) || 0;
+  const limit = parseInt(router.query.limit) || 20;
+  const page = parseInt(router.query.page) || 0;
 
   useEffect(() => {
     setData(props);
@@ -177,10 +157,6 @@ function render(props) {
   }, [props]);
 
   const [expanded, setExpanded] = React.useState(false);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
 
   const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
 
@@ -196,7 +172,7 @@ function render(props) {
     }
   };
 
-  let breadcrumb = [
+  const breadcrumb = [
     {
       name: 'Trang chủ',
       link: '/cs',
@@ -213,10 +189,10 @@ function render(props) {
   const debounceSearchAssignUser = async (q) => {
     const accountClient = getAccountClient();
     const accountResp = await accountClient.getListEmployeeFromClient(0, 20, q);
-    let tmpData = [];
+    const tmpData = [];
     if (accountResp.status === 'OK') {
       // cheat to err data
-      accountResp.data.map((account) => {
+      accountResp.data.forEach((account) => {
         if (account && account.username) {
           tmpData.push({ value: account.username, label: account.username });
         }
@@ -255,7 +231,7 @@ function render(props) {
   };
 
   return (
-    <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
+    <AppCS select="/cs/all-case" breadcrumb={breadcrumb}>
       <Head>
         <title>DS phiếu yêu cầu</title>
       </Head>
@@ -272,7 +248,7 @@ function render(props) {
               <FontAwesomeIcon icon={faFilter} style={{ marginRight: 8 }} />
               Bộ lọc
             </Button>
-            <Link href="/cs/all_case/new">
+            <Link href="/cs/all-case/new">
               <Button variant="contained" color="primary" className={styles.cardButton}>
                 <FontAwesomeIcon icon={faPlus} style={{ marginRight: 8 }} />
                 Thêm yêu cầu
@@ -390,7 +366,7 @@ function render(props) {
                           placeholder="Chọn"
                           errors={errors}
                           control={control}
-                        ></MuiMultipleAuto>
+                        />
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -408,7 +384,7 @@ function render(props) {
                           name="assignUser"
                           errors={errors}
                           control={control}
-                        ></MuiSingleAuto>
+                        />
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -448,14 +424,14 @@ function render(props) {
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <Link href="/cs/all_case/new">
+                          <Link href="/cs/all-case/new">
                             <Button variant="contained" color="primary">
                               Xuất file
                             </Button>
                           </Link>
                         </Grid>
                         <Grid item>
-                          <Link href="/cs/all_case/new">
+                          <Link href="/cs/all-case/new">
                             <Button
                               variant="contained"
                               color="primary"
@@ -581,7 +557,7 @@ function render(props) {
               rowsPerPage={limit}
               page={page}
               onChangePage={(event, page, rowsPerPage) => {
-                Router.push(`/cs/all_case?page=${page}&limit=${rowsPerPage}&q=${search}`);
+                Router.push(`/cs/all-case?page=${page}&limit=${rowsPerPage}&q=${search}`);
               }}
             />
           ) : (
@@ -591,4 +567,8 @@ function render(props) {
       </TableContainer>
     </AppCS>
   );
+}
+
+export default function TicketPage(props) {
+  return renderWithLoggedInUser(props, render);
 }

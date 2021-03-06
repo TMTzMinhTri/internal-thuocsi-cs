@@ -1,15 +1,14 @@
 import { Button, FormControl, FormLabel, TextField, Typography, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useState, useEffect } from 'react';
-import { reasons, listStatus } from 'components/global';
-import { formatNumber, formatDateTime } from 'components/global';
+import { reasons, listStatus, formatNumber, formatDateTime } from 'components/global';
 import Router from 'next/router';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
-import styles from 'pages/cs/all_case/request.module.css';
+import styles from 'pages/cs/all-case/request.module.css';
 import { useForm } from 'react-hook-form';
 
 import clsx from 'clsx';
@@ -93,7 +92,7 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
           success('Cập nhật yêu cầu thành công');
           // toggleDrawer(anchor, false)
           if (idxPage) {
-            Router.push('/cs/all_case');
+            Router.push('/cs/all-case');
           } else {
             resetData(orderData.orderNo);
           }

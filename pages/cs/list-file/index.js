@@ -83,7 +83,7 @@ function render(props) {
   ];
 
   return (
-    <AppCuS select="/cs/list_file" breadcrumb={breadcrumb}>
+    <AppCuS select="/cs/list-file" breadcrumb={breadcrumb}>
       <Head>
         <title>Danh sách file</title>
       </Head>

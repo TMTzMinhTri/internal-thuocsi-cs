@@ -1,8 +1,8 @@
 import { APIClient } from '@thuocsi/nextjs-components/lib/utils';
-const URI = `/marketplace/order/v1`;
 import { constURL } from './constant';
+
+const URI = `/marketplace/order/v1`;
 const prefix = constURL.PREFIX_ORDER;
-// const URI = ``
 
 class OrderClient extends APIClient {
   constructor(ctx, data) {

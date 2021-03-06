@@ -17,24 +17,20 @@ import {
   Chip,
 } from '@material-ui/core';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import Head from 'next/head';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCS from 'pages/_layout';
 import styles from './request.module.css';
 import { reasons } from 'components/global';
-import RichTextField from '@thuocsi/nextjs-components/editor/rich-text-field/index';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 import { List } from 'container/cs/list';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-import Router, { useRouter } from 'next/router';
+import Router from 'next/router';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
-import { red } from '@material-ui/core/colors';
 import { getOrderClient } from 'client/order';
-import { formatNumber, formatDateTime } from 'components/global';
+import { formatDateTime } from 'components/global';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import Link from 'next/link';
@@ -42,7 +38,7 @@ import EditIcon from '@material-ui/icons/Edit';
 
 import Drawer from '@material-ui/core/Drawer';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { getAccountClient } from 'client/account';
 import { getCustomerClient } from 'client/customer';
 import { getTicketClient } from 'client/ticket';
@@ -240,7 +236,7 @@ function render(props) {
           error(customerResp.message ?? actionErrorText);
         } else {
           success('Tạo yêu cầu thành công');
-          Router.push('/cs/all_case');
+          Router.push('/cs/all-case');
         }
       }
     } catch (err) {
@@ -255,7 +251,7 @@ function render(props) {
     },
     {
       name: 'DS yêu cầu cá nhân',
-      link: '/cs/all_case',
+      link: '/cs/all-case',
     },
     {
       name: 'Thêm yêu cầu mới',
@@ -288,7 +284,7 @@ function render(props) {
   };
 
   return (
-    <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
+    <AppCS select="/cs/all-case" breadcrumb={breadcrumb}>
       <Head>
         <title>Thêm yêu cầu mới</title>
       </Head>
@@ -471,7 +467,7 @@ function render(props) {
                         <TableCell align="center">{row.createdBy}</TableCell>
                         <TableCell align="center">{formatDateTime(row.createdTime)}</TableCell>
                         <TableCell align="center">
-                          {/* <Link href={`/cs/all_case/edit`}>
+                          {/* <Link href={`/cs/all-case/edit`}>
                                                             <a>
                                                                 <Tooltip title="Cập nhật thông tin của yêu cầu">
                                                                     <IconButton>
@@ -648,7 +644,7 @@ function render(props) {
                   </Grid>
                   <Grid item container xs={12} justify="flex-end" spacing={1}>
                     <Grid item>
-                      <Link href="/cs/all_case/new">
+                      <Link href="/cs/all-case/new">
                         <Button variant="contained" color="default">
                           Quay lại
                         </Button>

@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
-import AppCS from 'pages/_layout';
+import AppCuS from 'pages/_layout';
 import styles from './request.module.css';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,8 +13,6 @@ import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import Link from 'next/link';
 
 import React, { useEffect, useState } from 'react';
-
-const LIMIT = 20;
 
 export async function getServerSideProps(ctx) {
   return await doWithLoggedInUser(ctx, (ctx) => {
@@ -144,16 +142,16 @@ function render(props) {
       link: '/cs',
     },
     {
-      name: 'Danh sách tất cả phiếu yêu cầu',
-      link: '/cs/all_case',
+      name: 'Danh sách yêu cầu của tôi',
+      link: '/cs/my-case',
     },
     {
-      name: 'Chỉnh sửa yêu cầu',
+      name: 'Sửa yêu cầu dành cho tôi',
     },
   ];
 
   return (
-    <AppCS select="/cs/all_case" breadcrumb={breadcrumb}>
+    <AppCuS select="/cs/my-case" breadcrumb={breadcrumb}>
       <Head>
         <title>Chỉnh sửa</title>
       </Head>
@@ -416,6 +414,6 @@ function render(props) {
           </form>
         </MyCard>
       </div>
-    </AppCS>
+    </AppCuS>
   );
 }

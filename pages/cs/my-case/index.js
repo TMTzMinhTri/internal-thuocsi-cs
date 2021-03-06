@@ -232,7 +232,7 @@ function render(props) {
   };
 
   return (
-    <AppCuS select="/cs/all_case" breadcrumb={breadcrumb}>
+    <AppCuS select="/cs/all-case" breadcrumb={breadcrumb}>
       <Head>
         <title>DS yêu cầu cá nhân</title>
       </Head>
@@ -249,7 +249,7 @@ function render(props) {
               <FontAwesomeIcon icon={faFilter} style={{ paddingRight: '2px' }} />
               Bộ lọc
             </Button>
-            <Link href="/cs/my_case/new">
+            <Link href="/cs/my-case/new">
               <Button variant="contained" color="primary" className={styles.cardButton}>
                 <FontAwesomeIcon icon={faPlus} style={{ paddingRight: '2px' }} />
                 Thêm yêu cầu
@@ -451,14 +451,14 @@ function render(props) {
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <Link href="/cs/all_case/new">
+                          <Link href="/cs/all-case/new">
                             <Button variant="contained" color="primary">
                               Xuất file
                             </Button>
                           </Link>
                         </Grid>
                         <Grid item>
-                          <Link href="/cs/all_case">
+                          <Link href="/cs/all-case">
                             <Button
                               variant="contained"
                               color="primary"
@@ -579,7 +579,7 @@ function render(props) {
               rowsPerPage={limit}
               page={page}
               onChangePage={(event, page, rowsPerPage) => {
-                Router.push(`/cs/my_case?page=${page}&limit=${rowsPerPage}&q=${search}`);
+                Router.push(`/cs/my-case?page=${page}&limit=${rowsPerPage}&q=${search}`);
               }}
             />
           ) : (
