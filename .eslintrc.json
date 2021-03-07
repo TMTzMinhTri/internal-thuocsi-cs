@@ -1,0 +1,58 @@
+{
+  "root": true,
+  "parser": "babel-eslint",
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:jsx-a11y/recommended",
+    "plugin:react-hooks/recommended",
+    "airbnb",
+    "prettier"
+  ],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "alias": {
+        "map": [
+          ["client", "./client"],
+          ["components", "./components"],
+          ["container", "./container"],
+          ["pages", "./pages"],
+          ["public","./public"]
+        ]
+      }
+    }
+  },
+  "rules": {
+    "react/prop-types": "off",
+    "react/forbid-prop-types": 0,
+    "react/require-default-props": "off",
+    "react/no-unescaped-entities": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/button-has-type": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "object-curly-newline": "off",
+    "implicit-arrow-linebreak": "off",
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "no-useless-constructor": "off"
+  },
+  "plugins": []
+}
