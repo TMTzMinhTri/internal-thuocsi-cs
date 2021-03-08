@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-export const reasons = [
+export const REASONS = [
   {
     value: 'SAISANPHAM',
     label: 'Sai sản phẩm',

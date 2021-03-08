@@ -10,7 +10,7 @@ import {
   makeStyles,
 } from '@material-ui/core';
 
-import { reasons, listStatus, formatNumber, formatDateTime } from 'components/global';
+import { REASONS, listStatus, formatNumber, formatDateTime } from 'components/global';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
@@ -343,7 +343,7 @@ const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage })
                     <MuiMultipleAuto
                       name="reasons"
                       required
-                      options={reasons}
+                      options={REASONS}
                       placeholder="Chọn"
                       errors={errors}
                       control={control}

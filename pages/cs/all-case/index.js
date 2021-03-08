@@ -26,7 +26,7 @@ import Router, { useRouter } from 'next/router';
 
 import AppCS from 'pages/_layout';
 
-import { formatUTCTime, listStatus, ErrorCode, formatUrlSearch, reasons } from 'components/global';
+import { formatUTCTime, listStatus, ErrorCode, formatUrlSearch, REASONS } from 'components/global';
 
 import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -34,7 +34,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import EditIcon from '@material-ui/icons/Edit';
 
 import { useForm } from 'react-hook-form';
-import { getOrderClient, getAccountClient, getTicketClient } from 'client';
+import { getAccountClient, getTicketClient } from 'client';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -45,6 +45,8 @@ import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-comp
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 
 import List from 'container/cs/list';
+import { isValid } from 'utils';
+import useModal from 'hooks/useModal';
 import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
@@ -59,7 +61,7 @@ export async function loadRequestData(ctx) {
   // TODO offset limit
   const [accountResult, ticketResult, listDepartmentResult] = await Promise.all([
     accountClient.getListEmployee(0, 1000, ''),
-    ticketClient.getList(offset, limit, q),
+    ticketClient.getList(offset, limit, null),
     accountClient.getListDepartment(0, 20, ''),
   ]);
 
@@ -71,7 +73,7 @@ export async function loadRequestData(ctx) {
     })) || [];
 
   const total = ticketResult?.total || 0;
-  const data = ticketResult?.data || [];
+  const tickets = ticketResult?.data || [];
   const usersAssign =
     accountResult?.data?.map((acc) => ({ value: acc.username, label: acc.username })) || [];
 
@@ -79,7 +81,7 @@ export async function loadRequestData(ctx) {
     props: {
       listDepartment,
       total,
-      data,
+      tickets,
       usersAssign,
     },
   };
@@ -88,6 +90,16 @@ export async function loadRequestData(ctx) {
 export async function getServerSideProps(ctx) {
   return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
+
+const breadcrumb = [
+  {
+    name: 'Trang chủ',
+    link: '/cs',
+  },
+  {
+    name: 'DS phiếu yêu cầu',
+  },
+];
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -119,7 +131,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const ListTicketPage = (props) => {
-  const { usersAssign, total } = props;
+  const { usersAssign, total, tickets } = props;
 
   const { register, handleSubmit, errors, control, getValues } = useForm({
     defaultValues: {
@@ -130,11 +142,12 @@ const ListTicketPage = (props) => {
 
   const router = useRouter();
   const [search, setSearch] = useState('');
+  const [showHideFilter, toggleFilter] = useModal(false);
 
   const q = router.query.q || '';
 
   const [data, setData] = useState(props);
-  const [listAssignUser, setListAssignUser] = useState([...usersAssign]);
+  // const [listTickets,setListickets] =
 
   const limit = parseInt(router.query.limit) || 5;
   const page = parseInt(router.query.page) || 0;
@@ -144,60 +157,43 @@ const ListTicketPage = (props) => {
     setSearch(formatUrlSearch(q));
   }, [props]);
 
-  const [showHideFilter, setShowHideResults] = React.useState(false);
-  const ShowHideFilter = () => {
-    if (showHideFilter === false) {
-      setShowHideResults(true);
-    } else {
-      setShowHideResults(false);
-    }
-  };
-
-  const breadcrumb = [
-    {
-      name: 'Trang chủ',
-      link: '/cs',
-    },
-    {
-      name: 'DS phiếu yêu cầu',
-    },
-  ];
-
   const classes = useStyles();
 
   const [state, setState] = React.useState({});
 
   const debounceSearchAssignUser = async (q) => {
     const accountClient = getAccountClient();
-    const accountResp = await accountClient.getListEmployeeFromClient(0, 20, q);
-    const tmpData = [];
-    if (accountResp.status === 'OK') {
+    const accountResp = await accountClient.getListEmployeeFromClient(0, 100, q);
+
+    if (!isValid(accountResp)) {
+      return [];
       // cheat to err data
-      accountResp.data.forEach((account) => {
-        if (account && account.username) {
-          tmpData.push({ value: account.username, label: account.username });
-        }
-      });
     }
-    return tmpData;
+    return accountResp.data.map(({ username }) => ({ value: username, label: username }));
   };
 
-  const onSubmit = async (formData) => {
+  const onSubmit = async ({
+    saleOrderCode,
+    saleOrderID,
+    status,
+    reasons,
+    assignUser,
+    createdTime,
+    lastUpdatedTime,
+  }) => {
     const ticketClient = getTicketClient();
     const ticketResp = await ticketClient.getTicketByFilter({
-      saleOrderCode: formData.saleOrderCode,
-      saleOrderID: +formData.saleOrderID,
-      status: formData.status?.value,
+      saleOrderCode,
+      saleOrderID,
+      status: status?.value,
       reasons:
-        formData.reasons?.length > 0
-          ? formData.reasons.map((reason) => ({ code: reason.value, name: reason.label }))
+        reasons?.length > 0
+          ? reasons.map((reason) => ({ code: reason.value, name: reason.label }))
           : null,
-      assignUser: formData.assignUser?.value,
-      createdTime: formData.createdTime
-        ? new Date(formatUTCTime(formData.createdTime)).toISOString()
-        : null,
-      lastUpdatedTime: formData.lastUpdatedTime
-        ? new Date(formatUTCTime(formData.lastUpdatedTime)).toISOString()
+      assignUser: assignUser?.value,
+      createdTime: createdTime ? new Date(formatUTCTime(createdTime)).toISOString() : null,
+      lastUpdatedTime: lastUpdatedTime
+        ? new Date(formatUTCTime(lastUpdatedTime)).toISOString()
         : null,
     });
     if (ticketResp.status === 'OK') {
@@ -222,7 +218,7 @@ const ListTicketPage = (props) => {
             <Button
               variant="contained"
               color="primary"
-              onClick={ShowHideFilter}
+              onClick={toggleFilter}
               className={styles.cardButton}
               style={{ marginRight: '10px' }}
             >
@@ -246,7 +242,7 @@ const ListTicketPage = (props) => {
                   justify="space-between"
                   alignItems="center"
                 >
-                  {showHideFilter ? null : (
+                  {!showHideFilter && (
                     <>
                       <Grid item xs={12} sm={12} md={12}>
                         <Typography gutterBottom>
@@ -275,7 +271,7 @@ const ListTicketPage = (props) => {
                       </Grid>
                     </>
                   )}
-                  {showHideFilter ? (
+                  {showHideFilter && (
                     <>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -343,7 +339,7 @@ const ListTicketPage = (props) => {
                         </Typography>
                         <MuiMultipleAuto
                           name="reasons"
-                          options={reasons}
+                          options={REASONS}
                           placeholder="Chọn"
                           errors={errors}
                           control={control}
@@ -359,7 +355,7 @@ const ListTicketPage = (props) => {
                           </FormLabel>
                         </Typography>
                         <MuiSingleAuto
-                          options={listAssignUser}
+                          options={usersAssign}
                           onFieldChange={debounceSearchAssignUser}
                           placeholder="Chọn"
                           name="assignUser"
@@ -424,7 +420,7 @@ const ListTicketPage = (props) => {
                         </Grid>
                       </Grid>
                     </>
-                  ) : null}
+                  )}
                 </Grid>
               </FormControl>
             </MyCardContent>
@@ -457,7 +453,7 @@ const ListTicketPage = (props) => {
               <TableCell align="center">Thao tác</TableCell>
             </TableRow>
           </TableHead>
-          {data.total <= 0 ? (
+          {total <= 0 ? (
             <TableRow>
               <TableCell colSpan={5} align="left">
                 {ErrorCode.NOT_FOUND_TABLE}
@@ -465,7 +461,7 @@ const ListTicketPage = (props) => {
             </TableRow>
           ) : (
             <TableBody>
-              {data.data.map((row) => (
+              {tickets.map((row) => (
                 <TableRow key={uuidv4()}>
                   <TableCell align="center">{row.code}</TableCell>
                   <TableCell align="center">{row.saleOrderCode}</TableCell>
@@ -528,7 +524,7 @@ const ListTicketPage = (props) => {
               ))}
             </TableBody>
           )}
-          {data.count > 0 && (
+          {total > 0 && (
             <MyTablePagination
               labelUnit="yêu cầu"
               count={total}

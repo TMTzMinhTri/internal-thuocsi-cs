@@ -36,7 +36,8 @@
           ["container", "./container"],
           ["pages", "./pages"],
           ["public","./public"],
-          ["utils","./utils"]
+          ["utils","./utils"],
+          ["hooks","./hooks"]
         ]
       }
     }
