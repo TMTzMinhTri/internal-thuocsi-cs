@@ -4,7 +4,7 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCuS from 'pages/_layout';
-import styles from './request.module.css';
+
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
@@ -13,15 +13,10 @@ import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import Link from 'next/link';
 
 import React, { useEffect, useState } from 'react';
-
-export async function getServerSideProps(ctx) {
-  return await doWithLoggedInUser(ctx, (ctx) => {
-    return loadRequestData(ctx);
-  });
-}
+import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
-  let data = {
+  const data = {
     props: {
       data: [
         {
@@ -71,8 +66,10 @@ export async function loadRequestData(ctx) {
   return data;
 }
 
-export default function ProductPage(props) {
-  return renderWithLoggedInUser(props, render);
+export async function getServerSideProps(ctx) {
+  return await doWithLoggedInUser(ctx, (ctx) => {
+    return loadRequestData(ctx);
+  });
 }
 
 export function getFirstImage(val) {
@@ -116,27 +113,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function render(props) {
-  const { register, handleSubmit, errors, reset, control, getValues, setValue } = useForm({
+  const { errors, control } = useForm({
     defaultValues: {
       imageUrls: [],
     },
     mode: 'onChange',
   });
 
-  let [data, setData] = useState(props);
+  const [data, setData] = useState(props);
 
   useEffect(() => {
     setData(props);
   }, [props]);
 
-  const classes = useStyles();
-  const [expanded, setExpanded] = React.useState(false);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
-  let breadcrumb = [
+  const breadcrumb = [
     {
       name: 'Trang chủ',
       link: '/cs',
@@ -157,7 +147,7 @@ function render(props) {
       </Head>
       <div className={styles.grid}>
         <MyCard>
-          <MyCardHeader title="Chỉnh sửa yêu cầu"></MyCardHeader>
+          <MyCardHeader title="Chỉnh sửa yêu cầu" />
           <form>
             <MyCardContent>
               <FormControl size="small">
@@ -309,7 +299,7 @@ function render(props) {
                       name="người tạo"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -322,7 +312,7 @@ function render(props) {
                       name="người tạo"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -335,7 +325,7 @@ function render(props) {
                       name="người tạo"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -348,7 +338,7 @@ function render(props) {
                       name="người tạo"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={6}>
                     <Typography gutterBottom>
@@ -394,14 +384,14 @@ function render(props) {
                   </Grid>
                   <Grid item container xs={12} justify="flex-end" spacing={1}>
                     <Grid item>
-                      <Link href="#">
+                      <Link href="#id">
                         <Button variant="contained" color="primary">
                           Lưu
                         </Button>
                       </Link>
                     </Grid>
                     <Grid item>
-                      <Link href="#">
+                      <Link href="#id">
                         <Button variant="contained" color="default">
                           Hủy bỏ
                         </Button>
@@ -416,4 +406,7 @@ function render(props) {
       </div>
     </AppCuS>
   );
+}
+export default function ProductPage(props) {
+  return renderWithLoggedInUser(props, render);
 }

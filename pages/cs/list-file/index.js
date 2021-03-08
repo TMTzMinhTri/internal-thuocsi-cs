@@ -14,14 +14,8 @@ import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagin
 
 import React, { useEffect, useState } from 'react';
 
-export async function getServerSideProps(ctx) {
-  return await doWithLoggedInUser(ctx, (ctx) => {
-    return loadRequestData(ctx);
-  });
-}
-
-export async function loadRequestData(ctx) {
-  let data = {
+export async function loadRequestData() {
+  const data = {
     props: {
       data: [
         {
@@ -43,9 +37,10 @@ export async function loadRequestData(ctx) {
 
   return data;
 }
-
-export default function ProductPage(props) {
-  return renderWithLoggedInUser(props, render);
+export async function getServerSideProps(ctx) {
+  return await doWithLoggedInUser(ctx, (ctx) => {
+    return loadRequestData(ctx);
+  });
 }
 
 export function getFirstImage(val) {
@@ -58,7 +53,7 @@ export function getFirstImage(val) {
 export function formatEllipsisText(text, len = 100) {
   if (text) {
     if (text.length > 50) {
-      return text.substring(0, len) + '...';
+      return `${text.substring(0, len)}...`;
     }
     return text;
   }
@@ -72,7 +67,7 @@ function render(props) {
     setData(props);
   }, [props]);
 
-  let breadcrumb = [
+  const breadcrumb = [
     {
       name: 'Trang chủ',
       link: '/cs',
@@ -103,13 +98,13 @@ function render(props) {
               <TableCell align="center">Tên file</TableCell>
               <TableCell align="center">Ngày</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
-              <TableCell align="center"></TableCell>
+              <TableCell align="center" />
             </TableRow>
           </TableHead>
           {data.count <= 0 ? (
             <TableRow>
               <TableCell colSpan={5} align="left">
-                {ErrorCode['NOT_FOUND_TABLE']}
+                {ErrorCode.NOT_FOUND_TABLE}
               </TableCell>
             </TableRow>
           ) : (
@@ -121,7 +116,7 @@ function render(props) {
                   <TableCell align="center">{row.date}</TableCell>
                   <TableCell align="center">{row.status}</TableCell>
                   <TableCell align="center">
-                    <a href="#">Tải về</a>
+                    <a href="#id">Tải về</a>
                   </TableCell>
                 </TableRow>
               ))}
@@ -144,4 +139,8 @@ function render(props) {
       </TableContainer>
     </AppCuS>
   );
+}
+
+export default function ProductPage(props) {
+  return renderWithLoggedInUser(props, render);
 }

@@ -18,11 +18,11 @@ import {
   Drawer,
 } from '@material-ui/core';
 import { MyCard, MyCardActions, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-
+import { v4 as uuidv4 } from 'uuid';
 import Head from 'next/head';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCuS from 'pages/_layout';
-import styles from './request.module.css';
+
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
@@ -33,24 +33,17 @@ import { getOrderClient } from 'client/order';
 import { getCustomerClient } from 'client/customer';
 import { getAccountClient } from 'client/account';
 import { getTicketClient } from 'client/ticket';
-import Router, { useRouter } from 'next/router';
-import { formatDateTime, formatUTCTime, listStatus } from 'components/global';
-import { reasons } from 'components/global';
-import { ErrorCode, formatMessageError, formatUrlSearch } from 'components/global';
+import Router from 'next/router';
+import { formatDateTime, reasons, ErrorCode } from 'components/global';
 import { List } from 'container/cs/list';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
-
-export async function getServerSideProps(ctx) {
-  return await doWithLoggedInUser(ctx, (ctx) => {
-    return loadRequestData(ctx);
-  });
-}
+import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
-  let data = {
+  const data = {
     props: {
       listDepartment: [],
     },
@@ -69,8 +62,10 @@ export async function loadRequestData(ctx) {
   return data;
 }
 
-export default function TicketPage(props) {
-  return renderWithLoggedInUser(props, render);
+export async function getServerSideProps(ctx) {
+  return await doWithLoggedInUser(ctx, (ctx) => {
+    return loadRequestData(ctx);
+  });
 }
 
 export function getFirstImage(val) {
@@ -83,7 +78,7 @@ export function getFirstImage(val) {
 export function formatEllipsisText(text, len = 100) {
   if (text) {
     if (text.length > 50) {
-      return text.substring(0, len) + '...';
+      return `${text.substring(0, len)}...`;
     }
     return text;
   }
@@ -120,36 +115,20 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function render(props) {
-  const {
-    register,
-    handleSubmit,
-    errors,
-    reset,
-    control,
-    getValues,
-    clearErrors,
-    setValue,
-  } = useForm({
+  const { register, handleSubmit, errors, control, clearErrors, setValue } = useForm({
     defaultValues: {
       imageUrls: [],
     },
     mode: 'onChange',
   });
 
-  let [data, setData] = useState(props);
-
   useEffect(() => {
     setData(props);
   }, [props]);
 
   const classes = useStyles();
-  const [expanded, setExpanded] = React.useState(false);
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
-  let breadcrumb = [
+  const breadcrumb = [
     {
       name: 'Trang chủ',
       link: '/cs',
@@ -176,8 +155,8 @@ function render(props) {
   });
 
   const onSearchOrder = async () => {
-    let orderClient = getOrderClient();
-    let resp = await orderClient.getOrderByOrderNoFromClient(search);
+    const orderClient = getOrderClient();
+    const resp = await orderClient.getOrderByOrderNoFromClient(search);
     if (resp.status !== 'OK') {
       setOrderData(null);
       setListTicket([]);
@@ -233,20 +212,19 @@ function render(props) {
       if (ticketResp.status !== 'OK') {
         error(ticketResp.message ?? actionErrorText);
         return;
+      }
+      const customerClient = getCustomerClient();
+      const customerResp = await customerClient.updateBankCustomer({
+        bank: formData.bank,
+        bankCode: formData.bankCode,
+        bankBranch: formData.bankBranch,
+        customerID: orderData.customerID,
+      });
+      if (customerResp.status !== 'OK') {
+        error(customerResp.message ?? actionErrorText);
       } else {
-        const customerClient = getCustomerClient();
-        const customerResp = await customerClient.updateBankCustomer({
-          bank: formData.bank,
-          bankCode: formData.bankCode,
-          bankBranch: formData.bankBranch,
-          customerID: orderData.customerID,
-        });
-        if (customerResp.status !== 'OK') {
-          error(customerResp.message ?? actionErrorText);
-        } else {
-          success('Tạo yêu cầu thành công');
-          Router.push('/cs/all-case');
-        }
+        success('Tạo yêu cầu thành công');
+        Router.push('/cs/all-case');
       }
     } catch (err) {
       error(err ?? unknownErrorText);
@@ -290,7 +268,7 @@ function render(props) {
       </Head>
       <div className={styles.grid}>
         <MyCard>
-          <MyCardHeader title="Thêm yêu cầu mới"></MyCardHeader>
+          <MyCardHeader title="Thêm yêu cầu mới" />
           <form>
             <MyCardActions>
               <FormControl size="small">
@@ -452,13 +430,13 @@ function render(props) {
               {listTicket.length <= 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} align="left">
-                    {ErrorCode['NOT_FOUND_TABLE']}
+                    {ErrorCode.NOT_FOUND_TABLE}
                   </TableCell>
                 </TableRow>
               ) : (
                 <TableBody>
-                  {listTicket.map((row, i) => (
-                    <TableRow key={i}>
+                  {listTicket.map((row) => (
+                    <TableRow key={uuidv4()}>
                       <TableCell align="center">{row.code}</TableCell>
                       <TableCell align="center">{row.saleOrderCode}</TableCell>
                       <TableCell align="center">{row.saleOrderID}</TableCell>
@@ -515,21 +493,6 @@ function render(props) {
                   ))}
                 </TableBody>
               )}
-              {/* {data.count > 0 ? (
-              <MyTablePagination
-                labelUnit="yêu cầu"
-                count={data.count}
-                rowsPerPage={10}
-                page={2}
-                onChangePage={(event, page, rowsPerPage) => {
-                  Router.push(
-                    `/cms/product?page=${page}&limit=${rowsPerPage}&q=${search}`
-                  );
-                }}
-              />
-            ) : (
-              <div />
-            )} */}
             </Table>
           </TableContainer>
         </MyCard>
@@ -557,7 +520,7 @@ function render(props) {
                     placeholder="Chọn"
                     errors={errors}
                     control={control}
-                  ></MuiMultipleAuto>
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Typography gutterBottom>
@@ -574,7 +537,7 @@ function render(props) {
                     placeholder="Chọn"
                     errors={errors}
                     control={control}
-                  ></MuiSingleAuto>
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Typography gutterBottom>
@@ -590,7 +553,7 @@ function render(props) {
                     placeholder="Chọn"
                     errors={errors}
                     control={control}
-                  ></MuiSingleAuto>
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <Typography gutterBottom>
@@ -647,14 +610,14 @@ function render(props) {
                 </Grid>
                 <Grid item container xs={12} justify="flex-end" spacing={1}>
                   <Grid item>
-                    <Link href="#">
+                    <Link href="#id">
                       <Button variant="contained" color="default">
                         Quay lại
                       </Button>
                     </Link>
                   </Grid>
                   <Grid item>
-                    <Link href="#">
+                    <Link href="#id">
                       <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
                         Lưu
                       </Button>
@@ -668,4 +631,7 @@ function render(props) {
       </div>
     </AppCuS>
   );
+}
+export default function TicketPage(props) {
+  return renderWithLoggedInUser(props, render);
 }
