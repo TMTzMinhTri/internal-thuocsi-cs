@@ -35,7 +35,8 @@
           ["components", "./components"],
           ["container", "./container"],
           ["pages", "./pages"],
-          ["public","./public"]
+          ["public","./public"],
+          ["utils","./utils"]
         ]
       }
     }

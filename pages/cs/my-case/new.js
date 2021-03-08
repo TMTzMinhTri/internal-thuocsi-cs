@@ -186,7 +186,9 @@ function render(props) {
     }
 
     const ticketClient = getTicketClient();
-    const respTicket = await ticketClient.getTicketBySaleOrderCode(resp.data[0].orderNo);
+    const respTicket = await ticketClient.getTicketBySaleOrderCode({
+      saleOrderCode: resp.data[0].orderNo,
+    });
     if (respTicket.status === 'OK') {
       setListTicket(respTicket.data);
     }

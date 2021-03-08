@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Button,
   Paper,
@@ -16,31 +17,31 @@ import {
   Tooltip,
   Chip,
 } from '@material-ui/core';
-import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
+
 import Head from 'next/head';
-import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
+import Link from 'next/link';
+import Router from 'next/router';
+
 import AppCS from 'pages/_layout';
 
 import { reasons, formatDateTime } from 'components/global';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
-import { List } from 'container/cs/list';
-import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-import Router from 'next/router';
+
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
-import { getOrderClient } from 'client/order';
+
+import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
+import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
-import Link from 'next/link';
-import EditIcon from '@material-ui/icons/Edit';
+import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 
+import EditIcon from '@material-ui/icons/Edit';
 import Drawer from '@material-ui/core/Drawer';
 
-import React, { useState } from 'react';
-import { getAccountClient } from 'client/account';
-import { getCustomerClient } from 'client/customer';
-import { getTicketClient } from 'client/ticket';
+import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
+import List from 'container/cs/list';
 import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
@@ -51,7 +52,9 @@ export async function loadRequestData(ctx) {
   };
 
   const accountClient = getAccountClient(ctx, {});
+
   const listDepartment = await accountClient.getListDepartment(0, 20, '');
+
   if (listDepartment.status === 'OK') {
     data.props.listDepartment = listDepartment.data.map((department) => ({
       ...department,
@@ -193,7 +196,9 @@ function render(props) {
     }
 
     const ticketClient = getTicketClient();
-    const respTicket = await ticketClient.getTicketBySaleOrderCode(resp.data[0].orderNo);
+    const respTicket = await ticketClient.getTicketBySaleOrderCode({
+      saleOrderCode: resp.data[0].orderNo,
+    });
     if (respTicket.status === 'OK') {
       setListTicket(respTicket.data);
     }

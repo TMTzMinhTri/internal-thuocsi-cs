@@ -17,14 +17,14 @@ class OrderClient extends APIClient {
 
   getListOrder(offset, limit, q) {
     return this.callFromNextJS('GET', `${prefix}/tasks/list`, {
-      q: q,
-      offset: offset,
-      limit: limit,
+      q,
+      offset,
+      limit,
       getTotal: true,
     });
   }
 }
 
-export function getOrderClient(ctx, data) {
+export default function getOrderClient(ctx, data) {
   return new OrderClient(ctx, data);
 }

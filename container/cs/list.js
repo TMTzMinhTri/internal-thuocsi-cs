@@ -1,24 +1,31 @@
-import { Button, FormControl, FormLabel, TextField, Typography, Grid } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
 import { useState, useEffect } from 'react';
-import { reasons, listStatus, formatNumber, formatDateTime } from 'components/global';
 import Router from 'next/router';
-import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  TextField,
+  Typography,
+  Grid,
+  makeStyles,
+} from '@material-ui/core';
+
+import { reasons, listStatus, formatNumber, formatDateTime } from 'components/global';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
+
+import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
-import styles from 'pages/cs/all-case/request.module.css';
+
 import { useForm } from 'react-hook-form';
-
 import clsx from 'clsx';
-import { getAccountClient } from 'client/account';
-import { getTicketClient } from 'client/ticket';
-import { getCustomerClient } from 'client/customer';
-import { getOrderClient } from 'client/order';
+import { getCustomerClient, getAccountClient, getTicketClient, getOrderClient } from 'client';
 
-export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage }) => {
-  const { register, handleSubmit, errors, control, getValues, setValue } = useForm({
+import styles from 'pages/cs/all-case/request.module.css';
+
+const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage }) => {
+  const { register, handleSubmit, errors, control, setValue } = useForm({
     defaultValues: {
       // customerName: orderData?.customerName,
       // bankCode: customerInf?.bankCode,
@@ -78,24 +85,23 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
       if (ticketResp.status !== 'OK') {
         error(ticketResp.message ?? actionErrorText);
         return;
+      }
+      const customerClient = getCustomerClient();
+      const customerResp = await customerClient.updateBankCustomer({
+        bank: formData.bank,
+        bankCode: formData.bankCode,
+        bankBranch: formData.bankBranch,
+        customerID: row.customerID,
+      });
+      if (customerResp.status !== 'OK') {
+        error(customerResp.message ?? actionErrorText);
       } else {
-        const customerClient = getCustomerClient();
-        const customerResp = await customerClient.updateBankCustomer({
-          bank: formData.bank,
-          bankCode: formData.bankCode,
-          bankBranch: formData.bankBranch,
-          customerID: row.customerID,
-        });
-        if (customerResp.status !== 'OK') {
-          error(customerResp.message ?? actionErrorText);
+        success('Cập nhật yêu cầu thành công');
+        // toggleDrawer(anchor, false)
+        if (idxPage) {
+          Router.push('/cs/all-case');
         } else {
-          success('Cập nhật yêu cầu thành công');
-          // toggleDrawer(anchor, false)
-          if (idxPage) {
-            Router.push('/cs/all-case');
-          } else {
-            resetData(orderData.orderNo);
-          }
+          resetData(orderData.orderNo);
         }
       }
     } catch (err) {
@@ -139,8 +145,8 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
       }
 
       // get info order
-      let orderClient = getOrderClient();
-      let resp = await orderClient.getOrderByOrderNoFromClient(row.saleOrderCode);
+      const orderClient = getOrderClient();
+      const resp = await orderClient.getOrderByOrderNoFromClient(row.saleOrderCode);
       if (resp.status === 'OK') {
         setOrderData(resp.data[0]);
       }
@@ -175,7 +181,7 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
     >
       <div className={styles.grid}>
         <MyCard>
-          <MyCardHeader title="Thông tin yêu cầu"></MyCardHeader>
+          <MyCardHeader title="Thông tin yêu cầu" />
           <form key={row.code}>
             <MyCardContent>
               <FormControl size="small">
@@ -338,11 +344,10 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
                       name="reasons"
                       required
                       options={reasons}
-                      required
                       placeholder="Chọn"
                       errors={errors}
                       control={control}
-                    ></MuiMultipleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -360,7 +365,7 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
                       placeholder="Chọn"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -375,7 +380,7 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
                       placeholder="Chọn"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -389,7 +394,7 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
                       options={listStatus}
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -464,3 +469,5 @@ export const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idx
     </div>
   );
 };
+
+export default List;

@@ -20,6 +20,6 @@ class CustomerClient extends APIClient {
   }
 }
 
-export function getCustomerClient(ctx, data) {
+export default function getCustomerClient(ctx, data) {
   return new CustomerClient(ctx, data);
 }

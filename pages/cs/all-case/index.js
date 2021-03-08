@@ -16,89 +16,77 @@ import {
   Grid,
   Tooltip,
   Chip,
+  makeStyles,
+  Drawer,
 } from '@material-ui/core';
 
-import { List } from 'container/cs/list';
-import Drawer from '@material-ui/core/Drawer';
+import Link from 'next/link';
+import Head from 'next/head';
 import Router, { useRouter } from 'next/router';
+
+import AppCS from 'pages/_layout';
+
 import { formatUTCTime, listStatus, ErrorCode, formatUrlSearch, reasons } from 'components/global';
-import { getOrderClient } from 'client/order';
 
 import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-
 import EditIcon from '@material-ui/icons/Edit';
 
-import { makeStyles } from '@material-ui/core/styles';
-
-import Head from 'next/head';
-import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
-import AppCS from 'pages/_layout';
-
 import { useForm } from 'react-hook-form';
-import Link from 'next/link';
+import { getOrderClient, getAccountClient, getTicketClient } from 'client';
+
+import { v4 as uuidv4 } from 'uuid';
+
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
-import { getAccountClient } from 'client/account';
-import { getTicketClient } from 'client/ticket';
+import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
+import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
+
+import List from 'container/cs/list';
 import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
-  // setup data
-  const data = { props: {} };
-
   // Fetch data from external API
   const { query } = ctx;
   const { q = '', page = 0, limit = 20 } = query;
   const offset = page * limit;
 
-  const orderClient = getOrderClient(ctx, {});
-
-  data.props = await orderClient.getListOrder(offset, limit, q);
-
-  if (data.props.status !== 'OK') {
-    return { props: { data: [], count: 0, message: data.props.message } };
-  }
-  data.props.count = data.props.total;
-
   const accountClient = getAccountClient(ctx, {});
-  const listDepartment = await accountClient.getListDepartment(0, 20, '');
-  if (listDepartment.status === 'OK') {
-    data.props.listDepartment = listDepartment.data.map((department) => ({
-      ...department,
-      value: department.code,
-      label: department.name,
-    }));
-  }
+  const ticketClient = getTicketClient(ctx, {});
 
-  const accountResp = await accountClient.getListEmployee(0, 20, '');
-  const tmpData = [];
-  if (accountResp.status === 'OK') {
-    accountResp.data.forEach((account) => {
-      if (account && account.username) {
-        tmpData.push({ value: account.username, label: account.username });
-      }
-    });
-  }
+  // TODO offset limit
+  const [accountResult, ticketResult, listDepartmentResult] = await Promise.all([
+    accountClient.getListEmployee(0, 1000, ''),
+    ticketClient.getList(offset, limit, q),
+    accountClient.getListDepartment(0, 20, ''),
+  ]);
 
-  data.props.accountInfo = tmpData;
+  const listDepartment =
+    listDepartmentResult?.data?.map((depart) => ({
+      ...depart,
+      value: depart.code,
+      label: depart.name,
+    })) || [];
 
-  return data;
+  const total = ticketResult?.total || 0;
+  const data = ticketResult?.data || [];
+  const usersAssign =
+    accountResult?.data?.map((acc) => ({ value: acc.username, label: acc.username })) || [];
+
+  return {
+    props: {
+      listDepartment,
+      total,
+      data,
+      usersAssign,
+    },
+  };
 }
 
 export async function getServerSideProps(ctx) {
-  const res = await doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
-  return res;
-}
-
-export function getFirstImage(val) {
-  if (val && val.length > 0) {
-    return val[0];
-  }
-  return `/default.png`;
+  return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -130,7 +118,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function render(props) {
+const ListTicketPage = (props) => {
+  const { usersAssign, total } = props;
+
   const { register, handleSubmit, errors, control, getValues } = useForm({
     defaultValues: {
       imageUrls: [],
@@ -140,11 +130,13 @@ function render(props) {
 
   const router = useRouter();
   const [search, setSearch] = useState('');
+
   const q = router.query.q || '';
 
   const [data, setData] = useState(props);
-  const [listAssignUser, setListAssignUser] = useState([...props.accountInfo]);
-  const limit = parseInt(router.query.limit) || 20;
+  const [listAssignUser, setListAssignUser] = useState([...usersAssign]);
+
+  const limit = parseInt(router.query.limit) || 5;
   const page = parseInt(router.query.page) || 0;
 
   useEffect(() => {
@@ -152,13 +144,6 @@ function render(props) {
     setSearch(formatUrlSearch(q));
   }, [props]);
 
-  const [expanded, setExpanded] = React.useState(false);
-
-  const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
   const [showHideFilter, setShowHideResults] = React.useState(false);
   const ShowHideFilter = () => {
     if (showHideFilter === false) {
@@ -463,19 +448,16 @@ function render(props) {
           </colgroup>
           <TableHead>
             <TableRow>
-              <TableCell align="center">#</TableCell>
+              <TableCell align="center">#Mã Phiếu</TableCell>
               <TableCell align="center">SO#</TableCell>
-              <TableCell align="center">Order#</TableCell>
+              <TableCell align="center">Số lượng#</TableCell>
               <TableCell align="left">Lỗi</TableCell>
               <TableCell align="left">Ghi chú của KH</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
-              {/* <TableCell align="center">Trạng thái</TableCell>
-              <TableCell align="center">Người tạo</TableCell>
-              <TableCell align="center">Người cập nhật</TableCell> */}
               <TableCell align="center">Thao tác</TableCell>
             </TableRow>
           </TableHead>
-          {data.count <= 0 ? (
+          {data.total <= 0 ? (
             <TableRow>
               <TableCell colSpan={5} align="left">
                 {ErrorCode.NOT_FOUND_TABLE}
@@ -483,25 +465,25 @@ function render(props) {
             </TableRow>
           ) : (
             <TableBody>
-              {data.data.map((row, i) => (
-                <TableRow key={i}>
+              {data.data.map((row) => (
+                <TableRow key={uuidv4()}>
                   <TableCell align="center">{row.code}</TableCell>
                   <TableCell align="center">{row.saleOrderCode}</TableCell>
                   <TableCell align="center">{row.saleOrderID}</TableCell>
                   <TableCell align="left">
                     {row.reasons.map((reason) => (
-                      <Chip style={{ margin: '3px' }} size="small" label={reason.name} />
+                      <Chip
+                        key={uuidv4()}
+                        style={{ margin: '3px' }}
+                        size="small"
+                        label={reason.name}
+                      />
                     ))}
                   </TableCell>
                   <TableCell align="left">{row.note}</TableCell>
                   <TableCell align="center">
                     {listStatus.filter((status) => status.value === row.status)[0].label}
                   </TableCell>
-                  {/* <TableCell align="center">
-                    <Chip size="small" label={"Chưa xử lý"} />
-                  </TableCell>
-                  <TableCell align="center">ct</TableCell>
-                  <TableCell align="center">ct</TableCell> */}
                   <TableCell align="center">
                     <div>
                       {[`right${row.code}`].map((anchor) => (
@@ -546,25 +528,23 @@ function render(props) {
               ))}
             </TableBody>
           )}
-          {data.count > 0 ? (
+          {data.count > 0 && (
             <MyTablePagination
               labelUnit="yêu cầu"
-              count={props.count}
+              count={total}
               rowsPerPage={limit}
               page={page}
               onChangePage={(event, newPage, rowsPerPage) => {
                 Router.push(`/cs/all-case?page=${newPage}&limit=${rowsPerPage}&q=${search}`);
               }}
             />
-          ) : (
-            <div />
           )}
         </Table>
       </TableContainer>
     </AppCS>
   );
-}
+};
 
-export default function TicketPage(props) {
-  return renderWithLoggedInUser(props, render);
-}
+const index = (props) => renderWithLoggedInUser(props, ListTicketPage);
+
+export default index;
