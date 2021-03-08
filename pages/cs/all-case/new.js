@@ -20,8 +20,8 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 import Head from 'next/head';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import AppCS from 'pages/_layout';
-import styles from './request.module.css';
-import { reasons } from 'components/global';
+
+import { reasons, formatDateTime } from 'components/global';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 import { List } from 'container/cs/list';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
@@ -30,7 +30,6 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
 import { getOrderClient } from 'client/order';
-import { formatDateTime } from 'components/global';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import Link from 'next/link';
@@ -42,15 +41,10 @@ import React, { useState } from 'react';
 import { getAccountClient } from 'client/account';
 import { getCustomerClient } from 'client/customer';
 import { getTicketClient } from 'client/ticket';
-
-export async function getServerSideProps(ctx) {
-  return await doWithLoggedInUser(ctx, (ctx) => {
-    return loadRequestData(ctx);
-  });
-}
+import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
-  let data = {
+  const data = {
     props: {
       listDepartment: [],
     },
@@ -68,9 +62,10 @@ export async function loadRequestData(ctx) {
 
   return data;
 }
-
-export default function ProductPage(props) {
-  return renderWithLoggedInUser(props, render);
+export async function getServerSideProps(ctx) {
+  return await doWithLoggedInUser(ctx, (cbCtx) => {
+    return loadRequestData(cbCtx);
+  });
 }
 
 export function getFirstImage(val) {
@@ -83,7 +78,7 @@ export function getFirstImage(val) {
 export function formatEllipsisText(text, len = 100) {
   if (text) {
     if (text.length > 50) {
-      return text.substring(0, len) + '...';
+      return `${text.substring(0, len)}...`;
     }
     return text;
   }
@@ -167,8 +162,8 @@ function render(props) {
   }
 
   const onSearchOrder = async () => {
-    let orderClient = getOrderClient();
-    let resp = await orderClient.getOrderByOrderNoFromClient(search);
+    const orderClient = getOrderClient();
+    const resp = await orderClient.getOrderByOrderNoFromClient(search);
     if (resp.status !== 'OK') {
       setOrderData(null);
       setListTicket([]);
@@ -224,27 +219,27 @@ function render(props) {
       if (ticketResp.status !== 'OK') {
         error(ticketResp.message ?? actionErrorText);
         return;
+      }
+      const customerClient = getCustomerClient();
+
+      const customerResp = await customerClient.updateBankCustomer({
+        bank: formData.bank,
+        bankCode: formData.bankCode,
+        bankBranch: formData.bankBranch,
+        customerID: orderData.customerID,
+      });
+      if (customerResp.status !== 'OK') {
+        error(customerResp.message ?? actionErrorText);
       } else {
-        const customerClient = getCustomerClient();
-        const customerResp = await customerClient.updateBankCustomer({
-          bank: formData.bank,
-          bankCode: formData.bankCode,
-          bankBranch: formData.bankBranch,
-          customerID: orderData.customerID,
-        });
-        if (customerResp.status !== 'OK') {
-          error(customerResp.message ?? actionErrorText);
-        } else {
-          success('Tạo yêu cầu thành công');
-          Router.push('/cs/all-case');
-        }
+        success('Tạo yêu cầu thành công');
+        Router.push('/cs/all-case');
       }
     } catch (err) {
       error(err ?? unknownErrorText);
     }
   };
 
-  let breadcrumb = [
+  const breadcrumb = [
     {
       name: 'Trang chủ',
       link: '/cs',
@@ -264,8 +259,8 @@ function render(props) {
       const accountResp = await accountClient.getListEmployeeByDepartment(department.code);
       if (accountResp.status === 'OK') {
         // cheat to err data
-        let tmpData = [];
-        accountResp.data.map((account) => {
+        const tmpData = [];
+        accountResp.data.forEach((account) => {
           if (account && account.username) {
             tmpData.push({ value: account.username, label: account.username });
           }
@@ -290,7 +285,7 @@ function render(props) {
       </Head>
       <div className={styles.grid}>
         <MyCard>
-          <MyCardHeader title="Thêm yêu cầu mới"></MyCardHeader>
+          <MyCardHeader title="Thêm yêu cầu mới" />
           <form>
             <MyCardContent>
               <FormControl size="small">
@@ -557,7 +552,7 @@ function render(props) {
                       placeholder="Chọn"
                       errors={errors}
                       control={control}
-                    ></MuiMultipleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -573,7 +568,7 @@ function render(props) {
                       name="departmentCode"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -588,7 +583,7 @@ function render(props) {
                       name="assignUser"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -651,7 +646,7 @@ function render(props) {
                       </Link>
                     </Grid>
                     <Grid item>
-                      <Link href="#">
+                      <Link href="#id">
                         <Button
                           variant="contained"
                           color="primary"
@@ -670,4 +665,8 @@ function render(props) {
       </div>
     </AppCS>
   );
+}
+
+export default function ProductPage(props) {
+  return renderWithLoggedInUser(props, render);
 }

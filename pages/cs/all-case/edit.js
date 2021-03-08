@@ -7,22 +7,14 @@ import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-comp
 import AppCS from 'pages/_layout';
 
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
-import { red } from '@material-ui/core/colors';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import Link from 'next/link';
 
 import styles from './request.module.css';
 
-export async function getServerSideProps(ctx) {
-  return await doWithLoggedInUser(ctx, (ctx) => {
-    return loadRequestData(ctx);
-  });
-}
-
-export async function loadRequestData(ctx) {
-  let data = {
+export async function loadRequestData() {
+  const data = {
     props: {
       data: [
         {
@@ -72,8 +64,8 @@ export async function loadRequestData(ctx) {
   return data;
 }
 
-export default function ProductPage(props) {
-  return renderWithLoggedInUser(props, render);
+export async function getServerSideProps(ctx) {
+  return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
 
 export function getFirstImage(val) {
@@ -86,58 +78,27 @@ export function getFirstImage(val) {
 export function formatEllipsisText(text, len = 100) {
   if (text) {
     if (text.length > 50) {
-      return text.substring(0, len) + '...';
+      return `${text.substring(0, len)}...`;
     }
     return text;
   }
   return '-';
 }
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: 800,
-  },
-  media: {
-    height: 0,
-    paddingTop: '56.25%', // 16:9
-  },
-  expand: {
-    transform: 'rotate(0deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)',
-  },
-  avatar: {
-    backgroundColor: red[800],
-  },
-}));
-
 function render(props) {
-  const { register, handleSubmit, errors, reset, control, getValues, setValue } = useForm({
+  const [data, setData] = useState(props);
+  const { errors, control } = useForm({
     defaultValues: {
       imageUrls: [],
     },
     mode: 'onChange',
   });
 
-  let [data, setData] = useState(props);
-
   useEffect(() => {
     setData(props);
   }, [props]);
 
-  const classes = useStyles();
-  const [expanded, setExpanded] = React.useState(false);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
-  let breadcrumb = [
+  const breadcrumb = [
     {
       name: 'Trang chủ',
       link: '/cs',
@@ -158,7 +119,7 @@ function render(props) {
       </Head>
       <div className={styles.grid}>
         <MyCard>
-          <MyCardHeader title="Chỉnh sửa yêu cầu"></MyCardHeader>
+          <MyCardHeader title="Chỉnh sửa yêu cầu" />
           <form>
             <MyCardContent>
               <FormControl size="small">
@@ -310,7 +271,7 @@ function render(props) {
                       name="người tạo"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -323,7 +284,7 @@ function render(props) {
                       name="người tạo"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -336,7 +297,7 @@ function render(props) {
                       name="người tạo"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
@@ -349,7 +310,7 @@ function render(props) {
                       name="người tạo"
                       errors={errors}
                       control={control}
-                    ></MuiSingleAuto>
+                    />
                   </Grid>
                   <Grid item xs={12} sm={6} md={6}>
                     <Typography gutterBottom>
@@ -395,14 +356,14 @@ function render(props) {
                   </Grid>
                   <Grid item container xs={12} justify="flex-end" spacing={1}>
                     <Grid item>
-                      <Link href="#">
+                      <Link href="#id">
                         <Button variant="contained" color="primary">
                           Lưu
                         </Button>
                       </Link>
                     </Grid>
                     <Grid item>
-                      <Link href="#">
+                      <Link href="#id">
                         <Button variant="contained" color="default">
                           Hủy bỏ
                         </Button>
@@ -417,4 +378,8 @@ function render(props) {
       </div>
     </AppCS>
   );
+}
+
+export default function ProductPage(props) {
+  return renderWithLoggedInUser(props, render);
 }

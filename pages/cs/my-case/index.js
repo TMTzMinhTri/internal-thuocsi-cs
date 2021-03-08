@@ -22,7 +22,7 @@ import { MyCard, MyCardActions, MyCardHeader } from '@thuocsi/nextjs-components/
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 
-import { ErrorCode, formatUrlSearch } from 'components/global';
+import { ErrorCode, formatUrlSearch, reasons, formatUTCTime, listStatus } from 'components/global';
 
 import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -31,24 +31,17 @@ import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/core/styles';
 import Head from 'next/head';
 import AppCuS from 'pages/_layout';
-import styles from './request.module.css';
+
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import { List } from 'container/cs/list';
-import { reasons } from 'components/global';
 import { getOrderClient } from 'client/order';
 import { getAccountClient } from 'client/account';
 import { getTicketClient } from 'client/ticket';
 import Router, { useRouter } from 'next/router';
-import { formatUTCTime, listStatus } from 'components/global';
-
-export async function getServerSideProps(ctx) {
-  return await doWithLoggedInUser(ctx, (ctx) => {
-    return loadRequestData(ctx);
-  });
-}
+import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
   // setup data
@@ -61,15 +54,15 @@ export async function loadRequestData(ctx) {
   let limit = query.limit || 20;
   let offset = page * limit;
 
-  let _client = getOrderClient(ctx, {});
-  data.props = await _client.getListOrder(offset, limit, q);
+  let orderClient = getOrderClient(ctx, {});
+  data.props = await orderClient.getListOrder(offset, limit, q);
   if (data.props.status !== 'OK') {
     return { props: { data: [], count: 0, message: data.props.message } };
   }
   data.props.count = data.props.total;
 
-  const _accountClient = getAccountClient(ctx, {});
-  const listDepartment = await _accountClient.getListDepartment(0, 20, '');
+  const accountClient = getAccountClient(ctx, {});
+  const listDepartment = await accountClient.getListDepartment(0, 20, '');
   if (listDepartment.status === 'OK') {
     data.props.listDepartment = listDepartment.data.map((department) => ({
       ...department,
@@ -78,11 +71,11 @@ export async function loadRequestData(ctx) {
     }));
   }
 
-  const accountResp = await _accountClient.getListEmployee(0, 20, '');
-  let tmpData = [];
+  const accountResp = await accountClient.getListEmployee(0, 20, '');
+  const tmpData = [];
   if (accountResp.status === 'OK') {
     // cheat to err data
-    accountResp.data.map((account) => {
+    accountResp.data.forEach((account) => {
       if (account && account.username) {
         tmpData.push({
           value: account.username,
@@ -94,8 +87,8 @@ export async function loadRequestData(ctx) {
 
   data.props.accountInfo = tmpData;
 
-  const _ticketClient = getTicketClient(ctx, {});
-  const myTicketResp = await _ticketClient.getTicketByAssignUser();
+  const ticketClient = getTicketClient(ctx, {});
+  const myTicketResp = await ticketClient.getTicketByAssignUser();
   data.props.myTicketResp = [];
   if (myTicketResp.status === 'OK') {
     data.props.myTicketResp = myTicketResp.data;
@@ -104,8 +97,10 @@ export async function loadRequestData(ctx) {
   return data;
 }
 
-export default function TicketPage(props) {
-  return renderWithLoggedInUser(props, render);
+export async function getServerSideProps(ctx) {
+  return await doWithLoggedInUser(ctx, (ctx) => {
+    return loadRequestData(ctx);
+  });
 }
 
 export function getFirstImage(val) {
@@ -145,7 +140,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function render(props) {
-  const { register, handleSubmit, errors, reset, control, getValues, setValue } = useForm({
+  const { register, handleSubmit, errors, control, getValues } = useForm({
     defaultValues: {
       imageUrls: [],
     },
@@ -154,32 +149,22 @@ function render(props) {
 
   const classes = useStyles();
 
-  let [data, setData] = useState(props);
   const [state, setState] = React.useState({});
   const [myTicketList, setMyTicketList] = useState([]);
-  const [expanded, setExpanded] = React.useState(false);
   const [showHideFilter, setShowHideResults] = React.useState(false);
-  const [selectedDate, setSelectedDate] = React.useState(new Date('2014-08-18T21:11:54'));
-  let router = useRouter();
-  let q = router.query.q || '';
-  let limit = parseInt(router.query.limit) || 20;
-  let page = parseInt(router.query.page) || 0;
+
+  const router = useRouter();
+  const q = router.query.q || '';
+  const limit = parseInt(router.query.limit) || 20;
+  const page = parseInt(router.query.page) || 0;
   const [listAssignUser, setListAssignUser] = useState([...props.accountInfo]);
-  let [search, setSearch] = useState('');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     setData(props);
     setSearch(formatUrlSearch(q));
     setMyTicketList(props.myTicketResp);
   }, [props]);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
 
   const ShowHideFilter = () => {
     if (showHideFilter === false) {
@@ -189,7 +174,7 @@ function render(props) {
     }
   };
 
-  let breadcrumb = [
+  const breadcrumb = [
     {
       name: 'Trang chủ',
       link: '/cs',
@@ -363,7 +348,7 @@ function render(props) {
                           fullWidth
                           errors={errors}
                           control={control}
-                        ></MuiSingleAuto>
+                        />
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -384,7 +369,7 @@ function render(props) {
                           fullWidth
                           errors={errors}
                           control={control}
-                        ></MuiSingleAuto>
+                        />
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -405,7 +390,7 @@ function render(props) {
                           fullWidth
                           errors={errors}
                           control={control}
-                        ></MuiSingleAuto>
+                        />
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
@@ -506,7 +491,7 @@ function render(props) {
           {myTicketList.length <= 0 ? (
             <TableRow>
               <TableCell colSpan={5} align="left">
-                {ErrorCode['NOT_FOUND_TABLE']}
+                {ErrorCode.NOT_FOUND_TABLE}
               </TableCell>
             </TableRow>
           ) : (
@@ -578,8 +563,8 @@ function render(props) {
               count={props.count}
               rowsPerPage={limit}
               page={page}
-              onChangePage={(event, page, rowsPerPage) => {
-                Router.push(`/cs/my-case?page=${page}&limit=${rowsPerPage}&q=${search}`);
+              onChangePage={(event, newPage, rowsPerPage) => {
+                Router.push(`/cs/my-case?page=${newPage}&limit=${rowsPerPage}&q=${search}`);
               }}
             />
           ) : (
@@ -589,4 +574,7 @@ function render(props) {
       </TableContainer>
     </AppCuS>
   );
+}
+export default function TicketPage(props) {
+  return renderWithLoggedInUser(props, render);
 }

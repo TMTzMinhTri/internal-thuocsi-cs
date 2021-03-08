@@ -51,15 +51,13 @@ export async function loadRequestData(ctx) {
   const data = { props: {} };
 
   // Fetch data from external API
-  let query = ctx.query;
-  let q = typeof query.q === 'undefined' ? '' : query.q;
-  let page = query.page || 0;
-  let limit = query.limit || 20;
-  let offset = page * limit;
+  const { query } = ctx;
+  const { q = '', page = 0, limit = 20 } = query;
+  const offset = page * limit;
 
-  const _client = getOrderClient(ctx, {});
+  const orderClient = getOrderClient(ctx, {});
 
-  data.props = await _client.getListOrder(offset, limit, q);
+  data.props = await orderClient.getListOrder(offset, limit, q);
 
   if (data.props.status !== 'OK') {
     return { props: { data: [], count: 0, message: data.props.message } };
@@ -76,11 +74,9 @@ export async function loadRequestData(ctx) {
     }));
   }
 
-  // const accountClient = getAccountClient();
   const accountResp = await accountClient.getListEmployee(0, 20, '');
   const tmpData = [];
   if (accountResp.status === 'OK') {
-    // cheat to err data
     accountResp.data.forEach((account) => {
       if (account && account.username) {
         tmpData.push({ value: account.username, label: account.username });
@@ -482,7 +478,7 @@ function render(props) {
           {data.count <= 0 ? (
             <TableRow>
               <TableCell colSpan={5} align="left">
-                {ErrorCode['NOT_FOUND_TABLE']}
+                {ErrorCode.NOT_FOUND_TABLE}
               </TableCell>
             </TableRow>
           ) : (
@@ -556,8 +552,8 @@ function render(props) {
               count={props.count}
               rowsPerPage={limit}
               page={page}
-              onChangePage={(event, page, rowsPerPage) => {
-                Router.push(`/cs/all-case?page=${page}&limit=${rowsPerPage}&q=${search}`);
+              onChangePage={(event, newPage, rowsPerPage) => {
+                Router.push(`/cs/all-case?page=${newPage}&limit=${rowsPerPage}&q=${search}`);
               }}
             />
           ) : (
