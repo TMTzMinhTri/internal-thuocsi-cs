@@ -42,6 +42,7 @@ import { getAccountClient } from 'client/account';
 import { getTicketClient } from 'client/ticket';
 import Router, { useRouter } from 'next/router';
 import styles from './request.module.css';
+import { LabelFormCs } from 'components/atoms';
 
 export async function loadRequestData(ctx) {
   // setup data
@@ -373,15 +374,7 @@ function render(props) {
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
-                          <FormLabel
-                            component="legend"
-                            style={{
-                              fontWeight: 'bold',
-                              color: 'black',
-                            }}
-                          >
-                            Người tiếp nhận:
-                          </FormLabel>
+                          <LabelFormCs>Người tiếp nhận:</LabelFormCs>
                         </Typography>
                         <MuiSingleAuto
                           options={listAssignUser}
@@ -394,15 +387,7 @@ function render(props) {
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
-                          <FormLabel
-                            component="legend"
-                            style={{
-                              fontWeight: 'bold',
-                              color: 'black',
-                            }}
-                          >
-                            Ngày bắt đầu:
-                          </FormLabel>
+                          <LabelFormCs>Ngày bắt đầu:</LabelFormCs>
                         </Typography>
                         <TextField
                           name="createdTime"
@@ -415,15 +400,7 @@ function render(props) {
                       </Grid>
                       <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
-                          <FormLabel
-                            component="legend"
-                            style={{
-                              fontWeight: 'bold',
-                              color: 'black',
-                            }}
-                          >
-                            Ngày kết thúc:
-                          </FormLabel>
+                          <LabelFormCs>Ngày kết thúc:</LabelFormCs>
                         </Typography>
                         <TextField
                           name="lastUpdatedTime"

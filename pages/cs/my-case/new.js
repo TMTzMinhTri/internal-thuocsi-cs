@@ -63,26 +63,7 @@ export async function loadRequestData(ctx) {
 }
 
 export async function getServerSideProps(ctx) {
-  return await doWithLoggedInUser(ctx, (ctx) => {
-    return loadRequestData(ctx);
-  });
-}
-
-export function getFirstImage(val) {
-  if (val && val.length > 0) {
-    return val[0];
-  }
-  return `/default.png`;
-}
-
-export function formatEllipsisText(text, len = 100) {
-  if (text) {
-    if (text.length > 50) {
-      return `${text.substring(0, len)}...`;
-    }
-    return text;
-  }
-  return '-';
+  return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -122,12 +103,6 @@ function render(props) {
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    setData(props);
-  }, [props]);
-
-  const classes = useStyles();
-
   const breadcrumb = [
     {
       name: 'Trang chủ',
@@ -156,7 +131,7 @@ function render(props) {
 
   const onSearchOrder = async () => {
     const orderClient = getOrderClient();
-    const resp = await orderClient.getOrderByOrderNoFromClient(search);
+    const resp = await orderClient.getOrderByOrderNo(search);
     if (resp.status !== 'OK') {
       setOrderData(null);
       setListTicket([]);
@@ -255,7 +230,7 @@ function render(props) {
   };
 
   async function handleChange(event) {
-    const value = event.target.value;
+    const { value } = event.target;
     setSearch(value);
   }
 

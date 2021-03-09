@@ -34,6 +34,14 @@ class TicketClient extends APIClient {
       getTotal: true,
     });
   }
+
+  getListReason() {
+    return this.callFromNextJS('GET', `${URI}/tasks/reasons/list`);
+  }
+
+  getTicketDetail(code) {
+    return this.callFromClient('GET', `${URI}/tasks`, { code });
+  }
 }
 
 export default function getTicketClient(ctx, data) {

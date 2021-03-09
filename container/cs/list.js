@@ -10,7 +10,7 @@ import {
   makeStyles,
 } from '@material-ui/core';
 
-import { REASONS, listStatus, formatNumber, formatDateTime } from 'components/global';
+import { listStatus, formatNumber, formatDateTime } from 'components/global';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
@@ -24,7 +24,7 @@ import { getCustomerClient, getAccountClient, getTicketClient, getOrderClient } 
 
 import styles from 'pages/cs/all-case/request.module.css';
 
-const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage }) => {
+const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage, listReason }) => {
   const { register, handleSubmit, errors, control, setValue } = useForm({
     defaultValues: {
       // customerName: orderData?.customerName,
@@ -146,7 +146,7 @@ const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage })
 
       // get info order
       const orderClient = getOrderClient();
-      const resp = await orderClient.getOrderByOrderNoFromClient(row.saleOrderCode);
+      const resp = await orderClient.getOrderByOrderNo(row.saleOrderCode);
       if (resp.status === 'OK') {
         setOrderData(resp.data[0]);
       }
@@ -343,7 +343,7 @@ const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage })
                     <MuiMultipleAuto
                       name="reasons"
                       required
-                      options={REASONS}
+                      options={listReason}
                       placeholder="Chọn"
                       errors={errors}
                       control={control}

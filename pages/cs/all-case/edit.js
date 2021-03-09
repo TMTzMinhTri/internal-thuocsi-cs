@@ -10,7 +10,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { useForm } from 'react-hook-form';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import Link from 'next/link';
-
+import { LabelFormCs } from 'components/atoms';
 import styles from './request.module.css';
 
 export async function loadRequestData() {
@@ -68,24 +68,7 @@ export async function getServerSideProps(ctx) {
   return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
 
-export function getFirstImage(val) {
-  if (val && val.length > 0) {
-    return val[0];
-  }
-  return `/default.png`;
-}
-
-export function formatEllipsisText(text, len = 100) {
-  if (text) {
-    if (text.length > 50) {
-      return `${text.substring(0, len)}...`;
-    }
-    return text;
-  }
-  return '-';
-}
-
-function render(props) {
+const PageEditCs = (props) => {
   const [data, setData] = useState(props);
   const { errors, control } = useForm({
     defaultValues: {
@@ -262,9 +245,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
-                        Sai sản phẩm:
-                      </FormLabel>
+                      <LabelFormCs>Sai sản phẩm:</LabelFormCs>
                     </Typography>
                     <MuiSingleAuto
                       placeholder="Chọn"
@@ -275,9 +256,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
-                        Chọn bộ phận tiếp nhận:
-                      </FormLabel>
+                      <LabelFormCs>Chọn bộ phận tiếp nhận:</LabelFormCs>
                     </Typography>
                     <MuiSingleAuto
                       placeholder="Chọn"
@@ -288,9 +267,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
-                        Chọn người tiếp nhận:
-                      </FormLabel>
+                      <LabelFormCs>Chọn người tiếp nhận:</LabelFormCs>
                     </Typography>
                     <MuiSingleAuto
                       placeholder="Chọn"
@@ -301,9 +278,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
                     <Typography gutterBottom>
-                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
-                        Chọn trạng thái:
-                      </FormLabel>
+                      <LabelFormCs>Chọn trạng thái:</LabelFormCs>
                     </Typography>
                     <MuiSingleAuto
                       placeholder="Chọn"
@@ -314,9 +289,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={6}>
                     <Typography gutterBottom>
-                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
-                        Mã trả hàng:
-                      </FormLabel>
+                      <LabelFormCs>Mã trả hàng:</LabelFormCs>
                     </Typography>
                     <TextField
                       variant="outlined"
@@ -328,9 +301,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={6}>
                     <Typography gutterBottom>
-                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
-                        Số tiền chuyển lại khách:
-                      </FormLabel>
+                      <LabelFormCs>Số tiền chuyển lại khách:</LabelFormCs>
                     </Typography>
                     <TextField
                       variant="outlined"
@@ -342,9 +313,7 @@ function render(props) {
                   </Grid>
                   <Grid item xs={12} sm={6} md={6}>
                     <Typography gutterBottom>
-                      <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
-                        Mô tả
-                      </FormLabel>
+                      <LabelFormCs>Mô tả</LabelFormCs>
                     </Typography>
                     <TextField
                       variant="outlined"
@@ -378,8 +347,8 @@ function render(props) {
       </div>
     </AppCS>
   );
-}
+};
 
-export default function ProductPage(props) {
-  return renderWithLoggedInUser(props, render);
+export default function index(props) {
+  return renderWithLoggedInUser(props, PageEditCs);
 }

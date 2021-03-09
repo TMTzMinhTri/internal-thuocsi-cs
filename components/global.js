@@ -1,20 +1,5 @@
 import moment from 'moment';
 
-export const REASONS = [
-  {
-    value: 'SAISANPHAM',
-    label: 'Sai sản phẩm',
-  },
-  {
-    value: 'DONGTHIEUHANG',
-    label: 'Đóng thiếu hàng',
-  },
-  {
-    value: 'DONGDUHANG',
-    label: 'Đóng dư hàng',
-  },
-];
-
 export const department = [
   {
     value: 'TECH',

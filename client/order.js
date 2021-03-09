@@ -1,26 +1,15 @@
 import { APIClient } from '@thuocsi/nextjs-components/lib/utils';
-import { constURL } from './constant';
 
 const URI = `/marketplace/order/v1`;
-const prefix = constURL.PREFIX_ORDER;
 
 class OrderClient extends APIClient {
   constructor(ctx, data) {
     super(ctx, data);
   }
 
-  getOrderByOrderNoFromClient(orderNo) {
+  getOrderByOrderNo(orderNo) {
     return this.callFromClient('GET', `${URI}/order`, {
-      order_no: orderNo,
-    });
-  }
-
-  getListOrder(offset, limit, q) {
-    return this.callFromNextJS('GET', `${prefix}/tasks/list`, {
-      q,
-      offset,
-      limit,
-      getTotal: true,
+      orderNo,
     });
   }
 }

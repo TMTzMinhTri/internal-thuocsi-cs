@@ -37,7 +37,8 @@
           ["pages", "./pages"],
           ["public","./public"],
           ["utils","./utils"],
-          ["hooks","./hooks"]
+          ["hooks","./hooks"],
+          ["data","./data"]
         ]
       }
     }
