@@ -201,7 +201,7 @@ function render(props) {
         error(customerResp.message ?? actionErrorText);
       } else {
         success('Tạo yêu cầu thành công');
-        Router.push('/cs/all-case');
+        Router.push('/cs');
       }
     } catch (err) {
       error(err ?? unknownErrorText);

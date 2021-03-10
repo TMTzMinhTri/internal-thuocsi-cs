@@ -1,2 +1,3 @@
-export { default as TableCs } from './TableCs';
-export { default as DrawerEdit } from './DrawerEdit';
+export { default as TicketList } from './TicketList';
+export { default as TicketEdit } from './TicketEdit';
+export { default as TicketTable } from './TicketTable';

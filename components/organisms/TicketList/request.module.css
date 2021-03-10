@@ -1,0 +1,40 @@
+.grid {
+  margin-bottom: 10px;
+}
+
+.rightGroup {
+  float: right;
+  align-items: center;
+}
+
+.contentPadding {
+  padding: 12px;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.inputSearch {
+  flex: 1;
+  margin-left: 3px;
+}
+
+.search {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+.cardButton {
+  background-color: blue;
+}

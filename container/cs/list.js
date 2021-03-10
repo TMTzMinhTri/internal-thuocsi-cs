@@ -99,7 +99,7 @@ const List = ({ anchor, row, listDepartment, resetData, toggleDrawer, idxPage, l
         success('Cập nhật yêu cầu thành công');
         // toggleDrawer(anchor, false)
         if (idxPage) {
-          Router.push('/cs/all-case');
+          Router.push('/cs');
         } else {
           resetData(orderData.orderNo);
         }

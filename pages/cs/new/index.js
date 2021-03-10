@@ -221,7 +221,7 @@ const PageNewCS = (props) => {
         error(customerResp.message ?? actionErrorText);
       } else {
         success('Tạo yêu cầu thành công');
-        Router.push('/cs/all-case');
+        Router.push('/cs');
       }
     } catch (err) {
       error(err ?? unknownErrorText);
@@ -235,7 +235,7 @@ const PageNewCS = (props) => {
     },
     {
       name: 'DS yêu cầu cá nhân',
-      link: '/cs/all-case',
+      link: '/cs',
     },
     {
       name: 'Thêm yêu cầu mới',

@@ -9,7 +9,7 @@ class OrderClient extends APIClient {
 
   getOrderByOrderNo(orderNo) {
     return this.callFromClient('GET', `${URI}/order`, {
-      orderNo,
+      order_no: orderNo,
     });
   }
 }

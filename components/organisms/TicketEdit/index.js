@@ -11,8 +11,7 @@ import {
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-import { getAccountClient, getCustomerClient, getTicketClient } from 'client';
+import { getAccountClient, getCustomerClient, getOrderClient, getTicketClient } from 'client';
 import clsx from 'clsx';
 import { LabelFormCs } from 'components/atoms';
 import { formatDateTime, formatNumber, listStatus } from 'components/global';
@@ -49,13 +48,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
+const customerClient = getCustomerClient();
+const ticketClient = getTicketClient();
+const orderClient = getOrderClient();
+
+const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, listAssignUser }) => {
   const classes = useStyles();
   const styles = makeStyles(useStyles);
   const [ticketDetail, setTicketDetail] = useState({});
-  const [listDepartment, setListDepartment] = useState([{ value: '', code: '' }]);
-  // const [listReasons, setListReason] = useState([]);
-  const [listAssignUser, setListAssignUser] = useState([{ value: '', code: '' }]);
 
   const anchor = '';
 
@@ -67,19 +67,31 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
   });
 
   useEffect(() => {
-    const loadData = async () => {
-      const ticketClient = getTicketClient();
-      const ticketDetailResult = await ticketClient.getTicketDetail(ticketId);
-      if (!isValid(ticketDetailResult)) {
-        setTicketDetail(null);
-        return;
+    const fetchDataDetail = async (code) => {
+      const [ticketResult] = await Promise.all([ticketClient.getTicketDetail({ code })]);
+
+      if (isValid(ticketResult)) {
+        const detail = getFirst(ticketResult);
+        const [accRes, orderRes] = await Promise.all([
+          customerClient.getCustomer(detail.customerID),
+          orderClient.getOrderByOrderNo(detail.saleOrderCode),
+        ]);
+
+        if (isValid(accRes)) {
+          detail.customer = getFirst(accRes);
+        }
+        if (isValid(orderRes)) {
+          detail.order = getFirst(orderRes);
+        }
+
+        setTicketDetail(detail);
       }
-      setTicketDetail(getFirst(ticketDetailResult));
     };
 
-    loadData(ticketId);
+    fetchDataDetail(ticketId);
   }, []);
 
+  const { cashback = 0, bankBranch = '', bankName = '', note = '', returnCode = '' } = ticketDetail;
   return (
     <Drawer
       ModalProps={{
@@ -156,7 +168,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         <LabelFormCs>
                           Ngày mua:{' '}
                           <span style={{ color: 'grey' }}>
-                            {formatDateTime(ticketDetail?.createdTime)}
+                            {formatDateTime(ticketDetail?.order?.createdTime)}
                           </span>
                         </LabelFormCs>
                       </Typography>
@@ -179,13 +191,13 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Họ tên khách hàng: {ticketDetail?.name}
+                          Họ tên khách hàng: {ticketDetail?.order?.customerName}
                         </FormLabel>
                         <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Số điện thoại: {ticketDetail?.customerPhone}
+                          Số điện thoại: {ticketDetail?.order?.customerPhone}
                         </FormLabel>
                       </Typography>
                     </Grid>
@@ -202,6 +214,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         size="small"
                         type="text"
                         fullWidth
+                        value={ticketDetail?.order?.customerName}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -232,6 +245,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         size="small"
                         type="text"
                         fullWidth
+                        value={bankName}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -247,26 +261,27 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         size="small"
                         type="text"
                         fullWidth
+                        value={bankBranch}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
                       <Typography gutterBottom>
                         <LabelFormCs>Nguyên nhân:</LabelFormCs>
                       </Typography>
-                      {/* <MuiMultipleAuto
+                      <MuiMultipleAuto
                         name="reasons"
                         required
                         options={listReason}
                         placeholder="Chọn"
                         errors={errors}
                         control={control}
-                      /> */}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                       <Typography gutterBottom>
                         <LabelFormCs>Chọn bộ phận tiếp nhận:</LabelFormCs>
                       </Typography>
-                      {/* <MuiSingleAuto
+                      <MuiSingleAuto
                         name="departmentCode"
                         onValueChange={(data) => {
                           console.log(data);
@@ -276,7 +291,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         placeholder="Chọn"
                         errors={errors}
                         control={control}
-                      /> */}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                       <Typography gutterBottom>
@@ -315,6 +330,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         type="text"
                         fullWidth
                         placeholder="0"
+                        value={returnCode}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
@@ -329,6 +345,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         type="number"
                         fullWidth
                         placeholder="0"
+                        value={cashback}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
@@ -343,6 +360,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         type="text"
                         fullWidth
                         placeholder="Ghi chú..."
+                        value={note}
                       />
                     </Grid>
                     <Grid item container xs={12} justify="flex-end" spacing={1}>
@@ -376,4 +394,4 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
   );
 };
 
-export default DrawerEdit;
+export default TicketEdit;

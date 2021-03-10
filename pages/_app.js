@@ -22,20 +22,14 @@ const menu = [
   {
     key: 'ALLCASE',
     name: 'DS phiếu yêu cầu',
-    link: '/cs/all-case',
+    link: '/cs',
     icon: faList,
   },
   {
     key: 'MYCASE',
     name: 'DS yêu cầu cá nhân',
-    link: '/cs/my-case',
+    link: '/cs/my',
     icon: faList,
-  },
-  {
-    key: 'LISTFILE',
-    name: 'Danh sách file',
-    link: '/cs/list-file',
-    icon: faFile,
   },
 ];
 

@@ -24,7 +24,7 @@ export async function loadRequestData(ctx) {
   // TODO offset limit
   const [accountResult, ticketResult, listDepartmentResult, listReasonRes] = await Promise.all([
     accountClient.getListEmployee(0, 1000, ''),
-    ticketClient.getList(offset, limit, q),
+    ticketClient.getTicketByAssignUser(offset, limit, q),
     accountClient.getListDepartment(0, 20, ''),
     ticketClient.getListReason(),
   ]);
@@ -69,15 +69,15 @@ const breadcrumb = [
   },
 ];
 
-const ListTicketPage = (props) => (
+const MyListTicketPage = (props) => (
   <AppCS select="/cs" breadcrumb={breadcrumb}>
     <Head>
-      <title>DS phiếu yêu cầu</title>
+      <title>DS phiếu yêu cầu cá nhân</title>
     </Head>
     <TicketList {...props} />
   </AppCS>
 );
 
-const index = (props) => renderWithLoggedInUser(props, ListTicketPage);
+const index = (props) => renderWithLoggedInUser(props, MyListTicketPage);
 
 export default index;
