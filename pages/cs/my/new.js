@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   Button,
   Paper,
@@ -28,14 +29,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import EditIcon from '@material-ui/icons/Edit';
-import React, { useEffect, useState } from 'react';
-import { getOrderClient } from 'client/order';
-import { getCustomerClient } from 'client/customer';
-import { getAccountClient } from 'client/account';
-import { getTicketClient } from 'client/ticket';
+
+import { getOrderClient, getCustomerClient, getAccountClient, getTicketClient } from 'client';
 import Router from 'next/router';
-import { formatDateTime, reasons, ErrorCode } from 'components/global';
-import { List } from 'container/cs/list';
+import { formatDateTime, ErrorCode } from 'components/global';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
@@ -453,15 +450,7 @@ function render(props) {
                                 anchor="right"
                                 open={state[anchor]}
                                 onClose={() => toggleDrawer(anchor, false)}
-                              >
-                                <List
-                                  resetData={onSearchOrder}
-                                  toggleDrawer={toggleDrawer}
-                                  anchor={anchor}
-                                  listDepartment={props.listDepartment}
-                                  row={row}
-                                />
-                              </Drawer>
+                              />
                             </React.Fragment>
                           ))}
                         </div>

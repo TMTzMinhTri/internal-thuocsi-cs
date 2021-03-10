@@ -45,7 +45,6 @@ import { LabelFormCs } from 'components/atoms';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
 import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
-import List from 'container/cs/list';
 import styles from './request.module.css';
 
 export async function loadRequestData(ctx) {
@@ -474,15 +473,7 @@ const PageNewCS = (props) => {
                                       anchor="right"
                                       open={state[anchor]}
                                       onClose={() => toggleDrawer(anchor, false)}
-                                    >
-                                      <List
-                                        resetData={onSearchOrder}
-                                        toggleDrawer={toggleDrawer}
-                                        anchor={anchor}
-                                        listDepartment={listDepartment}
-                                        row={row}
-                                      />
-                                    </Drawer>
+                                    />
                                   </React.Fragment>
                                 ))}
                               </div>
