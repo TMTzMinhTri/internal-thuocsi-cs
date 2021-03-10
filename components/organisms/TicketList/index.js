@@ -55,7 +55,6 @@ const TicketList = ({
   const pathName = router.pathname;
   const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
   const page = parseInt(router.query.page, 10) || PAGE_DEFAULT;
-  console.log('ticketId > ', ticketId);
 
   // function
   const onSubmit = useCallback(
