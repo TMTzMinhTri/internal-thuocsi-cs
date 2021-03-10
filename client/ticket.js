@@ -1,38 +1,49 @@
-import { APIClient } from "@thuocsi/nextjs-components/lib/utils";
-const URI = `/marketplace/ticket/v1`
-// const URI = ``
+import { APIClient } from '@thuocsi/nextjs-components/lib/utils';
 
+const URI = `/marketplace/ticket/v1`;
 class TicketClient extends APIClient {
+  constructor(ctx, data) {
+    super(ctx, data);
+  }
 
-    constructor(ctx, data) {
-        super(ctx, data)
-    }
+  createTicket(formData) {
+    return this.callFromClient('POST', `${URI}/tasks`, formData);
+  }
 
-    createTicket(formData) {
-        return this.callFromClient(
-            "POST",
-            `${URI}/tasks`, formData)
-    }
+  updateTicket(formData) {
+    return this.callFromClient('PUT', `${URI}/task`, formData);
+  }
 
-    updateTicket(formData) {
-        return this.callFromClient("PUT", `${URI}/task`, formData)
-    }
+  getTicketBySaleOrderCode({ saleOrderCode }) {
+    return this.callFromClient('GET', `${URI}/tasks`, { saleOrderCode });
+  }
 
-    getTicketBySaleOrderCode(code) {
-        return this.callFromClient("GET", `${URI}/tasks`, { sale_order_code: code })
-    }
+  getTicketByFilter(formData) {
+    return this.callFromClient('POST', `${URI}/tasks/list`, formData);
+  }
 
-    getTicketByFilter(formData) {
-        return this.callFromClient("POST", `${URI}/tasks/list`, formData)
-    }
+  getTicketByAssignUser() {
+    return this.callFromNextJS('GET', `${URI}/me/tasks/list`);
+  }
 
-    getTicketByAssignUser() {
-        return this.callFromNextJS("GET", `${URI}/me/tasks/list`)
-    }
+  getList(offset, limit, q) {
+    return this.callFromNextJS('GET', `${URI}/tasks/list`, {
+      q,
+      offset,
+      limit,
+      getTotal: true,
+    });
+  }
 
+  getListReason() {
+    return this.callFromNextJS('GET', `${URI}/tasks/reasons/list`);
+  }
+
+  getTicketDetail({ code }) {
+    return this.callFromClient('GET', `${URI}/task`, { code });
+  }
 }
 
-
-export function getTicketClient(ctx, data) {
-    return new TicketClient(ctx, data)
+export default function getTicketClient(ctx, data) {
+  return new TicketClient(ctx, data);
 }

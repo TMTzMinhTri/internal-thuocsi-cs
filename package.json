@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
-    "start": "next start -p 80"
+    "start": "next start -p 80",
+    "lint:check": "eslint --ext=js,jsx pages"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
@@ -14,8 +15,10 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@material-ui/core": "4.11.2",
+    "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "@thuocsi/nextjs-components": "git+https://gitlab.com/thuocsi.vn-sdk/nextjs-components.git#v0.1.33",
+    "clsx": "^1.1.1",
     "cross-env": "^7.0.3",
     "draft-js": "^0.11.7",
     "draft-js-export-html": "^1.4.1",
@@ -29,9 +32,18 @@
     "react-dom": "16.13.1",
     "react-draft-wysiwyg": "^1.14.5",
     "react-hook-form": "^6.15.3",
-    "react-select": "^3.2.0"
+    "react-select": "^3.2.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@material-ui/icons": "^4.11.2"
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.13.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0"
   }
 }
