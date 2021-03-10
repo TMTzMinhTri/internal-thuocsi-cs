@@ -11,6 +11,7 @@ import {
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
+import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import { getAccountClient, getCustomerClient, getOrderClient, getTicketClient } from 'client';
 import clsx from 'clsx';
 import { LabelFormCs } from 'components/atoms';
@@ -56,13 +57,19 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
   const classes = useStyles();
   const styles = makeStyles(useStyles);
   const [ticketDetail, setTicketDetail] = useState({});
+  const { success, error } = useToast();
 
   const anchor = '';
+  const onSubmit = async (data) => {
+    const ticketUpdateRes = await ticketClient.updateTicket(data);
+    if (!isValid(ticketUpdateRes)) {
+      error(ticketUpdateRes?.message || 'Cập nhập thất bại ');
+      return;
+    }
+    success('Cập nhập thành công.');
+  };
 
   const { register, handleSubmit, errors, control, clearErrors, setValue } = useForm({
-    defaultValues: {
-      imageUrls: [],
-    },
     mode: 'onChange',
   });
 
@@ -365,11 +372,7 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                     </Grid>
                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                       <Grid item>
-                        <Button
-                          variant="contained"
-                          color="default"
-                          // onClick={() => toggleDrawer(anchor, false)}
-                        >
+                        <Button variant="contained" color="default" onClick={() => onClose()}>
                           Quay lại
                         </Button>
                       </Grid>
@@ -377,7 +380,7 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                         <Button
                           variant="contained"
                           color="primary"
-                          // onClick={handleSubmit(onSubmit)}
+                          onClick={handleSubmit(onSubmit)}
                         >
                           Lưu
                         </Button>
