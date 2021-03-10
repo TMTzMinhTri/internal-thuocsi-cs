@@ -17,6 +17,7 @@ import clsx from 'clsx';
 import { LabelFormCs } from 'components/atoms';
 import { formatDateTime, formatNumber, listStatus } from 'components/global';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { getFirst, isValid } from 'utils';
 
 const useStyles = makeStyles((theme) => ({
@@ -50,7 +51,13 @@ const useStyles = makeStyles((theme) => ({
 
 const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
   const classes = useStyles();
+  const styles = makeStyles(useStyles);
   const [ticketDetail, setTicketDetail] = useState({});
+  const [listDepartment, setListDepartment] = useState([{ value: '', code: '' }]);
+  // const [listReasons, setListReason] = useState([]);
+  const [listAssignUser, setListAssignUser] = useState([{ value: '', code: '' }]);
+
+  const anchor = '';
 
   const { register, handleSubmit, errors, control, clearErrors, setValue } = useForm({
     defaultValues: {
@@ -100,7 +107,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
         <div className={styles.grid}>
           <MyCard>
             <MyCardHeader title="Thông tin yêu cầu" />
-            <form key={ticketDetail.code}>
+            <form key={ticketDetail?.code}>
               <MyCardContent>
                 <FormControl size="small">
                   <Grid
@@ -116,13 +123,13 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Ngày tạo: {formatDateTime(ticketDetail.createdTime)}
+                          Ngày tạo: {formatDateTime(ticketDetail?.createdTime)}
                         </FormLabel>
                         <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px', fontSize: '40px' }}
                         >
-                          {ticketDetail.code} - {ticketDetail.saleOrderCode}
+                          {ticketDetail?.code} - {ticketDetail?.saleOrderCode}
                         </FormLabel>
                         <FormLabel
                           component="legend"
@@ -143,7 +150,8 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Người tạo: <span style={{ color: 'grey' }}>{ticketDetail.createdBy}</span>
+                          Người tạo:{' '}
+                          <span style={{ color: 'grey' }}>{ticketDetail?.createdBy}</span>
                         </FormLabel>
                         <LabelFormCs>
                           Ngày mua:{' '}
@@ -159,7 +167,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          User ID: {ticketDetail.customerID}
+                          User ID: {ticketDetail?.customerID}
                         </FormLabel>
                         <FormLabel
                           component="legend"
@@ -203,8 +211,8 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                       <TextField
                         name="bankCode"
                         inputRef={register({ required: 'Vui lòng nhập thông tin' })}
-                        error={!!errors.bankCode}
-                        helperText={errors.bankCode?.message}
+                        error={!!errors?.bankCode}
+                        helperText={errors?.bankCode?.message}
                         variant="outlined"
                         size="small"
                         type="text"
@@ -234,7 +242,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         name="bankBranch"
                         inputRef={register({ required: 'Vui lòng nhập thông tin' })}
                         error={!!errors.bankBranch}
-                        helperText={errors.bankBranch?.message}
+                        helperText={errors?.bankBranch?.message}
                         variant="outlined"
                         size="small"
                         type="text"
@@ -245,20 +253,20 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                       <Typography gutterBottom>
                         <LabelFormCs>Nguyên nhân:</LabelFormCs>
                       </Typography>
-                      <MuiMultipleAuto
+                      {/* <MuiMultipleAuto
                         name="reasons"
                         required
                         options={listReason}
                         placeholder="Chọn"
                         errors={errors}
                         control={control}
-                      />
+                      /> */}
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                       <Typography gutterBottom>
                         <LabelFormCs>Chọn bộ phận tiếp nhận:</LabelFormCs>
                       </Typography>
-                      <MuiSingleAuto
+                      {/* <MuiSingleAuto
                         name="departmentCode"
                         onValueChange={(data) => {
                           console.log(data);
@@ -268,7 +276,7 @@ const DrawerEdit = ({ isOpen, onClose, ticketId, listReason }) => {
                         placeholder="Chọn"
                         errors={errors}
                         control={control}
-                      />
+                      /> */}
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                       <Typography gutterBottom>

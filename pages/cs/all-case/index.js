@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, FormControl, TextField, Typography, Grid, makeStyles } from '@material-ui/core';
+import { Button, FormControl, TextField, Typography, Grid } from '@material-ui/core';
 
 import Link from 'next/link';
 import Head from 'next/head';
@@ -23,7 +23,7 @@ import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
 import { LabelFormCs } from 'components/atoms';
 import { TableCs, DrawerEdit } from 'components/organisms';
-import { getData, isValid } from 'utils';
+import { getData, isValid, ReasonUtils } from 'utils';
 import useModal from 'hooks/useModal';
 import styles from './request.module.css';
 
@@ -56,9 +56,12 @@ export async function loadRequestData(ctx) {
   const usersAssign =
     accountResult?.data?.map((acc) => ({ value: acc.username, label: acc.username })) || [];
 
+  console.log('listReason >>> ', listReason);
+
   return {
     props: {
       listReason: listReason?.data || [],
+      mapListReason: ReasonUtils.convertReasonList(listReason?.data || []),
       listDepartment,
       total,
       tickets,
@@ -81,37 +84,8 @@ const breadcrumb = [
   },
 ];
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: 800,
-  },
-  muiDrawerRoot: {
-    boxShadow: 'none',
-  },
-  media: {
-    height: 0,
-    paddingTop: '56.25%', // 16:9
-  },
-  expand: {
-    transform: 'rotate(0deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  },
-  BackdropProps: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)',
-  },
-  list: {
-    width: '70vw',
-  },
-}));
-
 const ListTicketPage = (props) => {
-  const { usersAssign, total, tickets, listReason } = props;
+  const { usersAssign, total, tickets, listReason, mapListReason } = props;
 
   const { register, handleSubmit, errors, control, getValues } = useForm({
     defaultValues: {
@@ -128,16 +102,12 @@ const ListTicketPage = (props) => {
 
   const [listTickets, setListickets] = useState(tickets);
 
-  const limit = parseInt(router.query.limit) || LIMIT_DEFAULT;
-  const page = parseInt(router.query.page) || PAGE_DEFAULT;
+  const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
+  const page = parseInt(router.query.page, 10) || PAGE_DEFAULT;
 
   useEffect(() => {
     setSearch(formatUrlSearch(q));
   }, [props]);
-
-  const classes = useStyles();
-
-  const [state, setState] = React.useState({});
 
   const debounceSearchAssignUser = async (q) => {
     const accountClient = getAccountClient();
@@ -188,6 +158,9 @@ const ListTicketPage = (props) => {
   // const toggleDrawer = (anchor, open) => {
   //   setState({ ...state, [anchor]: open });
   // };
+
+  console.log('listReasons >> ', listReason);
+  console.log('mapListReason > ', mapListReason);
 
   return (
     <AppCS select="/cs/all-case" breadcrumb={breadcrumb}>
@@ -376,6 +349,8 @@ const ListTicketPage = (props) => {
         page={page}
         limit={limit}
         search={search}
+        listReasons={listReason}
+        mapListReason={mapListReason}
         onClickBtnEdit={handleBtnEdit}
       />
       <DrawerEdit isOpen={showEditPopup} onClose={toggleEdit} />

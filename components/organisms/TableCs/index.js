@@ -1,8 +1,6 @@
 import {
   Chip,
-  Drawer,
   IconButton,
-  makeStyles,
   Paper,
   Table,
   TableBody,
@@ -17,12 +15,20 @@ import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, listStatus } from 'components/global';
 import { v4 as uuidv4 } from 'uuid';
 import React from 'react';
-import List from 'container/cs/list';
 import Router from 'next/router';
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
 
-const TableCs = (props) => {
-  const { data, total, page, limit, search, onClickBtnEdit } = props;
+const TableCs = ({
+  data,
+  total,
+  page,
+  limit,
+  search,
+  onClickBtnEdit,
+  listReasons,
+  mapListReason,
+}) => {
+  const aaa = '';
 
   return (
     <TableContainer component={Paper}>
@@ -64,8 +70,13 @@ const TableCs = (props) => {
                 <TableCell align="center">{item.saleOrderCode}</TableCell>
                 <TableCell align="center">{item.saleOrderID}</TableCell>
                 <TableCell align="left">
-                  {item.reasons.map(({ name }) => (
-                    <Chip key={uuidv4()} style={{ margin: '3px' }} size="small" label={name} />
+                  {item.reasons.map((code) => (
+                    <Chip
+                      key={uuidv4()}
+                      style={{ margin: '3px' }}
+                      size="small"
+                      label={mapListReason[code]}
+                    />
                   ))}
                 </TableCell>
                 <TableCell align="left">{item.note}</TableCell>
