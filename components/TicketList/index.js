@@ -2,10 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Button, FormControl, TextField, Typography, Grid } from '@material-ui/core';
 
 import Link from 'next/link';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
-
-import AppCS from 'pages/_layout';
 
 import { formatUTCTime, listStatus } from 'components/global';
 
@@ -20,11 +17,11 @@ import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import useModal from 'hooks/useModal';
-import { LabelFormCs } from 'components/atoms';
 
 import { getData, isValid } from 'utils';
 import TicketTable from '../TicketTable';
 import TicketEdit from '../TicketEdit';
+import LabelFormCs from '../LabelFormCs';
 
 import styles from './request.module.css';
 

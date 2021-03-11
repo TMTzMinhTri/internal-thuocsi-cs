@@ -41,7 +41,7 @@ import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 
 import EditIcon from '@material-ui/icons/Edit';
 import Drawer from '@material-ui/core/Drawer';
-import { LabelFormCs } from 'components/atoms';
+import { LabelFormCs } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
 import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
@@ -114,6 +114,7 @@ const PageNewCS = (props) => {
   const [listAssignUser, setListAssignUser] = useState([{ value: '', label: '' }]);
 
   const [search, setSearch] = useState();
+
   const [customerInf, setCustomerInf] = useState({
     bank: '',
     bankCode: '',

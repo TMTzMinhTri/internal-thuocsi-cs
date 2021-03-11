@@ -14,11 +14,11 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import { getAccountClient, getCustomerClient, getOrderClient, getTicketClient } from 'client';
 import clsx from 'clsx';
-import { LabelFormCs } from 'components/atoms';
 import { formatDateTime, formatNumber, listStatus } from 'components/global';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { getFirst, isValid } from 'utils';
+import LabelFormCs from '../LabelFormCs';
 
 const useStyles = makeStyles((theme) => ({
   root: {
