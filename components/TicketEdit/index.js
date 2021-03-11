@@ -5,6 +5,7 @@ import {
   FormLabel,
   Grid,
   makeStyles,
+  TextareaAutosize,
   TextField,
   Typography,
 } from '@material-ui/core';
@@ -12,9 +13,10 @@ import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-import { getTicketClient } from 'client';
+import { getAccountClient, getTicketClient } from 'client';
 import clsx from 'clsx';
 import { formatDateTime, formatNumber, listStatus } from 'components/global';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValid } from 'utils';
 import LabelFormCs from '../LabelFormCs';
@@ -56,11 +58,12 @@ const TicketEdit = ({
   listReason,
   listDepartment,
   ticketDetail,
-  listAssignUser,
+  listAssignUser: usersAssign,
 }) => {
   const classes = useStyles();
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
+  const [listAssignUser, setListAssignUser] = useState(usersAssign);
 
   const anchor = '';
 
@@ -97,6 +100,27 @@ const TicketEdit = ({
       assignUser: listAssignUser.find((item) => item.value === ticketDetail.assignUser),
     },
   });
+
+  const updateListAssignUser = useCallback(async (department) => {
+    if (department) {
+      const accountClient = getAccountClient();
+      const accountResp = await accountClient.getListEmployeeByDepartment(department.code);
+      if (accountResp.status === 'OK') {
+        // cheat to err data
+        const tmpData = [];
+        accountResp.data.forEach((account) => {
+          if (account && account.username) {
+            tmpData.push({ value: account.accountId, label: account.username });
+          }
+        });
+        setListAssignUser(tmpData);
+      } else {
+        setListAssignUser([{ value: '', label: '' }]);
+      }
+    } else {
+      setListAssignUser([{ value: '', label: '' }]);
+    }
+  }, []);
 
   return (
     <Drawer
@@ -162,7 +186,7 @@ const TicketEdit = ({
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Số lượng sản phẩm: xxx
+                          Số lượng sản phẩm: __
                         </FormLabel>
                         <FormLabel
                           component="legend"
@@ -287,7 +311,7 @@ const TicketEdit = ({
                       </Typography>
                       <MuiSingleAuto
                         name="departmentCode"
-                        onValueChange={(data) => {}}
+                        onValueChange={(data) => updateListAssignUser(data)}
                         options={listDepartment}
                         required
                         placeholder="Chọn"
@@ -348,18 +372,21 @@ const TicketEdit = ({
                         placeholder="0"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={6} md={6}>
+                    <Grid item xs={12} sm={12} md={12}>
                       <Typography gutterBottom>
                         <LabelFormCs>Mô tả</LabelFormCs>
                       </Typography>
-                      <TextField
+                      <TextareaAutosize
+                        style={{ width: '100%' }}
                         name="note"
+                        ref={register}
                         inputRef={register}
                         variant="outlined"
                         size="small"
                         type="text"
                         fullWidth
                         placeholder="Ghi chú..."
+                        rows="10"
                       />
                     </Grid>
                     <Grid item container xs={12} justify="flex-end" spacing={1}>

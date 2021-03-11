@@ -102,8 +102,8 @@ const TicketTable = ({ data, total, search, listReasons }) => {
   };
 
   useEffect(() => {
-    onClickBtnEdit(ticketSelected);
-  }, [ticketSelected]);
+    if (ticketSelected && ticketSelected.length > 0) onClickBtnEdit(ticketSelected);
+  }, [onClickBtnEdit, ticketSelected]);
 
   return (
     <>
@@ -146,7 +146,7 @@ const TicketTable = ({ data, total, search, listReasons }) => {
                 <TableRow key={uuidv4()}>
                   <TableCell align="center">{item.code}</TableCell>
                   <TableCell align="center">{item.saleOrderCode}</TableCell>
-                  <TableCell align="center">{item.saleOrderID}</TableCell>
+                  <TableCell align="center"></TableCell>
                   <TableCell align="left">
                     {item?.reasons?.map((code) => (
                       <Chip
