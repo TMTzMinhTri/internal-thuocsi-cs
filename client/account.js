@@ -16,6 +16,15 @@ class AccountClient extends APIClient {
     });
   }
 
+  clientGetListDepartment(offset, limit, q) {
+    return this.callFromClient('GET', `${URI}/department/list`, {
+      q,
+      offset,
+      limit,
+      getTotal: true,
+    });
+  }
+
   getListEmployeeByDepartment(departmentCode) {
     return this.callFromClient('GET', `${URI}/employee/by-department`, {
       departmentCode,

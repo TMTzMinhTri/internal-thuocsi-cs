@@ -18,7 +18,7 @@ import React from 'react';
 import Router from 'next/router';
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
 
-const TicketTable = ({ data, total, page, limit, search, onClickBtnEdit, mapListReason }) => (
+const TicketTable = ({ data, total, page, limit, search, onClickBtnEdit, listReasons }) => (
   <TableContainer component={Paper}>
     <Table size="small">
       <colgroup>
@@ -65,7 +65,7 @@ const TicketTable = ({ data, total, page, limit, search, onClickBtnEdit, mapList
                     key={uuidv4()}
                     style={{ margin: '3px' }}
                     size="small"
-                    label={mapListReason[code]}
+                    label={listReasons.find((reason) => reason.value === code).label}
                   />
                 ))}
               </TableCell>

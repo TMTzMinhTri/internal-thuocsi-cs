@@ -64,6 +64,7 @@ const TicketEdit = ({
   const { success, error } = useToast();
 
   const anchor = '';
+
   const onSubmit = async (data) => {
     const ticketUpdateDetail = {
       code: ticketId,

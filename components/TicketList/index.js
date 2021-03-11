@@ -10,7 +10,7 @@ import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useForm } from 'react-hook-form';
-import { getAccountClient, getTicketClient } from 'client';
+import { getAccountClient, getOrderClient, getTicketClient } from 'client';
 
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
@@ -18,26 +18,22 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import useModal from 'hooks/useModal';
 
-import { getData, isValid } from 'utils';
+import { getData, getFirst, isValid } from 'utils';
 import TicketTable from '../TicketTable';
 import TicketEdit from '../TicketEdit';
 import LabelFormCs from '../LabelFormCs';
 
 import styles from './request.module.css';
 
-const TicketList = ({
-  listUserAssign,
-  total,
-  tickets,
-  listReason,
-  mapListReason,
-  listDepartment,
-  ticketDetail,
-}) => {
+const TicketList = ({ total, tickets, listReason }) => {
   const [search, setSearch] = useState('');
   const [listTickets, setListickets] = useState(tickets);
+  const [listDepartment, setListDepartment] = useState([]);
+  const [listUserAssign, setListUserAssign] = useState([]);
   // Modal
   const [showHideFilter, toggleFilter] = useModal(false);
+  const [detail, setDetail] = useState(null);
+  // const [showHideFilter, toggleModalEdit] = useModal(false);
 
   const { register, handleSubmit, errors, control, getValues } = useForm({
     defaultValues: {},
@@ -47,7 +43,6 @@ const TicketList = ({
   const router = useRouter();
 
   // query + params
-  const { ticketId = null } = router.query;
   const pathName = router.pathname;
   const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
   const page = parseInt(router.query.page, 10) || PAGE_DEFAULT;
@@ -64,6 +59,7 @@ const TicketList = ({
       lastUpdatedTime,
     }) => {
       const ticketClient = getTicketClient();
+
       const ticketResp = await ticketClient.getTicketByFilter({
         saleOrderCode,
         saleOrderID,
@@ -83,12 +79,66 @@ const TicketList = ({
     [],
   );
 
-  const handleBtnEdit = useCallback((id) => {
-    router.push(`?ticketId=${id}`);
+  const handleBtnEdit = useCallback(async (code) => {
+    // init client
+    const ticketClient = getTicketClient();
+    const orderClient = getOrderClient();
+    const accountClient = getAccountClient();
+
+    // validate list department
+    if (listDepartment.length === 0) {
+      const listDepartmentRes = await accountClient.clientGetListDepartment(0, 20, '');
+      if (isValid(listDepartmentRes)) {
+        setListDepartment(
+          listDepartmentRes?.data?.map((depart) => ({
+            ...depart,
+            value: depart.code,
+            label: depart.name,
+          })) || [],
+        );
+      }
+    }
+
+    // validate user assign
+    if (listUserAssign.length === 0) {
+      const listUserAssignRes = await accountClient.getListEmployee(0, 10, '');
+      if (isValid(listUserAssignRes)) {
+        setListUserAssign(
+          listUserAssignRes?.data?.map((acc) => ({
+            value: acc.accountId || '',
+            label: acc.username || '',
+          })) || [],
+        );
+      }
+    }
+
+    // always get data detail
+    const [ticketRes] = await Promise.all([ticketClient.clientGetTicketDetail({ code })]);
+    // const ticketRes = await ticketClient.clientGetTicketDetail({ code });
+    if (isValid(ticketRes)) {
+      const ticketData = getFirst(ticketRes);
+      const orderRes = await orderClient.getOrderByOrderNo(ticketData.saleOrderCode);
+
+      if (isValid(orderRes)) {
+        const orderInfo = getFirst(orderRes);
+        ticketData.customerName = orderInfo.customerName;
+        ticketData.customerPhone = orderInfo.customerPhone;
+        ticketData.totalPrice = orderInfo.totalPrice;
+        ticketData.orderCreatedTime = orderInfo.createdTime;
+      }
+
+      // account
+
+      // list reasons
+
+      // department
+
+      setDetail(ticketData);
+    }
   }, []);
 
   const handleCloseBtnEdit = () => {
-    router.push('?');
+    setDetail(null);
   };
 
   const debounceSearchAssignUser = useCallback(async (q) => {
@@ -279,15 +329,14 @@ const TicketList = ({
           </form>
         </MyCard>
       </div>
-      {ticketId && (
+      {detail && (
         <TicketEdit
           isOpen
           onClose={handleCloseBtnEdit}
           listReason={listReason}
           listAssignUser={listUserAssign}
           listDepartment={listDepartment}
-          ticketId={ticketId}
-          ticketDetail={ticketDetail}
+          ticketDetail={detail}
         />
       )}
       {/* table cs  */}
@@ -297,7 +346,7 @@ const TicketList = ({
         page={page}
         limit={limit}
         search={search}
-        mapListReason={mapListReason}
+        listReasons={listReason}
         onClickBtnEdit={handleBtnEdit}
       />
     </>
