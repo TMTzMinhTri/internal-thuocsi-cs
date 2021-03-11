@@ -16,6 +16,7 @@ import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
+
 import useModal from 'hooks/useModal';
 
 import { getData, getFirst, isValid } from 'utils';
@@ -48,10 +49,10 @@ const TicketList = ({ total, tickets, listReason }) => {
   const page = parseInt(router.query.page, 10) || PAGE_DEFAULT;
 
   // function
-  const onSubmit = useCallback(
+  const onSearch = useCallback(
     async ({
       saleOrderCode,
-      saleOrderID,
+      saleOrderID = 0,
       status,
       reasons,
       assignUser,
@@ -61,13 +62,10 @@ const TicketList = ({ total, tickets, listReason }) => {
       const ticketClient = getTicketClient();
 
       const ticketResp = await ticketClient.getTicketByFilter({
-        saleOrderCode,
-        saleOrderID,
+        saleOrderCode: saleOrderCode.length === 0 ? null : saleOrderCode,
+        saleOrderID: parseInt(saleOrderID, 10),
         status: status?.value,
-        reasons:
-          reasons?.length > 0
-            ? reasons.map((reason) => ({ code: reason.value, name: reason.label }))
-            : null,
+        reasons: reasons?.length > 0 ? reasons.map((reason) => reason.value) : null,
         assignUser: assignUser?.value,
         createdTime: createdTime ? new Date(formatUTCTime(createdTime)).toISOString() : null,
         lastUpdatedTime: lastUpdatedTime
@@ -80,6 +78,18 @@ const TicketList = ({ total, tickets, listReason }) => {
   );
 
   const handleBtnEdit = useCallback(async (code) => {
+    // todo
+    router.push(
+      {
+        pathname: '',
+        query: {
+          ticketId: code,
+        },
+      },
+      `?ticketId=${code}`,
+      { shallow: true },
+    );
+
     // init client
     const ticketClient = getTicketClient();
     const orderClient = getOrderClient();
@@ -114,11 +124,10 @@ const TicketList = ({ total, tickets, listReason }) => {
 
     // always get data detail
     const [ticketRes] = await Promise.all([ticketClient.clientGetTicketDetail({ code })]);
-    // const ticketRes = await ticketClient.clientGetTicketDetail({ code });
     if (isValid(ticketRes)) {
       const ticketData = getFirst(ticketRes);
       const orderRes = await orderClient.getOrderByOrderNo(ticketData.saleOrderCode);
-
+      console.log(orderRes);
       if (isValid(orderRes)) {
         const orderInfo = getFirst(orderRes);
         ticketData.customerName = orderInfo.customerName;
@@ -138,6 +147,7 @@ const TicketList = ({ total, tickets, listReason }) => {
   }, []);
 
   const handleCloseBtnEdit = () => {
+    router.push('?');
     setDetail(null);
   };
 
@@ -167,7 +177,7 @@ const TicketList = ({ total, tickets, listReason }) => {
               <FontAwesomeIcon icon={faFilter} style={{ marginRight: 8 }} />
               Bộ lọc
             </Button>
-            <Link href={`${pathName}/new`}>
+            <Link href="/cs/new">
               <Button variant="contained" color="primary" className={styles.cardButton}>
                 <FontAwesomeIcon icon={faPlus} style={{ marginRight: 8 }} />
                 Thêm yêu cầu
@@ -201,7 +211,7 @@ const TicketList = ({ total, tickets, listReason }) => {
                           onKeyPress={(event) => {
                             if (event.key === 'Enter') {
                               event.preventDefault();
-                              onSubmit(getValues());
+                              onSearch(getValues());
                             }
                           }}
                         />
@@ -303,18 +313,18 @@ const TicketList = ({ total, tickets, listReason }) => {
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <Link href={`${pathName}/new`}>
+                          <Link href="/cs/new">
                             <Button variant="contained" color="primary">
                               Xuất file
                             </Button>
                           </Link>
                         </Grid>
                         <Grid item>
-                          <Link href={`${pathName}/new`}>
+                          <Link href="/cs/new">
                             <Button
                               variant="contained"
                               color="primary"
-                              onClick={handleSubmit(onSubmit)}
+                              onClick={handleSubmit(onSearch)}
                             >
                               Tìm kiếm
                             </Button>

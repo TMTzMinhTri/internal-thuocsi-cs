@@ -53,12 +53,12 @@ const ticketClient = getTicketClient();
 const TicketEdit = ({
   isOpen,
   onClose,
-  ticketId,
   listReason,
   listDepartment,
   ticketDetail,
   listAssignUser,
 }) => {
+  console.log(ticketDetail);
   const classes = useStyles();
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
@@ -67,7 +67,7 @@ const TicketEdit = ({
 
   const onSubmit = async (data) => {
     const ticketUpdateDetail = {
-      code: ticketId,
+      code: ticketDetail.code,
       ...data,
       assignUser: data?.assignUser?.value,
       departmentCode: data?.departmentCode?.code,
