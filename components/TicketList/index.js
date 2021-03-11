@@ -88,7 +88,7 @@ const TicketList = ({
   }, []);
 
   const handleCloseBtnEdit = () => {
-    router.push('/');
+    router.push('?');
   };
 
   const debounceSearchAssignUser = useCallback(async (q) => {

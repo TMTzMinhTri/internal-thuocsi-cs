@@ -31,7 +31,7 @@ export async function loadRequestData(ctx) {
     listReasonRes,
     ticketDetailRes,
   ] = await Promise.all([
-    accountClient.getListEmployee(0, 1000, ''),
+    accountClient.getListEmployee(0, 10, ''),
     ticketClient.getList(offset, limit, q),
     accountClient.getListDepartment(0, 20, ''),
     ticketClient.getListReason(),

@@ -174,7 +174,7 @@ const TicketEdit = ({
                         <LabelFormCs>
                           Ngày mua:{' '}
                           <span style={{ color: 'grey' }}>
-                            {formatDateTime(ticketDetail?.order?.createdTime)}
+                            {formatDateTime(ticketDetail?.orderCreatedTime)}
                           </span>
                         </LabelFormCs>
                       </Typography>
