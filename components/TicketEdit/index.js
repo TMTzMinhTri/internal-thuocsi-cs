@@ -64,6 +64,7 @@ const TicketEdit = ({
   const { success, error } = useToast();
 
   const anchor = '';
+
   const onSubmit = async (data) => {
     const ticketUpdateDetail = {
       code: ticketId,
@@ -174,7 +175,7 @@ const TicketEdit = ({
                         <LabelFormCs>
                           Ngày mua:{' '}
                           <span style={{ color: 'grey' }}>
-                            {formatDateTime(ticketDetail?.order?.createdTime)}
+                            {formatDateTime(ticketDetail?.orderCreatedTime)}
                           </span>
                         </LabelFormCs>
                       </Typography>
@@ -288,7 +289,7 @@ const TicketEdit = ({
                       <MuiSingleAuto
                         name="departmentCode"
                         onValueChange={(data) => {
-                          console.log(data);
+                          // console.log(data);
                         }}
                         options={listDepartment}
                         required
