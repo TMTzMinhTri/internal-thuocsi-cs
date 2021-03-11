@@ -288,7 +288,7 @@ const TicketEdit = ({
                       <MuiSingleAuto
                         name="departmentCode"
                         onValueChange={(data) => {
-                          console.log(data);
+                          // console.log(data);
                         }}
                         options={listDepartment}
                         required
