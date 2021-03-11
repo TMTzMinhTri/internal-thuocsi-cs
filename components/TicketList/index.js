@@ -32,6 +32,7 @@ const TicketList = ({
   listReason,
   mapListReason,
   listDepartment,
+  ticketDetail,
 }) => {
   const [search, setSearch] = useState('');
   const [listTickets, setListickets] = useState(tickets);
@@ -39,9 +40,7 @@ const TicketList = ({
   const [showHideFilter, toggleFilter] = useModal(false);
 
   const { register, handleSubmit, errors, control, getValues } = useForm({
-    defaultValues: {
-      imageUrls: [],
-    },
+    defaultValues: {},
     mode: 'onChange',
   });
 
@@ -99,6 +98,7 @@ const TicketList = ({
     if (!isValid(accountResp)) {
       return [];
     }
+
     return accountResp.data.map(({ username }) => ({ value: username, label: username }));
   }, []);
 
@@ -287,6 +287,7 @@ const TicketList = ({
           listAssignUser={listUserAssign}
           listDepartment={listDepartment}
           ticketId={ticketId}
+          ticketDetail={ticketDetail}
         />
       )}
       {/* table cs  */}

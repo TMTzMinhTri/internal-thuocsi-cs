@@ -40,7 +40,7 @@ class TicketClient extends APIClient {
   }
 
   getTicketDetail({ code }) {
-    return this.callFromClient('GET', `${URI}/task`, { code });
+    return this.callFromNextJS('GET', `${URI}/task`, { code });
   }
 }
 

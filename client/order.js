@@ -12,6 +12,12 @@ class OrderClient extends APIClient {
       order_no: orderNo,
     });
   }
+
+  getByOrderNo(orderNo) {
+    return this.callFromNextJS('GET', `${URI}/order`, {
+      order_no: orderNo,
+    });
+  }
 }
 
 export default function getOrderClient(ctx, data) {
