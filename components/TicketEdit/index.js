@@ -53,7 +53,6 @@ const ticketClient = getTicketClient();
 const TicketEdit = ({
   isOpen,
   onClose,
-  ticketId,
   listReason,
   listDepartment,
   ticketDetail,
@@ -67,7 +66,7 @@ const TicketEdit = ({
 
   const onSubmit = async (data) => {
     const ticketUpdateDetail = {
-      code: ticketId,
+      code: ticketDetail.code,
       ...data,
       assignUser: data?.assignUser?.value,
       departmentCode: data?.departmentCode?.code,
@@ -288,9 +287,7 @@ const TicketEdit = ({
                       </Typography>
                       <MuiSingleAuto
                         name="departmentCode"
-                        onValueChange={(data) => {
-                          // console.log(data);
-                        }}
+                        onValueChange={(data) => {}}
                         options={listDepartment}
                         required
                         placeholder="Chọn"

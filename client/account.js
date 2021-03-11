@@ -29,7 +29,7 @@ class AccountClient extends APIClient {
     return this.callFromClient('GET', `${URI}/employee/by-department`, {
       departmentCode,
       offset: 0,
-      limit: 20,
+      limit: 200,
       getTotal: true,
     });
   }
@@ -47,7 +47,7 @@ class AccountClient extends APIClient {
     });
   }
 
-  getListEmployeeFromClient(offset, limit, q) {
+  clientGetListEmployee(offset, limit, q) {
     return this.callFromClient('GET', `${URI}/employee/all`, {
       search: q,
       offset,

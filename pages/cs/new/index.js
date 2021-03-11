@@ -1,36 +1,23 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   FormControl,
   FormLabel,
   TextField,
-  IconButton,
   Typography,
   Grid,
-  Tooltip,
-  Chip,
 } from '@material-ui/core';
 
 import Head from 'next/head';
 import Link from 'next/link';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 
 import AppCS from 'pages/_layout';
 
-import { v4 as uuidv4 } from 'uuid';
-
-import { formatDateTime } from 'components/global';
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
 
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
-import { makeStyles } from '@material-ui/core/styles';
 import { useForm } from 'react-hook-form';
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
@@ -39,13 +26,21 @@ import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 
-import EditIcon from '@material-ui/icons/Edit';
-import Drawer from '@material-ui/core/Drawer';
-import { LabelFormCs } from 'components';
+import { LabelFormCs, TicketTable } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
 import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
 import styles from './request.module.css';
+
+const breadcrumb = [
+  {
+    name: 'Trang chủ',
+    link: '/cs',
+  },
+  {
+    name: 'Thêm yêu cầu mới',
+  },
+];
 
 export async function loadRequestData(ctx) {
   const accountClient = getAccountClient(ctx, {});
@@ -63,71 +58,34 @@ export async function loadRequestData(ctx) {
       label: department.name,
     })) || [];
 
+  const listReasons = listReasonsResult?.data?.map((item) => ({
+    value: item.code,
+    label: item.name,
+  }));
+
   return {
     props: {
       listDepartment,
-      listReasons: listReasonsResult?.data || [],
+      listReasons,
     },
   };
 }
+
 export async function getServerSideProps(ctx) {
   return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: 800,
-  },
-  muiDrawerRoot: {
-    boxShadow: 'none',
-  },
-  media: {
-    height: 0,
-    paddingTop: '56.25%', // 16:9
-  },
-  expand: {
-    transform: 'rotate(0deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  },
-  BackdropProps: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)',
-  },
-  list: {
-    width: '70vw',
-  },
-}));
+const PageNewCS = ({ listReasons, listDepartment }) => {
+  const router = useRouter();
 
-const PageNewCS = (props) => {
-  const { listReasons, listDepartment } = props;
-  const [state, setState] = React.useState({});
-
-  const [orderData, setOrderData] = useState();
-
-  const [listTicket, setListTicket] = useState([]);
-
+  const { orderNo } = router.query;
+  const [orderData, setOrderData] = useState(null);
   const [listAssignUser, setListAssignUser] = useState([{ value: '', label: '' }]);
+  const [search, setSearch] = useState(orderNo);
 
-  const [search, setSearch] = useState();
-
-  const [customerInf, setCustomerInf] = useState({
-    bank: '',
-    bankCode: '',
-    bankBranch: '',
-  });
-
-  const classes = useStyles();
   const { error, success } = useToast();
 
-  const { register, handleSubmit, errors, control, clearErrors, setValue } = useForm({
-    defaultValues: {
-      imageUrls: [],
-    },
+  const { register, handleSubmit, errors, control, setValue, getValues } = useForm({
     mode: 'onChange',
   });
 
@@ -136,53 +94,42 @@ const PageNewCS = (props) => {
     setSearch(value);
   }
 
-  const onSearchOrder = async () => {
+  const onSearchOrder = useCallback(async (code) => {
     const ticketClient = getTicketClient();
-    const customerClient = getCustomerClient();
     const orderClient = getOrderClient();
 
-    const resp = await orderClient.getOrderByOrderNo(search);
-
+    // get order
+    const resp = await orderClient.getOrderByOrderNo(code);
     if (!isValid(resp)) {
-      // setOrderData(null);
-      // setListTicket([]);
-      // setCustomerInf({ bank: '', bankCode: '', bankBranch: '' });
-      // setValue('bank', '');
-      // setValue('customerName', '');
-      // setValue('bankCode', '');
-      // setValue('bankBranch', '');
-      // if (resp.status === 'NOT_FOUND') {
-      //   return {
-      //     props: { data: [], count: 0, message: 'Không tìm thấy đơn hàng' },
-      //   };
-      // }
-      // return { props: { data: [], count: 0, message: resp.message } };
+      console.log(' invlaid sale order no ');
+      setOrderData(null);
+      setValue('customerName', '');
       return false;
     }
-    const searchOrderData = getData(resp);
-    setOrderData(searchOrderData);
-    const { customerName, customerID } = searchOrderData;
-    setValue('customerName', customerName);
+    // todo
+    Router.push(
+      {
+        pathname: '',
+        query: {
+          ticketId: code,
+        },
+      },
+      `?orderNo=${code}`,
+      { shallow: true },
+    );
 
-    const respCustomer = await customerClient.getListBankAccount(customerID);
-    if (isValid(respCustomer)) {
-      const customerInfo = getFirst(respCustomer);
-      const { bank, bankCode, bankBranch } = customerInfo;
-      setValue('bank', bank);
-      setValue('bankCode', bankCode);
-      setValue('bankBranch', bankBranch);
-      clearErrors();
-      setCustomerInf(customerInfo);
-    }
+    const orderDetail = getFirst(resp);
+
+    const { customerName, customerID } = orderDetail;
 
     const respTicket = await ticketClient.getTicketBySaleOrderCode({
-      saleOrderCode: searchOrderData.orderNo,
+      saleOrderCode: orderDetail.orderNo,
     });
-
-    if (isValid(respTicket)) {
-      setListTicket(respTicket.data);
-    }
-  };
+    orderDetail.tickets = getData(respTicket);
+    setOrderData(orderDetail);
+    setValue('customerName', customerName);
+    return false;
+  }, []);
 
   // onSubmit
   const onSubmit = async (formData) => {
@@ -195,14 +142,15 @@ const PageNewCS = (props) => {
         saleOrderID: orderData.orderId,
         customerID: orderData.customerID,
         departmentCode: formData.departmentCode.code,
-        reasons: formData.reasons.map(({ value, label }) => ({
-          code: value,
-          name: label,
-        })),
+        reasons: formData.reasons.map(({ value }) => value),
         returnCode: formData.returnCode,
         cashback: +formData.cashback,
         note: formData.note,
-        assignUser: formData.assignUser.value.toString(),
+        assignUser: parseInt(formData.assignUser.value, 10),
+        bankName: formData.bankName,
+        bankAccountName: formData.bankAccountName,
+        bankCode: formData.bankCode,
+        bankBranch: formData.bankBranch,
       });
 
       if (ticketResp.status !== 'OK') {
@@ -210,39 +158,25 @@ const PageNewCS = (props) => {
         return;
       }
 
-      const customerResp = await customerClient.updateBankCustomer({
-        bank: formData.bank,
+      await customerClient.updateBankCustomer({
+        bankName: formData.bankName,
         bankCode: formData.bankCode,
         bankBranch: formData.bankBranch,
-        customerID: orderData.customerID,
+        bankAccountName: formData.bankAccountName,
+        accountID: orderData.customerID,
       });
 
-      if (customerResp.status !== 'OK') {
-        error(customerResp.message ?? actionErrorText);
+      if (ticketResp.status !== 'OK') {
+        error(ticketResp.message ?? actionErrorText);
       } else {
         success('Tạo yêu cầu thành công');
-        Router.push('/cs');
       }
     } catch (err) {
       error(err ?? unknownErrorText);
     }
   };
 
-  const breadcrumb = [
-    {
-      name: 'Trang chủ',
-      link: '/cs',
-    },
-    {
-      name: 'DS yêu cầu cá nhân',
-      link: '/cs',
-    },
-    {
-      name: 'Thêm yêu cầu mới',
-    },
-  ];
-
-  const updateListAssignUser = async (department) => {
+  const updateListAssignUser = useCallback(async (department) => {
     if (department) {
       const accountClient = getAccountClient();
       const accountResp = await accountClient.getListEmployeeByDepartment(department.code);
@@ -251,7 +185,7 @@ const PageNewCS = (props) => {
         const tmpData = [];
         accountResp.data.forEach((account) => {
           if (account && account.username) {
-            tmpData.push({ value: account.username, label: account.username });
+            tmpData.push({ value: account.accountId, label: account.username });
           }
         });
         setListAssignUser(tmpData);
@@ -261,11 +195,11 @@ const PageNewCS = (props) => {
     } else {
       setListAssignUser([{ value: '', label: '' }]);
     }
-  };
+  }, []);
 
-  const toggleDrawer = (anchor, open) => {
-    setState({ ...state, [anchor]: open });
-  };
+  useEffect(() => {
+    onSearchOrder(search);
+  }, [search]);
 
   return (
     <AppCS select={PATH_URL.ALL_TICKETS} breadcrumb={breadcrumb}>
@@ -294,15 +228,20 @@ const PageNewCS = (props) => {
                       inputRef={register({
                         required: 'Vui lòng nhập thông tin',
                       })}
-                      onChange={handleChange}
                       size="small"
                       type="text"
                       fullWidth
                       placeholder="Nhập Mã SO"
+                      defaultValue={search}
+                      onKeyDown={(e) => e.key === 'Enter' && onSearchOrder(getValues('orderNo'))}
                     />
                   </Grid>
                   <Grid item xs={12} sm={12} md={5}>
-                    <Button variant="contained" color="primary" onClick={() => onSearchOrder()}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => onSearchOrder(getValues('orderNo'))}
+                    >
                       Tìm kiếm
                     </Button>
                   </Grid>
@@ -322,7 +261,7 @@ const PageNewCS = (props) => {
                     >
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
-                          <LabelFormCs>Tên khách hàng:</LabelFormCs>
+                          <LabelFormCs>Tên tài khoản:</LabelFormCs>
                         </Typography>
                         <TextField
                           disabled={!orderData}
@@ -330,9 +269,9 @@ const PageNewCS = (props) => {
                           size="small"
                           type="text"
                           fullWidth
-                          name="customerName"
-                          error={!!errors.customerName}
-                          helperText={errors.customerName?.message}
+                          name="bankAcountName"
+                          error={!!errors.bankAcountName}
+                          helperText={errors.bankAcountName?.message}
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
                           })}
@@ -366,9 +305,9 @@ const PageNewCS = (props) => {
                           size="small"
                           type="text"
                           fullWidth
-                          name="bank"
-                          error={!!errors.bank}
-                          helperText={errors.bank?.message}
+                          name="bankName"
+                          error={!!errors.bankName}
+                          helperText={errors.bankName?.message}
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
                           })}
@@ -395,96 +334,9 @@ const PageNewCS = (props) => {
                     </Grid>
                   </FormControl>
                 </Paper>
-                <TableContainer component={Paper}>
-                  <Table size="small" aria-label="a dense table">
-                    <colgroup>
-                      <col width="5%" />
-                      <col width="5%" />
-                      <col width="5%" />
-                      <col width="15%" />
-                      <col width="15%" />
-                      <col width="20%" />
-                      <col width="15%" />
-                      <col width="15%" />
-                    </colgroup>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell align="center">#</TableCell>
-                        <TableCell align="center">SO#</TableCell>
-                        <TableCell align="center">Order#</TableCell>
-                        <TableCell align="left">Lỗi</TableCell>
-                        <TableCell align="left">Mô tả</TableCell>
-                        <TableCell align="center">Khách hàng</TableCell>
-                        <TableCell align="center">Người tạo</TableCell>
-                        <TableCell align="center">Ngày tạo</TableCell>
-                        <TableCell align="center">Thao tác</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    {listTicket.length <= 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={5} align="left">
-                          Không có yêu cầu nào cả
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      <TableBody>
-                        {listTicket.map((row) => (
-                          <TableRow key={uuidv4()}>
-                            <TableCell align="center">{row.code}</TableCell>
-                            <TableCell align="center">{row.saleOrderCode}</TableCell>
-                            <TableCell align="center">{row.saleOrderID}</TableCell>
-                            <TableCell align="left">
-                              {row.reasons.map((reason) => (
-                                <Chip
-                                  key={uuidv4()}
-                                  style={{ margin: '3px' }}
-                                  size="small"
-                                  label={reason.name}
-                                />
-                              ))}
-                            </TableCell>
-                            <TableCell align="left">{row.note}</TableCell>
-                            <TableCell align="center">{orderData.customerName}</TableCell>
-                            <TableCell align="center">{row.createdBy}</TableCell>
-                            <TableCell align="center">{formatDateTime(row.createdTime)}</TableCell>
-                            <TableCell align="center">
-                              <div>
-                                {[`right${row.code}`].map((anchor) => (
-                                  <React.Fragment key={anchor}>
-                                    <a onClick={() => toggleDrawer(anchor, true)}>
-                                      <Tooltip title="Cập nhật thông tin của yêu cầu">
-                                        <IconButton>
-                                          <EditIcon fontSize="small" />
-                                        </IconButton>
-                                      </Tooltip>
-                                    </a>
-                                    <Drawer
-                                      ModalProps={{
-                                        BackdropProps: {
-                                          classes: {
-                                            root: classes.BackdropProps,
-                                          },
-                                        },
-                                      }}
-                                      PaperProps={{
-                                        classes: {
-                                          elevation16: classes.muiDrawerRoot,
-                                        },
-                                      }}
-                                      anchor="right"
-                                      open={state[anchor]}
-                                      onClose={() => toggleDrawer(anchor, false)}
-                                    />
-                                  </React.Fragment>
-                                ))}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    )}
-                  </Table>
-                </TableContainer>
+                {/* table cs  */}
+                <TicketTable data={orderData.tickets} listReasons={listReasons} />
+
                 <Paper className={`${styles.search}`}>
                   <FormControl size="small">
                     <Grid
@@ -538,6 +390,7 @@ const PageNewCS = (props) => {
                           name="assignUser"
                           errors={errors}
                           control={control}
+                          defaultValue=""
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={3}>
@@ -595,7 +448,7 @@ const PageNewCS = (props) => {
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <Link href={PATH_URL.NEW_TICKETS}>
+                          <Link href="/cs/new">
                             <Button variant="contained" color="default">
                               Quay lại
                             </Button>
