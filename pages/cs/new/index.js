@@ -101,7 +101,6 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
     // get order
     const resp = await orderClient.getOrderByOrderNo(code);
     if (!isValid(resp)) {
-      console.log(' invlaid sale order no ');
       setOrderData(null);
       setValue('customerName', '');
       return false;
