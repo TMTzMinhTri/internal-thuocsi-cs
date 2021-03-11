@@ -47,7 +47,7 @@ class AccountClient extends APIClient {
     });
   }
 
-  getListEmployeeFromClient(offset, limit, q) {
+  clientGetListEmployee(offset, limit, q) {
     return this.callFromClient('GET', `${URI}/employee/all`, {
       search: q,
       offset,

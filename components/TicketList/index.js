@@ -101,7 +101,7 @@ const TicketList = ({ total, tickets, listReason }) => {
 
     // validate user assign
     if (listUserAssign.length === 0) {
-      const listUserAssignRes = await accountClient.getListEmployee(0, 10, '');
+      const listUserAssignRes = await accountClient.clientGetListEmployee(0, 10, '');
       if (isValid(listUserAssignRes)) {
         setListUserAssign(
           listUserAssignRes?.data?.map((acc) => ({
