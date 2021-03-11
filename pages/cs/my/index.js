@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import Head from 'next/head';
 
@@ -9,7 +9,7 @@ import { getAccountClient, getTicketClient } from 'client';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
-import { TicketList } from 'components/organisms';
+import { TicketList } from 'components';
 import { ReasonUtils } from 'utils';
 
 export async function loadRequestData(ctx) {
@@ -65,12 +65,12 @@ const breadcrumb = [
     link: '/cs',
   },
   {
-    name: 'DS phiếu yêu cầu',
+    name: 'DS phiếu yêu cầu cá nhân',
   },
 ];
 
 const MyListTicketPage = (props) => (
-  <AppCS select="/cs" breadcrumb={breadcrumb}>
+  <AppCS select="/cs/my" breadcrumb={breadcrumb}>
     <Head>
       <title>DS phiếu yêu cầu cá nhân</title>
     </Head>

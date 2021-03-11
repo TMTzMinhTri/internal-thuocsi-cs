@@ -12,13 +12,12 @@ import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-import { getAccountClient, getCustomerClient, getOrderClient, getTicketClient } from 'client';
+import { getTicketClient } from 'client';
 import clsx from 'clsx';
-import { LabelFormCs } from 'components/atoms';
 import { formatDateTime, formatNumber, listStatus } from 'components/global';
-import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { getFirst, isValid } from 'utils';
+import { isValid } from 'utils';
+import LabelFormCs from '../LabelFormCs';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,19 +48,34 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const customerClient = getCustomerClient();
 const ticketClient = getTicketClient();
-const orderClient = getOrderClient();
 
-const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, listAssignUser }) => {
+const TicketEdit = ({
+  isOpen,
+  onClose,
+  ticketId,
+  listReason,
+  listDepartment,
+  ticketDetail,
+  listAssignUser,
+}) => {
   const classes = useStyles();
   const styles = makeStyles(useStyles);
-  const [ticketDetail, setTicketDetail] = useState({});
   const { success, error } = useToast();
 
   const anchor = '';
   const onSubmit = async (data) => {
-    const ticketUpdateRes = await ticketClient.updateTicket(data);
+    const ticketUpdateDetail = {
+      code: ticketId,
+      ...data,
+      assignUser: data?.assignUser?.value,
+      departmentCode: data?.departmentCode?.code,
+      reasons: data?.reasons?.map((item) => item.value) || [],
+      cashback: parseInt(data?.cashback || 0, 10),
+      status: data?.status?.value,
+    };
+
+    const ticketUpdateRes = await ticketClient.updateTicket(ticketUpdateDetail);
     if (!isValid(ticketUpdateRes)) {
       error(ticketUpdateRes?.message || 'Cập nhập thất bại ');
       return;
@@ -69,36 +83,21 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
     success('Cập nhập thành công.');
   };
 
-  const { register, handleSubmit, errors, control, clearErrors, setValue } = useForm({
+  if (!ticketDetail) {
+    return null;
+  }
+
+  const { register, handleSubmit, errors, control } = useForm({
     mode: 'onChange',
+    defaultValues: {
+      ...ticketDetail,
+      status: listStatus.find((item) => item.value === ticketDetail.status),
+      departmentCode: listDepartment.find((item) => item.value === ticketDetail.departmentCode),
+      reasons: listReason.filter((item) => ticketDetail?.reasons?.indexOf(item.value) >= 0),
+      assignUser: listAssignUser.find((item) => item.value === ticketDetail.assignUser),
+    },
   });
 
-  useEffect(() => {
-    const fetchDataDetail = async (code) => {
-      const [ticketResult] = await Promise.all([ticketClient.getTicketDetail({ code })]);
-
-      if (isValid(ticketResult)) {
-        const detail = getFirst(ticketResult);
-        const [accRes, orderRes] = await Promise.all([
-          customerClient.getCustomer(detail.customerID),
-          orderClient.getOrderByOrderNo(detail.saleOrderCode),
-        ]);
-
-        if (isValid(accRes)) {
-          detail.customer = getFirst(accRes);
-        }
-        if (isValid(orderRes)) {
-          detail.order = getFirst(orderRes);
-        }
-
-        setTicketDetail(detail);
-      }
-    };
-
-    fetchDataDetail(ticketId);
-  }, []);
-
-  const { cashback = 0, bankBranch = '', bankName = '', note = '', returnCode = '' } = ticketDetail;
   return (
     <Drawer
       ModalProps={{
@@ -163,7 +162,7 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Số lượng sản phẩm: 37
+                          Số lượng sản phẩm: xxx
                         </FormLabel>
                         <FormLabel
                           component="legend"
@@ -198,13 +197,13 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Họ tên khách hàng: {ticketDetail?.order?.customerName}
+                          Họ tên khách hàng: {ticketDetail?.customerName}
                         </FormLabel>
                         <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Số điện thoại: {ticketDetail?.order?.customerPhone}
+                          Số điện thoại: {ticketDetail?.customerPhone}
                         </FormLabel>
                       </Typography>
                     </Grid>
@@ -221,7 +220,6 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                         size="small"
                         type="text"
                         fullWidth
-                        value={ticketDetail?.order?.customerName}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -244,7 +242,7 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                         <LabelFormCs>Ngân hàng:</LabelFormCs>
                       </Typography>
                       <TextField
-                        name="bank"
+                        name="bankName"
                         inputRef={register({ required: 'Vui lòng nhập thông tin' })}
                         error={!!errors.bank}
                         helperText={errors.bank?.message}
@@ -252,7 +250,6 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                         size="small"
                         type="text"
                         fullWidth
-                        value={bankName}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -262,13 +259,13 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                       <TextField
                         name="bankBranch"
                         inputRef={register({ required: 'Vui lòng nhập thông tin' })}
+                        ref={register}
                         error={!!errors.bankBranch}
                         helperText={errors?.bankBranch?.message}
                         variant="outlined"
                         size="small"
                         type="text"
                         fullWidth
-                        value={bankBranch}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
@@ -337,7 +334,6 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                         type="text"
                         fullWidth
                         placeholder="0"
-                        value={returnCode}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
@@ -352,7 +348,6 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                         type="number"
                         fullWidth
                         placeholder="0"
-                        value={cashback}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
@@ -367,7 +362,6 @@ const TicketEdit = ({ isOpen, onClose, ticketId, listReason, listDepartment, lis
                         type="text"
                         fullWidth
                         placeholder="Ghi chú..."
-                        value={note}
                       />
                     </Grid>
                     <Grid item container xs={12} justify="flex-end" spacing={1}>
