@@ -103,6 +103,7 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
     if (!isValid(resp)) {
       setOrderData(null);
       setValue('customerName', '');
+      error('Không tìm thấy thông tin đơn hàng');
       return false;
     }
     // todo
@@ -197,7 +198,7 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
   }, []);
 
   useEffect(() => {
-    onSearchOrder(search);
+    if (search && search.length > 0) onSearchOrder(search);
   }, [search]);
 
   return (
