@@ -58,7 +58,6 @@ const TicketEdit = ({
   ticketDetail,
   listAssignUser,
 }) => {
-  console.log(ticketDetail);
   const classes = useStyles();
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
@@ -288,9 +287,7 @@ const TicketEdit = ({
                       </Typography>
                       <MuiSingleAuto
                         name="departmentCode"
-                        onValueChange={(data) => {
-                          // console.log(data);
-                        }}
+                        onValueChange={(data) => {}}
                         options={listDepartment}
                         required
                         placeholder="Chọn"
