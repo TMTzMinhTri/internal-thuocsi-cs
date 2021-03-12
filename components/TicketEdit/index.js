@@ -76,6 +76,8 @@ const TicketEdit = ({
       reasons: data?.reasons?.map((item) => item.value) || [],
       cashback: parseInt(data?.cashback || 0, 10),
       status: data?.status?.value,
+      facebookURL: data?.facebookURL,
+      chatContent: data?.chatContent,
     };
 
     const ticketUpdateRes = await ticketClient.updateTicket(ticketUpdateDetail);
@@ -148,7 +150,15 @@ const TicketEdit = ({
       >
         <div className={styles.grid}>
           <MyCard>
-            <MyCardHeader title="Thông tin yêu cầu" />
+            <MyCardHeader title="Thông tin yêu cầu">
+              <Grid item container xs={12} justify="flex-end" spacing={1}>
+                <Grid item>
+                  <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
+                    Lưu
+                  </Button>
+                </Grid>
+              </Grid>
+            </MyCardHeader>
             <form key={ticketDetail?.code}>
               <MyCardContent>
                 <FormControl size="small">
@@ -372,9 +382,54 @@ const TicketEdit = ({
                         placeholder="0"
                       />
                     </Grid>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <Typography gutterBottom>
+                        <LabelFormCs>Facebook khách hàng:</LabelFormCs>
+                      </Typography>
+                      <TextField
+                        name="facebookURL"
+                        inputRef={register}
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        fullWidth
+                        placeholder="https://facebook.com/thuocsivn"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <Typography gutterBottom>
+                        <LabelFormCs>Nôi dung tin nhắn vơi khách hàng:</LabelFormCs>
+                      </Typography>
+                      <TextField
+                        name="facebookURL"
+                        inputRef={register}
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        fullWidth
+                        placeholder="https://messenger.comthuocsivn"
+                      />
+                    </Grid>
                     <Grid item xs={12} sm={12} md={12}>
                       <Typography gutterBottom>
-                        <LabelFormCs>Mô tả</LabelFormCs>
+                        <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
+                      </Typography>
+                      <TextareaAutosize
+                        style={{ width: '100%' }}
+                        name="chatContent"
+                        ref={register}
+                        inputRef={register}
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        fullWidth
+                        placeholder="Nôi dung xử lý khách hàng ..."
+                        rows="5"
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={12} md={12}>
+                      <Typography gutterBottom>
+                        <LabelFormCs>Mô tả (CS)</LabelFormCs>
                       </Typography>
                       <TextareaAutosize
                         style={{ width: '100%' }}
@@ -386,9 +441,26 @@ const TicketEdit = ({
                         type="text"
                         fullWidth
                         placeholder="Ghi chú..."
-                        rows="10"
+                        rows="5"
                       />
                     </Grid>
+                    {/* <Grid item xs={12} sm={12} md={12}>
+                      <Typography gutterBottom>
+                        <LabelFormCs>Nôi dung xử lý khách hàng</LabelFormCs>
+                      </Typography>
+                      <TextareaAutosize
+                        style={{ width: '100%' }}
+                        name="chatContent"
+                        ref={register}
+                        inputRef={register}
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        fullWidth
+                        placeholder="Nôi dung xử lý khách hàng ..."
+                        rows="10"
+                      />
+                    </Grid> */}
                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                       <Grid item>
                         <Button variant="contained" color="default" onClick={() => onClose()}>
