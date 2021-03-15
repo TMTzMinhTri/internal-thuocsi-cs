@@ -19,13 +19,14 @@ import Router, { useRouter } from 'next/router';
 import { getAccountClient, getOrderClient, getTicketClient } from 'client';
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
 import TicketEdit from 'components/TicketEdit';
-import { getFirst, isValid } from 'utils';
+import { getFirst, isValid, getData } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
-const TicketTable = ({ data, total, search, listReasons }) => {
+
+const TicketTable = ({ data, total, search, listReasons, setListickets }) => {
   const router = useRouter();
   const { ticketId } = router.query;
-  const [ticketSelected, setTicketSelected] = useState(ticketId);
+  const [ticketSelected] = useState(ticketId);
   const [detail, setDetail] = useState(null);
   const [listDepartment, setListDepartment] = useState([]);
   const [listUserAssign, setListUserAssign] = useState([]);
@@ -96,7 +97,11 @@ const TicketTable = ({ data, total, search, listReasons }) => {
     }
   }, []);
 
-  const handleCloseBtnEdit = () => {
+  const handleCloseBtnEdit = async () => {
+    const ticketClient = getTicketClient();
+    const offset = page * limit;
+    const ticketResp = await ticketClient.getListByClient(offset, limit, '');
+    setListickets(getData(ticketResp));
     router.push('?');
     setDetail(null);
   };
@@ -104,6 +109,13 @@ const TicketTable = ({ data, total, search, listReasons }) => {
   useEffect(() => {
     if (ticketSelected && ticketSelected.length > 0) onClickBtnEdit(ticketSelected);
   }, [onClickBtnEdit, ticketSelected]);
+
+  const handleChangePage = async (newPage, rowPerPages) => {
+    const ticketClient = getTicketClient();
+    const offset = newPage * rowPerPages;
+    const ticketResp = await ticketClient.getListByClient(offset, limit, '');
+    setListickets(getData(ticketResp));
+  }
 
   return (
     <>
@@ -181,6 +193,7 @@ const TicketTable = ({ data, total, search, listReasons }) => {
               rowsPerPage={limit}
               page={page}
               onChangePage={(event, newPage, rowsPerPage) => {
+                handleChangePage(newPage, rowsPerPage);
                 Router.push(`?page=${newPage}&limit=${rowsPerPage}&q=${search}`);
               }}
             />

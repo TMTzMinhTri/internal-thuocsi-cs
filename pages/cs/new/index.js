@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
   Grid,
+  TextareaAutosize,
 } from '@material-ui/core';
 
 import Head from 'next/head';
@@ -136,7 +137,6 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
     try {
       const ticketClient = getTicketClient();
       const customerClient = getCustomerClient();
-
       const ticketResp = await ticketClient.createTicket({
         saleOrderCode: orderData.orderNo,
         saleOrderID: orderData.orderId,
@@ -151,8 +151,10 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
         bankAccountName: formData.bankAccountName,
         bankCode: formData.bankCode,
         bankBranch: formData.bankBranch,
+        facebookURL: formData.facebookURL,
+        chatURL: formData.chatURL,
+        feedBackContent: formData.feedBackContent,
       });
-
       if (ticketResp.status !== 'OK') {
         error(ticketResp.message ?? actionErrorText);
         return;
@@ -446,9 +448,54 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
                           placeholder="Ghi chú..."
                         />
                       </Grid>
+                      <Grid item xs={12} sm={6} md={6}>
+                        <Typography gutterBottom>
+                          <LabelFormCs>Facebook khách hàng:</LabelFormCs>
+                        </Typography>
+                        <TextField
+                          name="facebookURL"
+                          inputRef={register}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          fullWidth
+                          placeholder="https://facebook.com/thuocsivn"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={6}>
+                        <Typography gutterBottom>
+                          <LabelFormCs>Nôi dung tin nhắn vơi khách hàng:</LabelFormCs>
+                        </Typography>
+                        <TextField
+                          name="chatURL"
+                          inputRef={register}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          fullWidth
+                          placeholder="https://messenger.comthuocsivn"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={12}>
+                        <Typography gutterBottom>
+                          <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
+                        </Typography>
+                        <TextareaAutosize
+                          style={{ width: '100%' }}
+                          name="feedBackContent"
+                          ref={register}
+                          inputRef={register}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          fullWidth
+                          placeholder="Nôi dung xử lý khách hàng ..."
+                          rows="5"
+                        />
+                      </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <Link href="/cs/new">
+                          <Link href="/cs">
                             <Button variant="contained" color="default">
                               Quay lại
                             </Button>
