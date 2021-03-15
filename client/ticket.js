@@ -35,6 +35,15 @@ class TicketClient extends APIClient {
     });
   }
 
+  getListByClient(offset, limit, q) {
+    return this.callFromClient('GET', `${URI}/tasks/list`, {
+      q,
+      offset,
+      limit,
+      getTotal: true,
+    });
+  }
+
   getListReason() {
     return this.callFromNextJS('GET', `${URI}/tasks/reasons/list`);
   }
