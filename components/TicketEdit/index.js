@@ -19,6 +19,7 @@ import { formatDateTime, formatNumber, listStatus } from 'components/global';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValid } from 'utils';
+import Router from 'next/router';
 import LabelFormCs from '../LabelFormCs';
 
 const useStyles = makeStyles((theme) => ({
@@ -64,7 +65,6 @@ const TicketEdit = ({
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
   const [listAssignUser, setListAssignUser] = useState(usersAssign);
-
   const anchor = '';
 
   const onSubmit = async (data) => {
@@ -76,8 +76,6 @@ const TicketEdit = ({
       reasons: data?.reasons?.map((item) => item.value) || [],
       cashback: parseInt(data?.cashback || 0, 10),
       status: data?.status?.value,
-      facebookURL: data?.facebookURL,
-      chatContent: data?.chatContent,
     };
 
     const ticketUpdateRes = await ticketClient.updateTicket(ticketUpdateDetail);
@@ -401,7 +399,7 @@ const TicketEdit = ({
                         <LabelFormCs>Nôi dung tin nhắn vơi khách hàng:</LabelFormCs>
                       </Typography>
                       <TextField
-                        name="facebookURL"
+                        name="chatURL"
                         inputRef={register}
                         variant="outlined"
                         size="small"
@@ -416,7 +414,7 @@ const TicketEdit = ({
                       </Typography>
                       <TextareaAutosize
                         style={{ width: '100%' }}
-                        name="chatContent"
+                        name="feedBackContent"
                         ref={register}
                         inputRef={register}
                         variant="outlined"

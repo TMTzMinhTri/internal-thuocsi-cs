@@ -262,7 +262,13 @@ const TicketList = ({ total, tickets, listReason }) => {
           </form>
         </MyCard>
       </div>
-      <TicketTable listReasons={listReason} data={listTickets} total={total} />
+      <TicketTable
+        listReasons={listReason}
+        data={listTickets}
+        total={total}
+        setListickets={setListickets}
+        search={search}
+      />
     </>
   );
 };
