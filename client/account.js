@@ -8,7 +8,7 @@ class AccountClient extends APIClient {
   }
 
   getListDepartment(offset, limit, q) {
-    return this.callFromNextJS('GET', `${URI}/department/list`, {
+    return this.callFromNextJS('GET', `${URI}/department/all`, {
       q,
       offset,
       limit,
@@ -17,7 +17,7 @@ class AccountClient extends APIClient {
   }
 
   clientGetListDepartment(offset, limit, q) {
-    return this.callFromClient('GET', `${URI}/department/list`, {
+    return this.callFromClient('GET', `${URI}/department/all`, {
       q,
       offset,
       limit,
@@ -54,6 +54,10 @@ class AccountClient extends APIClient {
       limit,
       getTotal: true,
     });
+  }
+
+  getUserInfoMe() {
+    return this.callFromNextJS('GET', `${URI}/me`);
   }
 }
 

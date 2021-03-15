@@ -15,17 +15,17 @@ import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, listStatus } from 'components/global';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { getAccountClient, getOrderClient, getTicketClient } from 'client';
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
 import TicketEdit from 'components/TicketEdit';
-import { getFirst, isValid } from 'utils';
+import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
-const TicketTable = ({ data, total, search, listReasons }) => {
+const TicketTable = ({ data, total, search, listReasons = [] }) => {
   const router = useRouter();
   const { ticketId } = router.query;
-  const [ticketSelected, setTicketSelected] = useState(ticketId);
+  const [ticketSelected] = useState(ticketId);
   const [detail, setDetail] = useState(null);
   const [listDepartment, setListDepartment] = useState([]);
   const [listUserAssign, setListUserAssign] = useState([]);
@@ -34,76 +34,89 @@ const TicketTable = ({ data, total, search, listReasons }) => {
   const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
   const page = parseInt(router.query.page, 10) || PAGE_DEFAULT;
 
-  const onClickBtnEdit = useCallback(async (code) => {
-    // todo
+  const changeUrl = ({ ticketId, orderNo, search, page, limit, reload = false }) => {
+    const query = {
+      ...(ticketId && { ticketId }),
+      ...(orderNo && { orderNo }),
+      ...(search && { search }),
+      ...(page && { page }),
+      ...(limit && { limit }),
+    };
+
     router.push(
       {
         pathname: '',
-        query: {
-          ticketId: code,
-        },
+        query,
       },
-      `?ticketId=${code}`,
-      { shallow: true },
+      `?${convertObjectToParameter(query)}`,
+      { shallow: !reload },
     );
-
-    // init client
-    const ticketClient = getTicketClient();
-    const orderClient = getOrderClient();
-    const accountClient = getAccountClient();
-
-    // validate list department
-    if (listDepartment.length === 0) {
-      const listDepartmentRes = await accountClient.clientGetListDepartment(0, 20, '');
-      if (isValid(listDepartmentRes)) {
-        setListDepartment(
-          listDepartmentRes?.data?.map((depart) => ({
-            ...depart,
-            value: depart.code,
-            label: depart.name,
-          })) || [],
-        );
-      }
-    }
-
-    // validate user assign
-    if (listUserAssign.length === 0) {
-      const listUserAssignRes = await accountClient.clientGetListEmployee(0, 10, '');
-      if (isValid(listUserAssignRes)) {
-        setListUserAssign(
-          listUserAssignRes?.data?.map((acc) => ({
-            value: acc.accountId || '',
-            label: acc.username || '',
-          })) || [],
-        );
-      }
-    }
-
-    // always get data detail
-    const [ticketRes] = await Promise.all([ticketClient.clientGetTicketDetail({ code })]);
-    if (isValid(ticketRes)) {
-      const ticketData = getFirst(ticketRes);
-      const orderRes = await orderClient.getOrderByOrderNo(ticketData.saleOrderCode);
-      if (isValid(orderRes)) {
-        const orderInfo = getFirst(orderRes);
-        ticketData.customerName = orderInfo.customerName;
-        ticketData.customerPhone = orderInfo.customerPhone;
-        ticketData.totalPrice = orderInfo.totalPrice;
-        ticketData.orderCreatedTime = orderInfo.createdTime;
-      }
-
-      setDetail(ticketData);
-    }
-  }, []);
-
-  const handleCloseBtnEdit = () => {
-    router.push('?');
-    setDetail(null);
   };
 
+  const onClickBtnEdit = useCallback(async (code) => {
+    // todo
+    const { orderNo = null } = router.query;
+    changeUrl({ orderNo, ticketId: code });
+  }, []);
+
+  const handleCloseBtnEdit = useCallback(async () => {
+    const { orderNo = null } = router.query;
+    changeUrl({ orderNo });
+    setDetail(null);
+  });
+
   useEffect(() => {
-    if (ticketSelected && ticketSelected.length > 0) onClickBtnEdit(ticketSelected);
-  }, [onClickBtnEdit, ticketSelected]);
+    const loadData = async (code) => {
+      // init client
+      const ticketClient = getTicketClient();
+      const orderClient = getOrderClient();
+      const accountClient = getAccountClient();
+
+      // validate list department
+      if (listDepartment.length === 0) {
+        const listDepartmentRes = await accountClient.clientGetListDepartment(0, 20, '');
+        if (isValid(listDepartmentRes)) {
+          setListDepartment(
+            listDepartmentRes?.data?.map((depart) => ({
+              ...depart,
+              value: depart.code,
+              label: depart.name,
+            })) || [],
+          );
+        }
+      }
+
+      // validate user assign
+      if (listUserAssign.length === 0) {
+        const listUserAssignRes = await accountClient.clientGetListEmployee(0, 10, '');
+        if (isValid(listUserAssignRes)) {
+          setListUserAssign(
+            listUserAssignRes?.data?.map((acc) => ({
+              value: acc.accountId || '',
+              label: acc.username || '',
+            })) || [],
+          );
+        }
+      }
+
+      // always get data detail
+      const [ticketRes] = await Promise.all([ticketClient.clientGetTicketDetail({ code })]);
+      if (isValid(ticketRes)) {
+        const ticketData = getFirst(ticketRes);
+        const orderRes = await orderClient.getOrderByOrderNo(ticketData.saleOrderCode);
+        if (isValid(orderRes)) {
+          const orderInfo = getFirst(orderRes);
+          ticketData.customerName = orderInfo.customerName;
+          ticketData.customerPhone = orderInfo.customerPhone;
+          ticketData.totalPrice = orderInfo.totalPrice;
+          ticketData.orderCreatedTime = orderInfo.createdTime;
+        }
+
+        setDetail(ticketData);
+      }
+    };
+    loadData(ticketSelected);
+  }, [ticketSelected]);
 
   return (
     <>
@@ -132,7 +145,7 @@ const TicketTable = ({ data, total, search, listReasons }) => {
               <TableCell align="center">Thao tác</TableCell>
             </TableRow>
           </TableHead>
-          {data.length === 0 ? (
+          {!data || data.length === 0 ? (
             <TableBody>
               <TableRow>
                 <TableCell colSpan={5} align="left">
@@ -181,7 +194,16 @@ const TicketTable = ({ data, total, search, listReasons }) => {
               rowsPerPage={limit}
               page={page}
               onChangePage={(event, newPage, rowsPerPage) => {
-                Router.push(`?page=${newPage}&limit=${rowsPerPage}&q=${search}`);
+                // changeUrl({ page: newPage, search, limit: rowsPerPage, reload: true });
+                const pageSize = { page: newPage, limit: rowsPerPage };
+                const { query } = router;
+
+                router.push(
+                  `${router.pathname}?${convertObjectToParameter({
+                    ...query,
+                    ...pageSize,
+                  })}`,
+                );
               }}
             />
           )}

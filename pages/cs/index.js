@@ -13,15 +13,28 @@ import { TicketList } from 'components';
 
 export async function loadRequestData(ctx) {
   // Fetch data from external API
+
   const { query } = ctx;
-  const { q = '', page = PAGE_DEFAULT, limit = LIMIT_DEFAULT } = query;
+  const {
+    search = '',
+    page = PAGE_DEFAULT,
+    limit = LIMIT_DEFAULT,
+    action = '',
+    ...restProps
+  } = query;
   const offset = page * limit;
 
   const ticketClient = getTicketClient(ctx, {});
+  const filterValue = {
+    ...restProps,
+    ...(restProps?.reasons && { reasons: restProps?.reasons.split(',') }),
+  };
 
   // TODO offset limit
   const [ticketResult, listReasonRes] = await Promise.all([
-    ticketClient.getList(offset, limit, q),
+    action === 'filter'
+      ? ticketClient.getTicketByFilterServer(filterValue)
+      : ticketClient.getList(offset, limit, search),
     ticketClient.getListReason(),
   ]);
 
@@ -35,6 +48,8 @@ export async function loadRequestData(ctx) {
       listReason,
       total,
       tickets,
+      action,
+      filter: { ...restProps },
     },
   };
 }

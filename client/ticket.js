@@ -18,8 +18,16 @@ class TicketClient extends APIClient {
     return this.callFromClient('GET', `${URI}/tasks`, { saleOrderCode });
   }
 
+  getTicketBySaleOrderCodeServer({ saleOrderCode }) {
+    return this.callFromNextJS('GET', `${URI}/tasks`, { saleOrderCode });
+  }
+
   getTicketByFilter(formData) {
     return this.callFromClient('POST', `${URI}/tasks/list`, formData);
+  }
+
+  getTicketByFilterServer(formData) {
+    return this.callFromNextJS('POST', `${URI}/tasks/list`, formData);
   }
 
   getTicketByAssignUser() {
@@ -28,6 +36,15 @@ class TicketClient extends APIClient {
 
   getList(offset, limit, q) {
     return this.callFromNextJS('GET', `${URI}/tasks/list`, {
+      q,
+      offset,
+      limit,
+      getTotal: true,
+    });
+  }
+
+  getListByClient(offset, limit, q) {
+    return this.callFromClient('GET', `${URI}/tasks/list`, {
       q,
       offset,
       limit,

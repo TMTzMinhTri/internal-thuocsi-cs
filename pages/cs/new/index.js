@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
   Grid,
+  TextareaAutosize,
 } from '@material-ui/core';
 
 import Head from 'next/head';
@@ -43,8 +44,12 @@ const breadcrumb = [
 ];
 
 export async function loadRequestData(ctx) {
+  const { orderNo = '' } = ctx?.query;
+
   const accountClient = getAccountClient(ctx, {});
   const ticketClient = getTicketClient(ctx, {});
+  const orderClient = getOrderClient(ctx, {});
+  const customerClient = getCustomerClient(ctx, {});
 
   const [listDepartmentResult, listReasonsResult] = await Promise.all([
     accountClient.getListDepartment(0, 20, ''),
@@ -63,10 +68,34 @@ export async function loadRequestData(ctx) {
     label: item.name,
   }));
 
+  let orderData = null;
+  let tickets = [];
+
+  if (orderNo && orderNo.length > 0) {
+    const [orderResult, ticketResult] = await Promise.all([
+      orderClient.getByOrderNo(orderNo),
+      ticketClient.getTicketBySaleOrderCodeServer({ saleOrderCode: orderNo }),
+    ]);
+
+    orderData = getFirst(orderResult);
+
+    if (orderData) {
+      const bankResult = await customerClient.getListBankAccountServer(orderData.customerID);
+      if (isValid(bankResult)) {
+        orderData.bankInfo = getFirst(bankResult);
+      }
+    }
+
+    tickets = getData(ticketResult);
+  }
+
   return {
     props: {
       listDepartment,
       listReasons,
+      orderData,
+      tickets,
+      orderNo,
     },
   };
 }
@@ -75,68 +104,38 @@ export async function getServerSideProps(ctx) {
   return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
 
-const PageNewCS = ({ listReasons, listDepartment }) => {
+const PageNewCS = ({
+  listReasons,
+  listDepartment,
+  orderData = null,
+  tickets = [],
+  orderNo = '',
+}) => {
   const router = useRouter();
 
-  const { orderNo } = router.query;
-  const [orderData, setOrderData] = useState(null);
-  const [listAssignUser, setListAssignUser] = useState([{ value: '', label: '' }]);
-  const [search, setSearch] = useState(orderNo);
+  const [listAssignUser, setListAssignUser] = useState([
+    { value: '', label: 'Không có nguời tiếp nhận' },
+  ]);
 
   const { error, success } = useToast();
 
-  const { register, handleSubmit, errors, control, setValue, getValues } = useForm({
+  const { register, handleSubmit, errors, control, getValues } = useForm({
     mode: 'onChange',
   });
 
-  async function handleChange(event) {
-    const { value } = event.target;
-    setSearch(value);
-  }
-
   const onSearchOrder = useCallback(async (code) => {
-    const ticketClient = getTicketClient();
-    const orderClient = getOrderClient();
-
-    // get order
-    const resp = await orderClient.getOrderByOrderNo(code);
-    if (!isValid(resp)) {
-      setOrderData(null);
-      setValue('customerName', '');
-      error('Không tìm thấy thông tin đơn hàng');
-      return false;
-    }
-    // todo
-    Router.push(
-      {
-        pathname: '',
-        query: {
-          ticketId: code,
-        },
-      },
-      `?orderNo=${code}`,
-      { shallow: true },
-    );
-
-    const orderDetail = getFirst(resp);
-
-    const { customerName, customerID } = orderDetail;
-
-    const respTicket = await ticketClient.getTicketBySaleOrderCode({
-      saleOrderCode: orderDetail.orderNo,
-    });
-    orderDetail.tickets = getData(respTicket);
-    setOrderData(orderDetail);
-    setValue('customerName', customerName);
-    return false;
+    router.push(`?orderNo=${code}`);
   }, []);
+
+  const handleRefreshData = () => {
+    onSearchOrder(orderNo);
+  };
 
   // onSubmit
   const onSubmit = async (formData) => {
     try {
       const ticketClient = getTicketClient();
       const customerClient = getCustomerClient();
-
       const ticketResp = await ticketClient.createTicket({
         saleOrderCode: orderData.orderNo,
         saleOrderID: orderData.orderId,
@@ -151,8 +150,10 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
         bankAccountName: formData.bankAccountName,
         bankCode: formData.bankCode,
         bankBranch: formData.bankBranch,
+        facebookURL: formData.facebookURL,
+        chatURL: formData.chatURL,
+        feedBackContent: formData.feedBackContent,
       });
-
       if (ticketResp.status !== 'OK') {
         error(ticketResp.message ?? actionErrorText);
         return;
@@ -190,16 +191,12 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
         });
         setListAssignUser(tmpData);
       } else {
-        setListAssignUser([{ value: '', label: '' }]);
+        setListAssignUser([{ value: '', label: 'Không có người tiếp nhận' }]);
       }
     } else {
-      setListAssignUser([{ value: '', label: '' }]);
+      setListAssignUser([{ value: '', label: 'Không có người tiếp nhận' }]);
     }
   }, []);
-
-  useEffect(() => {
-    if (search && search.length > 0) onSearchOrder(search);
-  }, [search]);
 
   return (
     <AppCS select={PATH_URL.ALL_TICKETS} breadcrumb={breadcrumb}>
@@ -230,9 +227,8 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
                       })}
                       size="small"
                       type="text"
-                      fullWidth
                       placeholder="Nhập Mã SO"
-                      defaultValue={search}
+                      defaultValue={orderNo}
                       onKeyDown={(e) => e.key === 'Enter' && onSearchOrder(getValues('orderNo'))}
                     />
                   </Grid>
@@ -275,6 +271,7 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
                           })}
+                          defaultValue={orderData?.bankInfo?.bankAccountName}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={3}>
@@ -293,6 +290,7 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
                           })}
+                          defaultValue={orderData?.bankInfo?.bankCode}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={3}>
@@ -311,6 +309,7 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
                           })}
+                          defaultValue={orderData?.bankInfo?.bankCode}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={3}>
@@ -329,13 +328,18 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
                           })}
+                          defaultValue={orderData?.bankInfo?.bankBranch}
                         />
                       </Grid>
                     </Grid>
                   </FormControl>
                 </Paper>
                 {/* table cs  */}
-                <TicketTable data={orderData.tickets} listReasons={listReasons} />
+                <TicketTable
+                  data={tickets}
+                  listReasons={listReasons}
+                  refreshData={handleRefreshData}
+                />
 
                 <Paper className={`${styles.search}`}>
                   <FormControl size="small">
@@ -446,9 +450,52 @@ const PageNewCS = ({ listReasons, listDepartment }) => {
                           placeholder="Ghi chú..."
                         />
                       </Grid>
+                      <Grid item xs={12} sm={6} md={6}>
+                        <Typography gutterBottom>
+                          <LabelFormCs>Facebook khách hàng:</LabelFormCs>
+                        </Typography>
+                        <TextField
+                          name="facebookURL"
+                          inputRef={register}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          fullWidth
+                          placeholder="https://facebook.com/thuocsivn"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={6}>
+                        <Typography gutterBottom>
+                          <LabelFormCs>Nôi dung tin nhắn vơi khách hàng:</LabelFormCs>
+                        </Typography>
+                        <TextField
+                          name="chatURL"
+                          inputRef={register}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          fullWidth
+                          placeholder="https://messenger.comthuocsivn"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={12}>
+                        <Typography gutterBottom>
+                          <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
+                        </Typography>
+                        <TextareaAutosize
+                          style={{ width: '100%' }}
+                          name="feedBackContent"
+                          ref={register}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          placeholder="Nôi dung xử lý khách hàng ..."
+                          rows="5"
+                        />
+                      </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <Link href="/cs/new">
+                          <Link href="/cs">
                             <Button variant="contained" color="default">
                               Quay lại
                             </Button>
