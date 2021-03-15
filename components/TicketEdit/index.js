@@ -19,7 +19,6 @@ import { formatDateTime, formatNumber, listStatus } from 'components/global';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValid } from 'utils';
-import Router from 'next/router';
 import LabelFormCs from '../LabelFormCs';
 
 const useStyles = makeStyles((theme) => ({
@@ -416,11 +415,9 @@ const TicketEdit = ({
                         style={{ width: '100%' }}
                         name="feedBackContent"
                         ref={register}
-                        inputRef={register}
                         variant="outlined"
                         size="small"
                         type="text"
-                        fullWidth
                         placeholder="Nôi dung xử lý khách hàng ..."
                         rows="5"
                       />
@@ -433,11 +430,9 @@ const TicketEdit = ({
                         style={{ width: '100%' }}
                         name="note"
                         ref={register}
-                        inputRef={register}
                         variant="outlined"
                         size="small"
                         type="text"
-                        fullWidth
                         placeholder="Ghi chú..."
                         rows="5"
                       />
@@ -450,11 +445,11 @@ const TicketEdit = ({
                         style={{ width: '100%' }}
                         name="chatContent"
                         ref={register}
-                        inputRef={register}
+                        
                         variant="outlined"
                         size="small"
                         type="text"
-                        fullWidth
+                        
                         placeholder="Nôi dung xử lý khách hàng ..."
                         rows="10"
                       />

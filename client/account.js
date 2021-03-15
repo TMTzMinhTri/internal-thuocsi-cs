@@ -55,6 +55,10 @@ class AccountClient extends APIClient {
       getTotal: true,
     });
   }
+
+  getUserInfoMe() {
+    return this.callFromNextJS('GET', `${URI}/me`);
+  }
 }
 
 export default function getAccountClient(ctx, data) {

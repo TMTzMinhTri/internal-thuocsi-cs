@@ -12,11 +12,15 @@ class CustomerClient extends APIClient {
   }
 
   getListBankAccount(customerID) {
-    return this.callFromClient('GET', `${URI}/account/bank?customer_id=${customerID}`);
+    return this.callFromClient('GET', `${URI}/account/bank?accountID=${customerID}`);
   }
 
   getCustomer(customerID) {
     return this.callFromClient('GET', `${URI}/account?accountID=${customerID}`);
+  }
+
+  getListBankAccountServer(customerID) {
+    return this.callFromNextJS('GET', `${URI}/account/bank?accountID=${customerID}`);
   }
 }
 

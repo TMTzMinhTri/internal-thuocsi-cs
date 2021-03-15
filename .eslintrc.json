@@ -38,7 +38,8 @@
           ["public","./public"],
           ["utils","./utils"],
           ["hooks","./hooks"],
-          ["data","./data"]
+          ["data","./data"],
+          ["context","./context"]
         ]
       }
     }
