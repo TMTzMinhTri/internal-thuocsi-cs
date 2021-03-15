@@ -21,7 +21,7 @@ export async function loadRequestData(ctx) {
 
   // TODO offset limit
   const [ticketResult, listReasonRes] = await Promise.all([
-    ticketClient.getList(offset, limit, q),
+    ticketClient.getTicketByAssignUser(offset, limit, q),
     ticketClient.getListReason(),
   ]);
 

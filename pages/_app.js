@@ -20,22 +20,22 @@ export const theme = createMuiTheme({
 
 const menu = [
   {
-    key: 'ALLCASE',
+    key: 'ALLCASE_CS',
     name: 'DS phiếu yêu cầu',
-    link: '/cs/all-case',
+    link: '/cs',
     icon: faList,
   },
   {
-    key: 'MYCASE',
+    key: 'MYCASE_CS',
     name: 'DS yêu cầu cá nhân',
-    link: '/cs/my-case',
+    link: '/cs/my',
     icon: faList,
   },
   {
-    key: 'LISTFILE',
-    name: 'Danh sách file',
-    link: '/cs/list-file',
-    icon: faFile,
+    key: 'NEW_CS',
+    name: 'Tạo mới yêu cầu',
+    link: '/cs/new',
+    icon: faList,
   },
 ];
 

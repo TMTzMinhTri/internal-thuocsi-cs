@@ -1,7 +1,6 @@
 import { APIClient } from '@thuocsi/nextjs-components/lib/utils';
-const URI = `/marketplace/ticket/v1`;
-// const URI = ``
 
+const URI = `/marketplace/ticket/v1`;
 class TicketClient extends APIClient {
   constructor(ctx, data) {
     super(ctx, data);
@@ -15,8 +14,8 @@ class TicketClient extends APIClient {
     return this.callFromClient('PUT', `${URI}/task`, formData);
   }
 
-  getTicketBySaleOrderCode(code) {
-    return this.callFromClient('GET', `${URI}/tasks`, { sale_order_code: code });
+  getTicketBySaleOrderCode({ saleOrderCode }) {
+    return this.callFromClient('GET', `${URI}/tasks`, { saleOrderCode });
   }
 
   getTicketByFilter(formData) {
@@ -26,8 +25,29 @@ class TicketClient extends APIClient {
   getTicketByAssignUser() {
     return this.callFromNextJS('GET', `${URI}/me/tasks/list`);
   }
+
+  getList(offset, limit, q) {
+    return this.callFromNextJS('GET', `${URI}/tasks/list`, {
+      q,
+      offset,
+      limit,
+      getTotal: true,
+    });
+  }
+
+  getListReason() {
+    return this.callFromNextJS('GET', `${URI}/tasks/reasons/list`);
+  }
+
+  getTicketDetail({ code }) {
+    return this.callFromNextJS('GET', `${URI}/task`, { code });
+  }
+
+  clientGetTicketDetail({ code }) {
+    return this.callFromClient('GET', `${URI}/task`, { code });
+  }
 }
 
-export function getTicketClient(ctx, data) {
+export default function getTicketClient(ctx, data) {
   return new TicketClient(ctx, data);
 }

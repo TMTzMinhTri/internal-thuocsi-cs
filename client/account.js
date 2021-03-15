@@ -1,7 +1,6 @@
 import { APIClient } from '@thuocsi/nextjs-components/lib/utils';
 
 const URI = `/core/account/v1`;
-// const URI = ``
 
 class AccountClient extends APIClient {
   constructor(ctx, data) {
@@ -17,11 +16,20 @@ class AccountClient extends APIClient {
     });
   }
 
+  clientGetListDepartment(offset, limit, q) {
+    return this.callFromClient('GET', `${URI}/department/list`, {
+      q,
+      offset,
+      limit,
+      getTotal: true,
+    });
+  }
+
   getListEmployeeByDepartment(departmentCode) {
     return this.callFromClient('GET', `${URI}/employee/by-department`, {
       departmentCode,
       offset: 0,
-      limit: 20,
+      limit: 200,
       getTotal: true,
     });
   }
@@ -39,7 +47,7 @@ class AccountClient extends APIClient {
     });
   }
 
-  getListEmployeeFromClient(offset, limit, q) {
+  clientGetListEmployee(offset, limit, q) {
     return this.callFromClient('GET', `${URI}/employee/all`, {
       search: q,
       offset,
@@ -49,6 +57,6 @@ class AccountClient extends APIClient {
   }
 }
 
-export function getAccountClient(ctx, data) {
+export default function getAccountClient(ctx, data) {
   return new AccountClient(ctx, data);
 }

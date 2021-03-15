@@ -16,10 +16,10 @@ class CustomerClient extends APIClient {
   }
 
   getCustomer(customerID) {
-    return this.callFromClient('GET', `${URI}/account?customerID=${customerID}`);
+    return this.callFromClient('GET', `${URI}/account?accountID=${customerID}`);
   }
 }
 
-export function getCustomerClient(ctx, data) {
+export default function getCustomerClient(ctx, data) {
   return new CustomerClient(ctx, data);
 }
