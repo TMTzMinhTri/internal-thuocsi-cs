@@ -416,11 +416,9 @@ const TicketEdit = ({
                         style={{ width: '100%' }}
                         name="feedBackContent"
                         ref={register}
-                        inputRef={register}
                         variant="outlined"
                         size="small"
                         type="text"
-                        fullWidth
                         placeholder="Nôi dung xử lý khách hàng ..."
                         rows="5"
                       />
@@ -433,11 +431,9 @@ const TicketEdit = ({
                         style={{ width: '100%' }}
                         name="note"
                         ref={register}
-                        inputRef={register}
                         variant="outlined"
                         size="small"
                         type="text"
-                        fullWidth
                         placeholder="Ghi chú..."
                         rows="5"
                       />
@@ -450,11 +446,11 @@ const TicketEdit = ({
                         style={{ width: '100%' }}
                         name="chatContent"
                         ref={register}
-                        inputRef={register}
+                        
                         variant="outlined"
                         size="small"
                         type="text"
-                        fullWidth
+                        
                         placeholder="Nôi dung xử lý khách hàng ..."
                         rows="10"
                       />

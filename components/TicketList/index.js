@@ -9,37 +9,47 @@ import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useForm } from 'react-hook-form';
-import { getAccountClient, getTicketClient } from 'client';
+import { getAccountClient } from 'client';
 
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 
 import useModal from 'hooks/useModal';
-
-import { getData, isValid } from 'utils';
+import { useRouter } from 'next/router';
+import { cleanObj, convertObjectToParameter, isValid } from 'utils';
 import TicketTable from '../TicketTable';
 import LabelFormCs from '../LabelFormCs';
 
 import styles from './request.module.css';
 
-const TicketList = ({ total, tickets, listReason }) => {
+const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
   const [search, setSearch] = useState('');
-  const [listTickets, setListickets] = useState(tickets);
   const [listUserAssign] = useState([]);
 
   // Modal
-  const [showHideFilter, toggleFilter] = useModal(false);
+  const [showHideFilter, toggleFilter] = useModal(action === 'filter');
+
+  const statusFilter = filter?.status && listStatus.find((item) => item.value === filter.status);
+  const reasonsFilter =
+    filter?.reasons && listReason.filter((item) => filter.reasons.indexOf(item.value) >= 0);
+
+  const defaultValues = {
+    ...filter,
+    ...(statusFilter && { status: statusFilter }),
+    ...(reasonsFilter && { reasons: reasonsFilter }),
+  };
 
   const { register, handleSubmit, errors, control, getValues } = useForm({
-    defaultValues: {},
+    defaultValues,
     mode: 'onChange',
   });
 
-  // const router = useRouter();
+  const router = useRouter();
 
   // query + params
 
+  // TODO:
   // function
   const onSearch = useCallback(
     async ({
@@ -51,20 +61,29 @@ const TicketList = ({ total, tickets, listReason }) => {
       createdTime,
       lastUpdatedTime,
     }) => {
-      const ticketClient = getTicketClient();
+      // const ticketClient = getTicketClient();
 
-      const ticketResp = await ticketClient.getTicketByFilter({
+      const filterData = cleanObj({
+        action: 'filter',
         saleOrderCode: saleOrderCode.length === 0 ? null : saleOrderCode,
-        saleOrderID: parseInt(saleOrderID, 10),
-        status: status?.value,
+        saleOrderID: saleOrderID && saleOrderID > 0 ? parseInt(saleOrderID, 10) : null,
+        status: status?.value || null,
         reasons: reasons?.length > 0 ? reasons.map((reason) => reason.value) : null,
-        assignUser: assignUser?.value,
+        assignUser: assignUser?.value || null,
         createdTime: createdTime ? new Date(formatUTCTime(createdTime)).toISOString() : null,
         lastUpdatedTime: lastUpdatedTime
           ? new Date(formatUTCTime(lastUpdatedTime)).toISOString()
           : null,
       });
-      setListickets(getData(ticketResp));
+      router.push(
+        {
+          pathname: '',
+          query: filterData,
+        },
+        `?${convertObjectToParameter(filterData)}`,
+        { shallow: false },
+      );
+      return false;
     },
     [],
   );
@@ -195,7 +214,7 @@ const TicketList = ({ total, tickets, listReason }) => {
                           control={control}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
+                      {/* <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
                           <LabelFormCs>Người tiếp nhận:</LabelFormCs>
                         </Typography>
@@ -207,8 +226,8 @@ const TicketList = ({ total, tickets, listReason }) => {
                           errors={errors}
                           control={control}
                         />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
+                      </Grid> */}
+                      {/* <Grid item xs={12} sm={6} md={4}>
                         <Typography gutterBottom>
                           <LabelFormCs>Ngày bắt đầu:</LabelFormCs>
                         </Typography>
@@ -233,7 +252,7 @@ const TicketList = ({ total, tickets, listReason }) => {
                           fullWidth
                           type="datetime-local"
                         />
-                      </Grid>
+                      </Grid> */}
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
                           <Link href="/cs/new">
@@ -262,13 +281,7 @@ const TicketList = ({ total, tickets, listReason }) => {
           </form>
         </MyCard>
       </div>
-      <TicketTable
-        listReasons={listReason}
-        data={listTickets}
-        total={total}
-        setListickets={setListickets}
-        search={search}
-      />
+      <TicketTable listReasons={listReason} data={tickets} total={total} search={search} />
     </>
   );
 };

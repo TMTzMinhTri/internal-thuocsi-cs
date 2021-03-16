@@ -4,24 +4,43 @@ import Head from 'next/head';
 
 import AppCS from 'pages/_layout';
 
-import { getTicketClient } from 'client';
+import { getAccountClient, getTicketClient } from 'client';
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
 import { TicketList } from 'components';
+import { getFirst } from 'utils';
 
 export async function loadRequestData(ctx) {
   // Fetch data from external API
+
+  const accountClient = getAccountClient(ctx, {});
+  const userResult = await accountClient.getUserInfoMe();
+  const userInfo = getFirst(userResult);
+
   const { query } = ctx;
-  const { q = '', page = PAGE_DEFAULT, limit = LIMIT_DEFAULT } = query;
+  const {
+    search = '',
+    page = PAGE_DEFAULT,
+    limit = LIMIT_DEFAULT,
+    action = '',
+    ...restProps
+  } = query;
   const offset = page * limit;
 
   const ticketClient = getTicketClient(ctx, {});
+  const filterValue = {
+    ...restProps,
+    ...(restProps?.reasons && { reasons: restProps?.reasons.split(',') }),
+    assignUser: [userInfo.account.accountId],
+  };
 
   // TODO offset limit
   const [ticketResult, listReasonRes] = await Promise.all([
-    ticketClient.getTicketByAssignUser(offset, limit, q),
+    action === 'filter'
+      ? ticketClient.getTicketByFilterServer(filterValue)
+      : ticketClient.getTicketByAssignUser(offset, limit, search),
     ticketClient.getListReason(),
   ]);
 
@@ -35,6 +54,8 @@ export async function loadRequestData(ctx) {
       listReason,
       total,
       tickets,
+      action,
+      filter: { ...restProps },
     },
   };
 }
@@ -49,14 +70,14 @@ const breadcrumb = [
     link: '/cs',
   },
   {
-    name: 'DS phiếu yêu cầu',
+    name: 'DS phiếu yêu cầu cuả tôi',
   },
 ];
 
 const ListTicketPage = (props) => (
-  <AppCS select="/cs" breadcrumb={breadcrumb}>
+  <AppCS select="/cs/my" breadcrumb={breadcrumb}>
     <Head>
-      <title>DS phiếu yêu cầu</title>
+      <title>DS phiếu yêu cầu cuả tôi</title>
     </Head>
     <TicketList {...props} />
   </AppCS>
