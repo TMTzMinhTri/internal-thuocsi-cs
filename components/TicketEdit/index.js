@@ -8,6 +8,7 @@ import {
   TextareaAutosize,
   TextField,
   Typography,
+  Dialog
 } from '@material-ui/core';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
@@ -19,8 +20,14 @@ import { formatDateTime, formatNumber, listStatus } from 'components/global';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValid } from 'utils';
-import Router from 'next/router';
+import Slider from "react-slick";
+import Image from 'next/image';
 import LabelFormCs from '../LabelFormCs';
+
+import stylesModule from './styles.module.css';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css"
+  ;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,7 +72,29 @@ const TicketEdit = ({
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
   const [listAssignUser, setListAssignUser] = useState(usersAssign);
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: true,
+    adaptiveHeight: true
+
+  };
+  const images = ticketDetail.imageUrls || [];
   const anchor = '';
+
+  const [open, setOpen] = useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  }
+
+  const handleOpen = () => {
+    setOpen(true);
+  }
+
 
   const onSubmit = async (data) => {
     const ticketUpdateDetail = {
@@ -438,6 +467,27 @@ const TicketEdit = ({
                         rows="5"
                       />
                     </Grid>
+                    <Button color="primary" variant="contained" onClick={handleOpen}>
+                      Xem hình ảnh
+                    </Button>
+                    <Dialog
+                      open={open}
+                      onClose={handleClose}
+                      aria-labelledby="simple-modal-title"
+                      aria-describedby="simple-modal-description"
+                      className={styles.dialog_carousel}
+                    >
+                      <div>
+                        <Slider {...settings}>
+                          {images.length === 0 && (<div style={{ textAlign: "center" }}>Không có hình ảnh</div>)}
+                          {images.map(image => (
+                            <div className={stylesModule.carousel_element}>
+                              <Image src={image} width="800" height="400" />
+                            </div>
+                          ))}
+                        </Slider>
+                      </div>
+                    </Dialog>
                     {/* <Grid item xs={12} sm={12} md={12}>
                       <Typography gutterBottom>
                         <LabelFormCs>Nôi dung xử lý khách hàng</LabelFormCs>

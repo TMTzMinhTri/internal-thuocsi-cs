@@ -9,9 +9,10 @@ import {
   TableHead,
   TableRow,
   Tooltip,
+  Dialog
 } from '@material-ui/core';
 
-import { Edit as EditIcon } from '@material-ui/icons';
+import { Edit as EditIcon, Image as ImageIcon } from '@material-ui/icons';
 import { ErrorCode, listStatus } from 'components/global';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -22,7 +23,10 @@ import TicketEdit from 'components/TicketEdit';
 import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
+
+
 const TicketTable = ({ data, total, search, listReasons = [] }) => {
+
   const router = useRouter();
   const { ticketId } = router.query;
   const [ticketSelected] = useState(ticketId);
@@ -189,11 +193,13 @@ const TicketTable = ({ data, total, search, listReasons = [] }) => {
                         </IconButton>
                       </Tooltip>
                     </a>
+
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           )}
+
           {total > 0 && (
             <MyTablePagination
               labelUnit="yêu cầu"
@@ -216,16 +222,18 @@ const TicketTable = ({ data, total, search, listReasons = [] }) => {
           )}
         </Table>
       </TableContainer>
-      {detail && (
-        <TicketEdit
-          isOpen
-          onClose={handleCloseBtnEdit}
-          listReason={listReasons}
-          listAssignUser={listUserAssign}
-          listDepartment={listDepartment}
-          ticketDetail={detail}
-        />
-      )}
+      {
+        detail && (
+          <TicketEdit
+            isOpen
+            onClose={handleCloseBtnEdit}
+            listReason={listReasons}
+            listAssignUser={listUserAssign}
+            listDepartment={listDepartment}
+            ticketDetail={detail}
+          />
+        )
+      }
     </>
   );
 };

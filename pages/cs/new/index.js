@@ -13,7 +13,7 @@ import {
 import Head from 'next/head';
 import Link from 'next/link';
 import Router, { useRouter } from 'next/router';
-
+import ImageUploadField from "components/image-upload-field";
 import AppCS from 'pages/_layout';
 
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
@@ -26,11 +26,11 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-
+import LabelBox from "@thuocsi/nextjs-components/editor/label-box/index";
 import { LabelFormCs, TicketTable } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
-import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
+import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient, getCommonClient } from 'client';
 import styles from './request.module.css';
 
 const breadcrumb = [
@@ -116,11 +116,15 @@ const PageNewCS = ({
   const [listAssignUser, setListAssignUser] = useState([
     { value: '', label: 'Không có nguời tiếp nhận' },
   ]);
-
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [ticketImages, setTicketImages] = useState(orderData.imageUrls ?? []);
   const { error, success } = useToast();
 
-  const { register, handleSubmit, errors, control, getValues } = useForm({
+  const { register, handleSubmit, errors, control, getValues, setValue } = useForm({
     mode: 'onChange',
+    defaultValues: {
+      imageUrls: []
+    }
   });
 
   const onSearchOrder = useCallback(async (code) => {
@@ -129,6 +133,34 @@ const PageNewCS = ({
 
   const handleRefreshData = () => {
     onSearchOrder(orderNo);
+  };
+  const commonClient = getCommonClient();
+  async function uploadImage(img) {
+    const res = await commonClient.uploadImage(img);
+    return res.data;
+  }
+
+  async function handleCropCallback(value) {
+    setUploadingImage(true);
+    try {
+      const result = await uploadImage({
+        data: value,
+      });
+      const images = [...getValues("imageUrls"), result[0]];
+      setValue("imageUrls", images);
+      setTicketImages(images);
+    } catch (err) {
+      error(err.message || err.toString());
+    }
+    setUploadingImage(false);
+  }
+
+  const handleRemoveImage = (url) => {
+    setUploadingImage(true);
+    const images = [...getValues("imageUrls")?.filter((imgUrl) => imgUrl !== url)];
+    setValue("imageUrls", images);
+    setTicketImages(images);
+    setUploadingImage(false);
   };
 
   // onSubmit
@@ -153,6 +185,7 @@ const PageNewCS = ({
         facebookURL: formData.facebookURL,
         chatURL: formData.chatURL,
         feedBackContent: formData.feedBackContent,
+        imageUrls: formData.imageUrls,
       });
       if (ticketResp.status !== 'OK') {
         error(ticketResp.message ?? actionErrorText);
@@ -197,9 +230,11 @@ const PageNewCS = ({
       setListAssignUser([{ value: '', label: 'Không có người tiếp nhận' }]);
     }
   }, []);
-
+  useEffect(() => {
+    register({ name: "imageUrls" });
+  }, []);
   return (
-    <AppCS select={PATH_URL.ALL_TICKETS} breadcrumb={breadcrumb}>
+    <AppCS select={PATH_URL.ALL_TICKETS} readcrumb={breadcrumb}>
       <Head>
         <title>Thêm yêu cầu mới</title>
       </Head>
@@ -492,6 +527,17 @@ const PageNewCS = ({
                           placeholder="Nôi dung xử lý khách hàng ..."
                           rows="5"
                         />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={12}>
+                        <LabelBox label="Hình ảnh phản hồi" padding={5}>
+                          <ImageUploadField
+                            title="Cập nhật hình ảnh sản phẩm"
+                            images={ticketImages}
+                            handleCropCallback={handleCropCallback}
+                            handleRemoveImage={handleRemoveImage}
+
+                          />
+                        </LabelBox>
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>

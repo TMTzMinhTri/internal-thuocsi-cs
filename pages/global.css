@@ -17,3 +17,32 @@ body {
   font-weight: 700 !important;
   text-transform: uppercase;
 }
+
+.slick-dots {
+  bottom: 0 !important;
+  background-color: white !important;
+}
+
+.slick-slide {
+}
+
+.slick-arrow {
+  color: #4b4453 !important;
+  z-index: 99;
+}
+.slick-prev {
+  left: 0 !important;
+}
+
+.slick-next {
+  right: 25px !important;
+}
+
+.MuiDialog-paperWidthSm {
+  max-width: 1000px !important;
+}
+.slick-prev:before,
+.slick-next:before {
+  font-size: 44px !important;
+  color: black !important;
+}
