@@ -30,7 +30,7 @@ import LabelBox from "@thuocsi/nextjs-components/editor/label-box/index";
 import { LabelFormCs, TicketTable } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
-import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient, getCommonClient } from 'client';
+import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
 import styles from './request.module.css';
 
 const breadcrumb = [
@@ -116,8 +116,7 @@ const PageNewCS = ({
   const [listAssignUser, setListAssignUser] = useState([
     { value: '', label: 'Không có nguời tiếp nhận' },
   ]);
-  const [uploadingImage, setUploadingImage] = useState(false);
-  const [ticketImages, setTicketImages] = useState(orderData.imageUrls ?? []);
+  const [ticketImages, setTicketImages] = useState([]);
   const { error, success } = useToast();
 
   const { register, handleSubmit, errors, control, getValues, setValue } = useForm({
@@ -134,39 +133,36 @@ const PageNewCS = ({
   const handleRefreshData = () => {
     onSearchOrder(orderNo);
   };
-  const commonClient = getCommonClient();
+  const ticketClient = getTicketClient();
   async function uploadImage(img) {
-    const res = await commonClient.uploadImage(img);
-    return res.data;
+    const res = await ticketClient.uploadImage(img);
+    return res?.data || [];
   }
 
   async function handleCropCallback(value) {
-    setUploadingImage(true);
+
     try {
-      const result = await uploadImage({
+      const data = await uploadImage({
         data: value,
       });
-      const images = [...getValues("imageUrls"), result[0]];
+      const images = [...getValues("imageUrls"), data[0]];
       setValue("imageUrls", images);
       setTicketImages(images);
     } catch (err) {
       error(err.message || err.toString());
     }
-    setUploadingImage(false);
   }
 
   const handleRemoveImage = (url) => {
-    setUploadingImage(true);
+
     const images = [...getValues("imageUrls")?.filter((imgUrl) => imgUrl !== url)];
     setValue("imageUrls", images);
     setTicketImages(images);
-    setUploadingImage(false);
   };
 
   // onSubmit
   const onSubmit = async (formData) => {
     try {
-      const ticketClient = getTicketClient();
       const customerClient = getCustomerClient();
       const ticketResp = await ticketClient.createTicket({
         saleOrderCode: orderData.orderNo,
@@ -234,7 +230,7 @@ const PageNewCS = ({
     register({ name: "imageUrls" });
   }, []);
   return (
-    <AppCS select={PATH_URL.ALL_TICKETS} readcrumb={breadcrumb}>
+    <AppCS select={PATH_URL.ALL_TICKETS} breadcrumb={breadcrumb}>
       <Head>
         <title>Thêm yêu cầu mới</title>
       </Head>

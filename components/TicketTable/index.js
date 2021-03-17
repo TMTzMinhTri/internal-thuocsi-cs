@@ -9,10 +9,10 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  Dialog
+
 } from '@material-ui/core';
 
-import { Edit as EditIcon, Image as ImageIcon } from '@material-ui/icons';
+import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, listStatus } from 'components/global';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -25,7 +25,7 @@ import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
 
 
-const TicketTable = ({ data, total, search, listReasons = [] }) => {
+const TicketTable = ({ data, total, listReasons = [] }) => {
 
   const router = useRouter();
   const { ticketId } = router.query;
@@ -122,13 +122,6 @@ const TicketTable = ({ data, total, search, listReasons = [] }) => {
     loadData(ticketSelected);
   }, [ticketSelected]);
 
-  const handleChangePage = async (newPage, rowPerPages) => {
-    const ticketClient = getTicketClient();
-    const offset = newPage * rowPerPages;
-    const ticketResp = await ticketClient.getListByClient(offset, limit, '');
-    setListickets(getData(ticketResp));
-  }
-
   return (
     <>
       <TableContainer component={Paper}>
@@ -177,13 +170,13 @@ const TicketTable = ({ data, total, search, listReasons = [] }) => {
                         key={uuidv4()}
                         style={{ margin: '3px' }}
                         size="small"
-                        label={listReasons.find((reason) => reason.value === code).label}
+                        label={listReasons.find((reason) => reason.value === code)?.label || ''}
                       />
                     ))}
                   </TableCell>
                   <TableCell align="left">{item.note}</TableCell>
                   <TableCell align="center">
-                    {listStatus.filter((status) => status.value === item.status)[0].label}
+                    {listStatus.filter((status) => (status.value && status.value === item.status))[0].label}
                   </TableCell>
                   <TableCell align="center">
                     <a onClick={() => onClickBtnEdit(item.code)}>
@@ -207,7 +200,6 @@ const TicketTable = ({ data, total, search, listReasons = [] }) => {
               rowsPerPage={limit}
               page={page}
               onChangePage={(event, newPage, rowsPerPage) => {
-                // changeUrl({ page: newPage, search, limit: rowsPerPage, reload: true });
                 const pageSize = { page: newPage, limit: rowsPerPage };
                 const { query } = router;
 

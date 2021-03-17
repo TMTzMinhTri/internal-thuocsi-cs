@@ -22,6 +22,7 @@ import { useForm } from 'react-hook-form';
 import { isValid } from 'utils';
 import Slider from "react-slick";
 import Image from 'next/image';
+import useModal from 'hooks/useModal';
 import LabelFormCs from '../LabelFormCs';
 
 import stylesModule from './styles.module.css';
@@ -72,6 +73,7 @@ const TicketEdit = ({
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
   const [listAssignUser, setListAssignUser] = useState(usersAssign);
+  const [imageSelected, setImageSelected] = useState('');
   const settings = {
     dots: true,
     infinite: true,
@@ -82,18 +84,10 @@ const TicketEdit = ({
     adaptiveHeight: true
 
   };
-  const images = ticketDetail.imageUrls || [];
+  const images = ticketDetail?.imageUrls || [];
   const anchor = '';
 
-  const [open, setOpen] = useState(false);
-
-  const handleClose = () => {
-    setOpen(false);
-  }
-
-  const handleOpen = () => {
-    setOpen(true);
-  }
+  const [open, toggle] = useModal();
 
 
   const onSubmit = async (data) => {
@@ -151,6 +145,10 @@ const TicketEdit = ({
     }
   }, []);
 
+  const handleShowImage = (image) => {
+    setImageSelected(image);
+    toggle();
+  }
   return (
     <Drawer
       ModalProps={{
@@ -467,17 +465,30 @@ const TicketEdit = ({
                         rows="5"
                       />
                     </Grid>
-                    <Button color="primary" variant="contained" onClick={handleOpen}>
-                      Xem hình ảnh
-                    </Button>
+                    <Grid item xs={12} sm={12} md={12}>
+                      <Typography gutterBottom>
+                        <LabelFormCs>Hình ảnh sản phẩm</LabelFormCs>
+                      </Typography>
+                      <div style={{ display: "flex", flexDirection: "row" }}>
+                        {
+                          images.map(image => (
+                            <div style={{ padding: "15px", borderRadius: "30%" }}>
+                              <Image src={image} width="90" height="90" onClick={() => handleShowImage(image)} />
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </Grid>
+
                     <Dialog
                       open={open}
-                      onClose={handleClose}
+                      onClose={toggle}
                       aria-labelledby="simple-modal-title"
                       aria-describedby="simple-modal-description"
                       className={styles.dialog_carousel}
                     >
-                      <div>
+                      <Image src={imageSelected} width="1000" height="600" />
+                      {/* <div>
                         <Slider {...settings}>
                           {images.length === 0 && (<div style={{ textAlign: "center" }}>Không có hình ảnh</div>)}
                           {images.map(image => (
@@ -486,7 +497,7 @@ const TicketEdit = ({
                             </div>
                           ))}
                         </Slider>
-                      </div>
+                      </div> */}
                     </Dialog>
                     {/* <Grid item xs={12} sm={12} md={12}>
                       <Typography gutterBottom>
