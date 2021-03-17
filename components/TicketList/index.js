@@ -24,22 +24,12 @@ import { ExportCSV } from '../ExportCSV';
 import styles from './request.module.css';
 import { getTicketClient } from 'client';
 
-const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
+const TicketList = ({ total, tickets, listReason, action, filter = {}, filterObject = {} }) => {
   const ticketClient = getTicketClient('', {});
   const [search, setSearch] = useState('');
   const [listUserAssign] = useState([]);
   const [ticketAll, setTicketAll] = useState([]);
-  const fileName = `Danh_sach_yeu_cau_${new Date().toJSON().slice(0,10).replace(/-/g,'_')}`
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const [tickets] = await Promise.all([ticketClient.getListByClient(1, total,'')]);
-      if (isValid(tickets)) {
-        setTicketAll(tickets.data)
-      };
-    }
-    fetchData();
-  }, []);
+  const fileName = `Danh_Sach_Yeu_Cau_${new Date().toLocaleString().replace(/[ :]/g,'_').replace(/[,]/g,'')}`
 
   // Modal
   const [showHideFilter, toggleFilter] = useModal(action === 'filter');
@@ -116,6 +106,16 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
         label: username,
       })) || []
     );
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [tickets] = await Promise.all([ticketClient.getTicketByFilter(filterObject)]);
+      if (isValid(tickets)) {
+        setTicketAll(tickets.data)
+      };
+    }
+    fetchData();
   }, []);
 
   return (
