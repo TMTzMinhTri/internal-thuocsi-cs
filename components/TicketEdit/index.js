@@ -20,15 +20,12 @@ import { formatDateTime, formatNumber, listStatus } from 'components/global';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValid } from 'utils';
-import Slider from "react-slick";
 import Image from 'next/image';
 import useModal from 'hooks/useModal';
 import LabelFormCs from '../LabelFormCs';
 
-import stylesModule from './styles.module.css';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css"
-  ;
+
+;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,16 +71,6 @@ const TicketEdit = ({
   const { success, error } = useToast();
   const [listAssignUser, setListAssignUser] = useState(usersAssign);
   const [imageSelected, setImageSelected] = useState('');
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-    adaptiveHeight: true
-
-  };
   const images = ticketDetail?.imageUrls || [];
   const anchor = '';
 
@@ -495,34 +482,7 @@ const TicketEdit = ({
                       className={styles.dialog_carousel}
                     >
                       <Image src={imageSelected} width="1000" height="600" />
-                      {/* <div>
-                        <Slider {...settings}>
-                          {images.length === 0 && (<div style={{ textAlign: "center" }}>Không có hình ảnh</div>)}
-                          {images.map(image => (
-                            <div className={stylesModule.carousel_element}>
-                              <Image src={image} width="800" height="400" />
-                            </div>
-                          ))}
-                        </Slider>
-                      </div> */}
                     </Dialog>
-                    {/* <Grid item xs={12} sm={12} md={12}>
-                      <Typography gutterBottom>
-                        <LabelFormCs>Nôi dung xử lý khách hàng</LabelFormCs>
-                      </Typography>
-                      <TextareaAutosize
-                        style={{ width: '100%' }}
-                        name="chatContent"
-                        ref={register}
-                        
-                        variant="outlined"
-                        size="small"
-                        type="text"
-                        
-                        placeholder="Nôi dung xử lý khách hàng ..."
-                        rows="10"
-                      />
-                    </Grid> */}
                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                       <Grid item>
                         <Button variant="contained" color="default" onClick={() => onClose()}>
