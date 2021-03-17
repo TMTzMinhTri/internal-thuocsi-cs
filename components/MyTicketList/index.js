@@ -18,7 +18,7 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 import useModal from 'hooks/useModal';
 import { useRouter } from 'next/router';
 import { cleanObj, convertObjectToParameter, isValid } from 'utils';
-import TicketTable from '../TicketTable';
+import MyTicketTable from '../MyTicketTable';
 import LabelFormCs from '../LabelFormCs';
 
 import styles from './request.module.css';
@@ -225,7 +225,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
           </form>
         </MyCard>
       </div>
-      <TicketTable listReasons={listReason} data={tickets} total={total} search={search} />
+      <MyTicketTable listReasons={listReason} data={tickets} total={total} search={search} />
     </>
   );
 };

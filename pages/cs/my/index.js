@@ -9,7 +9,7 @@ import { getAccountClient, getTicketClient } from 'client';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
-import { TicketList } from 'components';
+import { MyTicketList } from 'components';
 import { getFirst } from 'utils';
 
 export async function loadRequestData(ctx) {
@@ -79,7 +79,7 @@ const ListTicketPage = (props) => (
     <Head>
       <title>DS phiếu yêu cầu cuả tôi</title>
     </Head>
-    <TicketList {...props} />
+    <MyTicketList {...props} />
   </AppCS>
 );
 
