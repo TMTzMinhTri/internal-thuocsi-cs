@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Button, FormControl, TextField, Typography, Grid } from '@material-ui/core';
 
 import Link from 'next/link';
@@ -20,12 +20,26 @@ import { useRouter } from 'next/router';
 import { cleanObj, convertObjectToParameter, isValid } from 'utils';
 import TicketTable from '../TicketTable';
 import LabelFormCs from '../LabelFormCs';
-
+import { ExportCSV } from '../ExportCSV';
 import styles from './request.module.css';
+import { getTicketClient } from 'client';
 
 const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
+  const ticketClient = getTicketClient('', {});
   const [search, setSearch] = useState('');
   const [listUserAssign] = useState([]);
+  const [ticketAll, setTicketAll] = useState([]);
+  const fileName = `Danh_sach_yeu_cau_${new Date().toJSON().slice(0,10).replace(/-/g,'_')}`
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const [tickets] = await Promise.all([ticketClient.getListByClient(1, total,'')]);
+      if (isValid(tickets)) {
+        setTicketAll(tickets.data)
+      };
+    }
+    fetchData();
+  }, []);
 
   // Modal
   const [showHideFilter, toggleFilter] = useModal(action === 'filter');
@@ -255,11 +269,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
                       </Grid> */}
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <Link href="/cs/new">
-                            <Button variant="contained" color="lightgray" disabled>
-                              Xuất file
-                            </Button>
-                          </Link>
+                          <ExportCSV csvData={ticketAll} fileName={fileName}/>
                         </Grid>
                         <Grid item>
                           <Link href="/cs/new">
