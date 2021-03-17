@@ -139,12 +139,12 @@ const PageNewCS = ({
     return res?.data || [];
   }
 
-  async function handleCropCallback(value) {
+  async function handleCropCallback(data) {
     try {
-      const data = await uploadImage({
-        data: value,
+      const imageData = await uploadImage({
+        data,
       });
-      const images = [...getValues('imageUrls'), data[0]];
+      const images = [...getValues('imageUrls'), imageData[0]];
       setValue('imageUrls', images);
       setTicketImages(images);
     } catch (err) {
