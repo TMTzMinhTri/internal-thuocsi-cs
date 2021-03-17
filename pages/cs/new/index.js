@@ -13,7 +13,7 @@ import {
 import Head from 'next/head';
 import Link from 'next/link';
 import Router, { useRouter } from 'next/router';
-import ImageUploadField from "components/image-upload-field";
+import ImageUploadField from 'components/image-upload-field';
 import AppCS from 'pages/_layout';
 
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
@@ -26,7 +26,7 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-import LabelBox from "@thuocsi/nextjs-components/editor/label-box/index";
+import LabelBox from '@thuocsi/nextjs-components/editor/label-box/index';
 import { LabelFormCs, TicketTable } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
@@ -122,8 +122,8 @@ const PageNewCS = ({
   const { register, handleSubmit, errors, control, getValues, setValue } = useForm({
     mode: 'onChange',
     defaultValues: {
-      imageUrls: []
-    }
+      imageUrls: [],
+    },
   });
 
   const onSearchOrder = useCallback(async (code) => {
@@ -140,13 +140,12 @@ const PageNewCS = ({
   }
 
   async function handleCropCallback(value) {
-
     try {
       const data = await uploadImage({
         data: value,
       });
-      const images = [...getValues("imageUrls"), data[0]];
-      setValue("imageUrls", images);
+      const images = [...getValues('imageUrls'), data[0]];
+      setValue('imageUrls', images);
       setTicketImages(images);
     } catch (err) {
       error(err.message || err.toString());
@@ -154,9 +153,8 @@ const PageNewCS = ({
   }
 
   const handleRemoveImage = (url) => {
-
-    const images = [...getValues("imageUrls")?.filter((imgUrl) => imgUrl !== url)];
-    setValue("imageUrls", images);
+    const images = getValues('imageUrls')?.filter((imgUrl) => imgUrl !== url);
+    setValue('imageUrls', images);
     setTicketImages(images);
   };
 
@@ -227,7 +225,7 @@ const PageNewCS = ({
     }
   }, []);
   useEffect(() => {
-    register({ name: "imageUrls" });
+    register({ name: 'imageUrls' });
   }, []);
   return (
     <AppCS select={PATH_URL.ALL_TICKETS} breadcrumb={breadcrumb}>
@@ -277,7 +275,6 @@ const PageNewCS = ({
             </MyCardContent>
             {orderData && (
               <>
-
                 {/* table cs  */}
                 <TicketTable
                   data={tickets}
@@ -292,7 +289,7 @@ const PageNewCS = ({
                       direction="row"
                       justify="space-between"
                       alignItems="center"
-                      style={{ marginTop: "10px" }}
+                      style={{ marginTop: '10px' }}
                     >
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
@@ -377,7 +374,7 @@ const PageNewCS = ({
                       direction="row"
                       justify="space-between"
                       alignItems="center"
-                      style={{ marginTop: "10px" }}
+                      style={{ marginTop: '10px' }}
                     >
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
@@ -544,7 +541,6 @@ const PageNewCS = ({
                             images={ticketImages}
                             handleCropCallback={handleCropCallback}
                             handleRemoveImage={handleRemoveImage}
-
                           />
                         </LabelBox>
                       </Grid>

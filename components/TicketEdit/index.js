@@ -8,7 +8,7 @@ import {
   TextareaAutosize,
   TextField,
   Typography,
-  Dialog
+  Dialog,
 } from '@material-ui/core';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
@@ -23,9 +23,6 @@ import { isValid } from 'utils';
 import Image from 'next/image';
 import useModal from 'hooks/useModal';
 import LabelFormCs from '../LabelFormCs';
-
-
-;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -75,7 +72,6 @@ const TicketEdit = ({
   const anchor = '';
 
   const [open, toggle] = useModal();
-
 
   const onSubmit = async (data) => {
     const ticketUpdateDetail = {
@@ -135,7 +131,7 @@ const TicketEdit = ({
   const handleShowImage = (image) => {
     setImageSelected(image);
     toggle();
-  }
+  };
   return (
     <Drawer
       ModalProps={{
@@ -456,21 +452,29 @@ const TicketEdit = ({
                       <Typography gutterBottom>
                         <LabelFormCs>Hình ảnh sản phẩm (Số lượng : {images.length})</LabelFormCs>
                       </Typography>
-                      <div style={{ display: "flex", flexDirection: "row" }}>
-
-                        {
-                          images.length !== 0 ? images.map(image => (
-                            <div style={{ padding: "15px" }}>
-                              <div style={{ borderRadius: "5px", border: '2px solid rgba(0, 0, 0, 0.87)', lineHeight: "0.43" }}>
-                                <Image src={image} width="90" height="90" onClick={() => handleShowImage(image)} />
+                      <div style={{ display: 'flex', flexDirection: 'row' }}>
+                        {images.length !== 0 ? (
+                          images.map((image) => (
+                            <div style={{ padding: '15px' }}>
+                              <div
+                                style={{
+                                  borderRadius: '5px',
+                                  border: '2px solid rgba(0, 0, 0, 0.87)',
+                                  lineHeight: '0.43',
+                                }}
+                              >
+                                <Image
+                                  src={image}
+                                  width="90"
+                                  height="90"
+                                  onClick={() => handleShowImage(image)}
+                                />
                               </div>
                             </div>
-                          )) : (
-                            <div>
-                              Không có hình ảnh
-                            </div>
-                          )
-                        }
+                          ))
+                        ) : (
+                          <div>Không có hình ảnh</div>
+                        )}
                       </div>
                     </Grid>
 

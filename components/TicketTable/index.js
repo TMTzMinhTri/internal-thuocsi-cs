@@ -9,7 +9,6 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-
 } from '@material-ui/core';
 
 import { Edit as EditIcon } from '@material-ui/icons';
@@ -23,10 +22,7 @@ import TicketEdit from 'components/TicketEdit';
 import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
-
-
 const TicketTable = ({ data, total, listReasons = [] }) => {
-
   const router = useRouter();
   const { ticketId } = router.query;
   const [ticketSelected] = useState(ticketId);
@@ -176,7 +172,8 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                   </TableCell>
                   <TableCell align="left">{item.note}</TableCell>
                   <TableCell align="center">
-                    {listStatus.filter((status) => (status.value && status.value === item.status))[0].label}
+                    {listStatus.find((status) => status.value && status.value === item.status)
+                      ?.label || ''}
                   </TableCell>
                   <TableCell align="center">
                     <a onClick={() => onClickBtnEdit(item.code)}>
@@ -186,7 +183,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                         </IconButton>
                       </Tooltip>
                     </a>
-
                   </TableCell>
                 </TableRow>
               ))}
@@ -214,18 +210,16 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
           )}
         </Table>
       </TableContainer>
-      {
-        detail && (
-          <TicketEdit
-            isOpen
-            onClose={handleCloseBtnEdit}
-            listReason={listReasons}
-            listAssignUser={listUserAssign}
-            listDepartment={listDepartment}
-            ticketDetail={detail}
-          />
-        )
-      }
+      {detail && (
+        <TicketEdit
+          isOpen
+          onClose={handleCloseBtnEdit}
+          listReason={listReasons}
+          listAssignUser={listUserAssign}
+          listDepartment={listDepartment}
+          ticketDetail={detail}
+        />
+      )}
     </>
   );
 };
