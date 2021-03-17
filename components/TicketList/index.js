@@ -30,6 +30,8 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, filterObj
   const [listUserAssign] = useState([]);
   const [ticketAll, setTicketAll] = useState([]);
   const fileName = `Danh_Sach_Yeu_Cau_${new Date().toLocaleString().replace(/[ :]/g,'_').replace(/[,]/g,'')}`
+  const OFFSET = 1000;
+  const totalPageSize = Math.ceil(total/OFFSET);
 
   // Modal
   const [showHideFilter, toggleFilter] = useModal(action === 'filter');
@@ -108,12 +110,31 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, filterObj
     );
   }, []);
 
+  const doAsync = (value) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(value);
+        }, Math.floor(Math.random() * 1000));
+    });
+  }
+
   useEffect(() => {
     const fetchData = async () => {
-      const [tickets] = await Promise.all([ticketClient.getTicketByFilter(filterObject)]);
-      if (isValid(tickets)) {
-        setTicketAll(tickets.data)
-      };
+      const promises = [];
+      for (let i = 0; i < totalPageSize; ++i) {
+        promises.push(doAsync(ticketClient.getTicketByFilter(i,OFFSET,filterObject)));
+      }
+
+      Promise.all(promises)
+      .then((results) => {
+          let data = [];
+          results.forEach((value) => {
+            value.data.forEach((item) => {
+              data.push(item)
+            });
+          });
+          setTicketAll(data);
+      })
     }
     fetchData();
   }, []);
