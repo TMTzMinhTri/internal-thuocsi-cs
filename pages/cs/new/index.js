@@ -277,6 +277,13 @@ const PageNewCS = ({
             </MyCardContent>
             {orderData && (
               <>
+
+                {/* table cs  */}
+                <TicketTable
+                  data={tickets}
+                  listReasons={listReasons}
+                  refreshData={handleRefreshData}
+                />
                 <Paper className={`${styles.search}`}>
                   <FormControl size="small">
                     <Grid
@@ -285,6 +292,7 @@ const PageNewCS = ({
                       direction="row"
                       justify="space-between"
                       alignItems="center"
+                      style={{ marginTop: "10px" }}
                     >
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
@@ -363,23 +371,13 @@ const PageNewCS = ({
                         />
                       </Grid>
                     </Grid>
-                  </FormControl>
-                </Paper>
-                {/* table cs  */}
-                <TicketTable
-                  data={tickets}
-                  listReasons={listReasons}
-                  refreshData={handleRefreshData}
-                />
-
-                <Paper className={`${styles.search}`}>
-                  <FormControl size="small">
                     <Grid
                       container
                       spacing={3}
                       direction="row"
                       justify="space-between"
                       alignItems="center"
+                      style={{ marginTop: "10px" }}
                     >
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
@@ -509,7 +507,7 @@ const PageNewCS = ({
                           placeholder="https://messenger.comthuocsivn"
                         />
                       </Grid>
-                      <Grid item xs={12} sm={12} md={12}>
+                      <Grid item xs={12} sm={12} md={6}>
                         <Typography gutterBottom>
                           <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
                         </Typography>
@@ -524,8 +522,23 @@ const PageNewCS = ({
                           rows="5"
                         />
                       </Grid>
-                      <Grid item xs={12} sm={12} md={12}>
-                        <LabelBox label="Hình ảnh phản hồi" padding={5}>
+                      <Grid item xs={12} sm={12} md={6}>
+                        <Typography gutterBottom>
+                          <LabelFormCs>Mô tả (CS)</LabelFormCs>
+                        </Typography>
+                        <TextareaAutosize
+                          style={{ width: '100%' }}
+                          name="note"
+                          ref={register}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          placeholder="Ghi chú ..."
+                          rows="5"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} className={styles.image}>
+                        <LabelBox label="Hình ảnh phản hồi" padding={2}>
                           <ImageUploadField
                             title="Cập nhật hình ảnh sản phẩm"
                             images={ticketImages}

@@ -435,7 +435,7 @@ const TicketEdit = ({
                         placeholder="https://messenger.comthuocsivn"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={12}>
+                    <Grid item xs={6} sm={6} md={6}>
                       <Typography gutterBottom>
                         <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
                       </Typography>
@@ -450,7 +450,7 @@ const TicketEdit = ({
                         rows="5"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={12}>
+                    <Grid item xs={6} sm={6} md={6}>
                       <Typography gutterBottom>
                         <LabelFormCs>Mô tả (CS)</LabelFormCs>
                       </Typography>
