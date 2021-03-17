@@ -467,15 +467,22 @@ const TicketEdit = ({
                     </Grid>
                     <Grid item xs={12} sm={12} md={12}>
                       <Typography gutterBottom>
-                        <LabelFormCs>Hình ảnh sản phẩm</LabelFormCs>
+                        <LabelFormCs>Hình ảnh sản phẩm (Số lượng : {images.length})</LabelFormCs>
                       </Typography>
                       <div style={{ display: "flex", flexDirection: "row" }}>
+
                         {
-                          images.map(image => (
-                            <div style={{ padding: "15px", borderRadius: "30%" }}>
-                              <Image src={image} width="90" height="90" onClick={() => handleShowImage(image)} />
+                          images.length !== 0 ? images.map(image => (
+                            <div style={{ padding: "15px" }}>
+                              <div style={{ borderRadius: "5px", border: '2px solid rgba(0, 0, 0, 0.87)', lineHeight: "0.43" }}>
+                                <Image src={image} width="90" height="90" onClick={() => handleShowImage(image)} />
+                              </div>
                             </div>
-                          ))
+                          )) : (
+                            <div>
+                              Không có hình ảnh
+                            </div>
+                          )
                         }
                       </div>
                     </Grid>
