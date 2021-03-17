@@ -128,17 +128,18 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
           </MyCardHeader>
           <form>
             <MyCardContent>
-              <FormControl size="small">
+              <FormControl size="medium">
                 <Grid
                   container
                   spacing={3}
                   direction="row"
                   justify="space-between"
                   alignItems="center"
+                  className={styles.filter}
                 >
                   {!showHideFilter && (
                     <>
-                      <Grid item xs={12} sm={12} md={12}>
+                      <Grid item xs={12} sm={12} md={4}>
                         <Typography gutterBottom>
                           <LabelFormCs>Mã SO:</LabelFormCs>
                         </Typography>
@@ -162,7 +163,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
                   )}
                   {showHideFilter && (
                     <>
-                      <Grid item xs={12} sm={6} md={4}>
+                      <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
                           <LabelFormCs>Mã SO:</LabelFormCs>
                         </Typography>
@@ -176,7 +177,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
                           placeholder="Nhập Mã SO"
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
+                      <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
                           <LabelFormCs>Order ID:</LabelFormCs>
                         </Typography>
@@ -190,7 +191,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
                           placeholder="Nhập Order ID"
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
+                      <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
                           <LabelFormCs>Trạng thái:</LabelFormCs>
                         </Typography>
@@ -202,7 +203,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
                           control={control}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
+                      <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
                           <LabelFormCs>Lý do:</LabelFormCs>
                         </Typography>
@@ -214,45 +215,6 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
                           control={control}
                         />
                       </Grid>
-                      {/* <Grid item xs={12} sm={6} md={4}>
-                        <Typography gutterBottom>
-                          <LabelFormCs>Người tiếp nhận:</LabelFormCs>
-                        </Typography>
-                        <MuiSingleAuto
-                          options={listUserAssign}
-                          onFieldChange={debounceSearchAssignUser}
-                          placeholder="Chọn"
-                          name="assignUser"
-                          errors={errors}
-                          control={control}
-                        />
-                      </Grid> */}
-                      {/* <Grid item xs={12} sm={6} md={4}>
-                        <Typography gutterBottom>
-                          <LabelFormCs>Ngày bắt đầu:</LabelFormCs>
-                        </Typography>
-                        <TextField
-                          name="createdTime"
-                          inputRef={register}
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                          type="datetime-local"
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Typography gutterBottom>
-                          <LabelFormCs>Ngày kết thúc:</LabelFormCs>
-                        </Typography>
-                        <TextField
-                          name="lastUpdatedTime"
-                          inputRef={register}
-                          variant="outlined"
-                          size="small"
-                          fullWidth
-                          type="datetime-local"
-                        />
-                      </Grid> */}
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
                           <Link href="/cs/new">
