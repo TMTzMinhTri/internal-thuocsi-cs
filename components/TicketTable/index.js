@@ -22,7 +22,7 @@ import TicketEdit from 'components/TicketEdit';
 import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
-const TicketTable = ({ data, total, search, listReasons = [] }) => {
+const TicketTable = ({ data, total, listReasons = [] }) => {
   const router = useRouter();
   const { ticketId } = router.query;
   const [ticketSelected] = useState(ticketId);
@@ -166,13 +166,14 @@ const TicketTable = ({ data, total, search, listReasons = [] }) => {
                         key={uuidv4()}
                         style={{ margin: '3px' }}
                         size="small"
-                        label={listReasons.find((reason) => reason.value === code).label}
+                        label={listReasons.find((reason) => reason.value === code)?.label || ''}
                       />
                     ))}
                   </TableCell>
                   <TableCell align="left">{item.note}</TableCell>
                   <TableCell align="center">
-                    {listStatus.filter((status) => status.value === item.status)[0].label}
+                    {listStatus.find((status) => status.value && status.value === item.status)
+                      ?.label || ''}
                   </TableCell>
                   <TableCell align="center">
                     <a onClick={() => onClickBtnEdit(item.code)}>
@@ -187,6 +188,7 @@ const TicketTable = ({ data, total, search, listReasons = [] }) => {
               ))}
             </TableBody>
           )}
+
           {total > 0 && (
             <MyTablePagination
               labelUnit="yêu cầu"
@@ -194,7 +196,6 @@ const TicketTable = ({ data, total, search, listReasons = [] }) => {
               rowsPerPage={limit}
               page={page}
               onChangePage={(event, newPage, rowsPerPage) => {
-                // changeUrl({ page: newPage, search, limit: rowsPerPage, reload: true });
                 const pageSize = { page: newPage, limit: rowsPerPage };
                 const { query } = router;
 

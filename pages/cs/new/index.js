@@ -13,7 +13,7 @@ import {
 import Head from 'next/head';
 import Link from 'next/link';
 import Router, { useRouter } from 'next/router';
-
+import ImageUploadField from 'components/image-upload-field';
 import AppCS from 'pages/_layout';
 
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
@@ -26,7 +26,7 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-
+import LabelBox from '@thuocsi/nextjs-components/editor/label-box/index';
 import { LabelFormCs, TicketTable } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
@@ -116,11 +116,14 @@ const PageNewCS = ({
   const [listAssignUser, setListAssignUser] = useState([
     { value: '', label: 'Không có nguời tiếp nhận' },
   ]);
-
+  const [ticketImages, setTicketImages] = useState([]);
   const { error, success } = useToast();
 
-  const { register, handleSubmit, errors, control, getValues } = useForm({
+  const { register, handleSubmit, errors, control, getValues, setValue } = useForm({
     mode: 'onChange',
+    defaultValues: {
+      imageUrls: [],
+    },
   });
 
   const onSearchOrder = useCallback(async (code) => {
@@ -130,11 +133,34 @@ const PageNewCS = ({
   const handleRefreshData = () => {
     onSearchOrder(orderNo);
   };
+  const ticketClient = getTicketClient();
+  async function uploadImage(img) {
+    const res = await ticketClient.uploadImage(img);
+    return res?.data || [];
+  }
+
+  async function handleCropCallback(data) {
+    try {
+      const imageData = await uploadImage({
+        data,
+      });
+      const images = [...getValues('imageUrls'), imageData[0]];
+      setValue('imageUrls', images);
+      setTicketImages(images);
+    } catch (err) {
+      error(err.message || err.toString());
+    }
+  }
+
+  const handleRemoveImage = (url) => {
+    const images = getValues('imageUrls')?.filter((imgUrl) => imgUrl !== url);
+    setValue('imageUrls', images);
+    setTicketImages(images);
+  };
 
   // onSubmit
   const onSubmit = async (formData) => {
     try {
-      const ticketClient = getTicketClient();
       const customerClient = getCustomerClient();
       const ticketResp = await ticketClient.createTicket({
         saleOrderCode: orderData.orderNo,
@@ -153,6 +179,7 @@ const PageNewCS = ({
         facebookURL: formData.facebookURL,
         chatURL: formData.chatURL,
         feedBackContent: formData.feedBackContent,
+        imageUrls: formData.imageUrls,
       });
       if (ticketResp.status !== 'OK') {
         error(ticketResp.message ?? actionErrorText);
@@ -197,7 +224,9 @@ const PageNewCS = ({
       setListAssignUser([{ value: '', label: 'Không có người tiếp nhận' }]);
     }
   }, []);
-
+  useEffect(() => {
+    register({ name: 'imageUrls' });
+  }, []);
   return (
     <AppCS select={PATH_URL.ALL_TICKETS} breadcrumb={breadcrumb}>
       <Head>
@@ -246,6 +275,12 @@ const PageNewCS = ({
             </MyCardContent>
             {orderData && (
               <>
+                {/* table cs  */}
+                <TicketTable
+                  data={tickets}
+                  listReasons={listReasons}
+                  refreshData={handleRefreshData}
+                />
                 <Paper className={`${styles.search}`}>
                   <FormControl size="small">
                     <Grid
@@ -254,6 +289,7 @@ const PageNewCS = ({
                       direction="row"
                       justify="space-between"
                       alignItems="center"
+                      style={{ marginTop: '10px' }}
                     >
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
@@ -332,23 +368,13 @@ const PageNewCS = ({
                         />
                       </Grid>
                     </Grid>
-                  </FormControl>
-                </Paper>
-                {/* table cs  */}
-                <TicketTable
-                  data={tickets}
-                  listReasons={listReasons}
-                  refreshData={handleRefreshData}
-                />
-
-                <Paper className={`${styles.search}`}>
-                  <FormControl size="small">
                     <Grid
                       container
                       spacing={3}
                       direction="row"
                       justify="space-between"
                       alignItems="center"
+                      style={{ marginTop: '10px' }}
                     >
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
@@ -478,7 +504,7 @@ const PageNewCS = ({
                           placeholder="https://messenger.comthuocsivn"
                         />
                       </Grid>
-                      <Grid item xs={12} sm={12} md={12}>
+                      <Grid item xs={12} sm={12} md={6}>
                         <Typography gutterBottom>
                           <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
                         </Typography>
@@ -492,6 +518,31 @@ const PageNewCS = ({
                           placeholder="Nôi dung xử lý khách hàng ..."
                           rows="5"
                         />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6}>
+                        <Typography gutterBottom>
+                          <LabelFormCs>Mô tả (CS)</LabelFormCs>
+                        </Typography>
+                        <TextareaAutosize
+                          style={{ width: '100%' }}
+                          name="note"
+                          ref={register}
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          placeholder="Ghi chú ..."
+                          rows="5"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={12} md={6} className={styles.image}>
+                        <LabelBox label="Hình ảnh phản hồi" padding={2}>
+                          <ImageUploadField
+                            title="Cập nhật hình ảnh sản phẩm"
+                            images={ticketImages}
+                            handleCropCallback={handleCropCallback}
+                            handleRemoveImage={handleRemoveImage}
+                          />
+                        </LabelBox>
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
