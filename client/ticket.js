@@ -66,9 +66,7 @@ class TicketClient extends APIClient {
   }
 
   uploadImage(data) {
-    return this.callFromClient(
-      "POST",
-      `${constURL.PREFIX_PRODUCT}/upload`, data)
+    return this.callFromClient('POST', `${constURL.PREFIX_PRODUCT}/upload`, data);
   }
 }
 

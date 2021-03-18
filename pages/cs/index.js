@@ -37,12 +37,10 @@ export async function loadRequestData(ctx) {
       : ticketClient.getList(offset, limit, search),
     ticketClient.getListReason(),
   ]);
-
   const total = ticketResult?.total || 0;
   const tickets = ticketResult?.data || [];
 
   const listReason = listReasonRes?.data?.map((item) => ({ value: item.code, label: item.name }));
-
   return {
     props: {
       listReason,
@@ -50,7 +48,7 @@ export async function loadRequestData(ctx) {
       tickets,
       action,
       filter: { ...restProps },
-      formData: filterValue
+      formData: filterValue,
     },
   };
 }

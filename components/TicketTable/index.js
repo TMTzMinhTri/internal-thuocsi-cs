@@ -25,7 +25,7 @@ import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import moment from 'moment';
 
-const TicketTable = ({ data, total, listReasons = [] }) => {
+const TicketTable = ({ data, total, listReasons = [], isMyTicket = false }) => {
   const router = useRouter();
   const { ticketId } = router.query;
   const [ticketSelected] = useState(ticketId);
@@ -45,7 +45,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
       ...(page && { page }),
       ...(limit && { limit }),
     };
-
     router.push(
       {
         pathname: '',
@@ -64,7 +63,8 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
 
   const handleCloseBtnEdit = useCallback(async () => {
     const { orderNo = null } = router.query;
-    changeUrl({ orderNo });
+
+    changeUrl({ orderNo, reload: true });
     setDetail(null);
   });
 
@@ -101,7 +101,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
           );
         }
       }
-
       // always get data detail
       const [ticketRes] = await Promise.all([ticketClient.clientGetTicketDetail({ code })]);
       if (isValid(ticketRes)) {
@@ -145,7 +144,7 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
               <TableCell align="left">Ghi chú của KH</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
               <TableCell align="center">Người tạo</TableCell>
-              <TableCell align="center">Người cập nhật</TableCell>
+              {!isMyTicket && <TableCell align="center">Người cập nhật</TableCell>}
               <TableCell align="right">Thao tác</TableCell>
             </TableRow>
           </TableHead>
@@ -194,7 +193,7 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                     </Grid>
                   </TableCell>
                   <TableCell align="center">{item.createdBy}</TableCell>
-                  <TableCell align="center">{item.assignName}</TableCell>
+                  {!isMyTicket && <TableCell align="center">{item.assignName}</TableCell>}
                   <TableCell align="right">
                     <a onClick={() => onClickBtnEdit(item.code)}>
                       <Tooltip title="Cập nhật thông tin của yêu cầu">
