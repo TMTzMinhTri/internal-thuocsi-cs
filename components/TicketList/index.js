@@ -27,8 +27,6 @@ import { getTicketClient } from 'client';
 const TicketList = ({ total, tickets, listReason, action, filter = {}, formData = {} }) => {
   const ticketClient = getTicketClient('', {});
   const [search, setSearch] = useState('');
-  const [listUserAssign] = useState([]);
-  const [ticketAll, setTicketAll] = useState([]);
   const fileName = `Danh_Sach_Yeu_Cau_${new Date().toLocaleString().replace(/[ :]/g,'_').replace(/[,]/g,'')}`
   const limit = 50;
   const totalPageSize = Math.ceil(total/limit);
@@ -67,7 +65,6 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
       createdTime,
       lastUpdatedTime,
     }) => {
-      // const ticketClient = getTicketClient();
 
       const filterData = cleanObj({
         action: 'filter',
@@ -112,7 +109,8 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
 
   const csvData = useCallback( async () => {
     const requestGetAllData = [] ;
-    for (let offset = 0; offset < totalPageSize; ++offset) {
+    for (let i = 0; i < totalPageSize; ++i) {
+      let offset = i * limit;
       requestGetAllData.push(ticketClient.getTicketByFilter({offset,limit,formData}));
     }
     
