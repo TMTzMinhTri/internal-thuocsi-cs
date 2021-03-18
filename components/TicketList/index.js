@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Button, FormControl, TextField, Typography, Grid } from '@material-ui/core';
 
 import Link from 'next/link';
@@ -17,15 +17,20 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 
 import useModal from 'hooks/useModal';
 import { useRouter } from 'next/router';
-import { cleanObj, convertObjectToParameter, isValid } from 'utils';
+import { cleanObj, convertObjectToParameter, isValid, getData } from 'utils';
 import TicketTable from '../TicketTable';
 import LabelFormCs from '../LabelFormCs';
-
+import { ExportCSV } from '../ExportCSV';
 import styles from './request.module.css';
+import { getTicketClient } from 'client';
 
-const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
+const TicketList = ({ total, tickets, listReason, action, filter = {}, formData = {} }) => {
+  const ticketClient = getTicketClient();
   const [search, setSearch] = useState('');
-  const [listUserAssign] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const fileName = `Danh_Sach_Yeu_Cau_${new Date().toLocaleString().replace(/[ :]/g,'_').replace(/[,]/g,'')}`
+  const limit = 50;
+  const totalPageSize = Math.ceil(total/limit);
 
   // Modal
   const [showHideFilter, toggleFilter] = useModal(action === 'filter');
@@ -61,7 +66,6 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
       createdTime,
       lastUpdatedTime,
     }) => {
-      // const ticketClient = getTicketClient();
 
       const filterData = cleanObj({
         action: 'filter',
@@ -103,6 +107,24 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
       })) || []
     );
   }, []);
+
+  const csvData = useCallback( async () => {
+    setLoading(true);
+    const requestGetAllData = [] ;
+    for (let i = 0; i < totalPageSize; ++i) {
+      let offset = i * limit;
+      requestGetAllData.push(ticketClient.getTicketByFilter({offset,limit,formData}));
+    }
+    
+    const arrayResult = await Promise.all(requestGetAllData);
+    
+    let data = []
+    
+    arrayResult.map( res => { data = data.concat(getData(res) ) } ) ;
+    setLoading(false);
+    return data; 
+     
+    } , [] );
 
   return (
     <>
@@ -217,11 +239,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <Link href="/cs/new">
-                            <Button variant="contained" color="lightgray" disabled>
-                              Xuất file
-                            </Button>
-                          </Link>
+                          <ExportCSV csvData={csvData} fileName={fileName} loading={loading}/>
                         </Grid>
                         <Grid item>
                           <Link href="/cs/new">
