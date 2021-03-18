@@ -6,7 +6,7 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 80",
-    "lint:check": "eslint --ext=js,jsx pages"
+    "lint:check": "eslint --ext=js,jsx pages components context data hooks utils client"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
@@ -22,6 +22,7 @@
     "cross-env": "^7.0.3",
     "draft-js": "^0.11.7",
     "draft-js-export-html": "^1.4.1",
+    "file-saver": "^2.0.5",
     "immutable": "^4.0.0-rc.12",
     "moment": "^2.29.1",
     "next": "^10.0.7",
@@ -33,7 +34,8 @@
     "react-draft-wysiwyg": "^1.14.5",
     "react-hook-form": "^6.15.3",
     "react-select": "^3.2.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "xlsx": "^0.16.9"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",

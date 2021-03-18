@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, FormControl, TextField, Typography, Grid } from '@material-ui/core';
 
 import Link from 'next/link';
@@ -9,7 +9,6 @@ import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useForm } from 'react-hook-form';
-import { getAccountClient } from 'client';
 
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
@@ -17,23 +16,14 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 
 import useModal from 'hooks/useModal';
 import { useRouter } from 'next/router';
-import { cleanObj, convertObjectToParameter, isValid, getData } from 'utils';
-import TicketTable from '../TicketTable';
+import { cleanObj, convertObjectToParameter } from 'utils';
+import MyTicketTable from '../MyTicketTable';
 import LabelFormCs from '../LabelFormCs';
-import { ExportCSV } from '../ExportCSV';
-import styles from './request.module.css';
-import { getTicketClient } from 'client';
 
-const TicketList = ({ total, tickets, listReason, action, filter = {}, formData = {} }) => {
-  const ticketClient = getTicketClient();
+import styles from './request.module.css';
+
+const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(false);
-  const fileName = `Danh_Sach_Yeu_Cau_${new Date()
-    .toLocaleString()
-    .replace(/[ :]/g, '_')
-    .replace(/[,]/g, '')}`;
-  const limit = 50;
-  const totalPageSize = Math.ceil(total / limit);
 
   // Modal
   const [showHideFilter, toggleFilter] = useModal(action === 'filter');
@@ -207,7 +197,11 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <ExportCSV csvData={csvData} fileName={fileName} loading={loading} />
+                          <Link href="/cs/new">
+                            <Button variant="contained" color="lightgray" disabled>
+                              Xuất file
+                            </Button>
+                          </Link>
                         </Grid>
                         <Grid item>
                           <Link href="/cs/new">
@@ -229,7 +223,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
           </form>
         </MyCard>
       </div>
-      <TicketTable listReasons={listReason} data={tickets} total={total} search={search} />
+      <MyTicketTable listReasons={listReason} data={tickets} total={total} search={search} />
     </>
   );
 };

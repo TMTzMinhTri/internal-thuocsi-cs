@@ -38,6 +38,10 @@ class AccountClient extends APIClient {
     return this.callFromClient('GET', `${URI}/account?username=${userName}&type=EMPLOYEE`);
   }
 
+  getAccountById(Id) {
+    return this.callFromNextJS('GET', `${URI}/account?accountID=${Id}`);
+  }
+
   getListEmployee(offset, limit, q) {
     return this.callFromNextJS('GET', `${URI}/employee/all`, {
       q,
