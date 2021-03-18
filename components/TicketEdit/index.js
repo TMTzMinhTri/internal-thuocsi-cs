@@ -8,6 +8,7 @@ import {
   TextareaAutosize,
   TextField,
   Typography,
+  Dialog,
 } from '@material-ui/core';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
@@ -19,6 +20,8 @@ import { formatDateTime, formatNumber, listStatus } from 'components/global';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValid } from 'utils';
+import Image from 'next/image';
+import useModal from 'hooks/useModal';
 import LabelFormCs from '../LabelFormCs';
 
 const useStyles = makeStyles((theme) => ({
@@ -64,7 +67,11 @@ const TicketEdit = ({
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
   const [listAssignUser, setListAssignUser] = useState(usersAssign);
+  const [imageSelected, setImageSelected] = useState('');
+  const images = ticketDetail?.imageUrls || [];
   const anchor = '';
+
+  const [open, toggle] = useModal();
 
   const onSubmit = async (data) => {
     const ticketUpdateDetail = {
@@ -121,6 +128,10 @@ const TicketEdit = ({
     }
   }, []);
 
+  const handleShowImage = (image) => {
+    setImageSelected(image);
+    toggle();
+  };
   return (
     <Drawer
       ModalProps={{
@@ -407,7 +418,7 @@ const TicketEdit = ({
                         placeholder="https://messenger.comthuocsivn"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={12}>
+                    <Grid item xs={6} sm={6} md={6}>
                       <Typography gutterBottom>
                         <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
                       </Typography>
@@ -422,7 +433,7 @@ const TicketEdit = ({
                         rows="5"
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={12}>
+                    <Grid item xs={6} sm={6} md={6}>
                       <Typography gutterBottom>
                         <LabelFormCs>Mô tả (CS)</LabelFormCs>
                       </Typography>
@@ -437,23 +448,45 @@ const TicketEdit = ({
                         rows="5"
                       />
                     </Grid>
-                    {/* <Grid item xs={12} sm={12} md={12}>
+                    <Grid item xs={12} sm={12} md={12}>
                       <Typography gutterBottom>
-                        <LabelFormCs>Nôi dung xử lý khách hàng</LabelFormCs>
+                        <LabelFormCs>Hình ảnh sản phẩm (Số lượng : {images.length})</LabelFormCs>
                       </Typography>
-                      <TextareaAutosize
-                        style={{ width: '100%' }}
-                        name="chatContent"
-                        ref={register}
-                        
-                        variant="outlined"
-                        size="small"
-                        type="text"
-                        
-                        placeholder="Nôi dung xử lý khách hàng ..."
-                        rows="10"
-                      />
-                    </Grid> */}
+                      <div style={{ display: 'flex', flexDirection: 'row' }}>
+                        {images.length !== 0 ? (
+                          images.map((image) => (
+                            <div style={{ padding: '15px' }}>
+                              <div
+                                style={{
+                                  borderRadius: '5px',
+                                  border: '2px solid rgba(0, 0, 0, 0.87)',
+                                  lineHeight: '0.43',
+                                }}
+                              >
+                                <Image
+                                  src={image}
+                                  width="90"
+                                  height="90"
+                                  onClick={() => handleShowImage(image)}
+                                />
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div>Không có hình ảnh</div>
+                        )}
+                      </div>
+                    </Grid>
+
+                    <Dialog
+                      open={open}
+                      onClose={toggle}
+                      aria-labelledby="simple-modal-title"
+                      aria-describedby="simple-modal-description"
+                      className={styles.dialog_carousel}
+                    >
+                      <Image src={imageSelected} width="1000" height="600" />
+                    </Dialog>
                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                       <Grid item>
                         <Button variant="contained" color="default" onClick={() => onClose()}>

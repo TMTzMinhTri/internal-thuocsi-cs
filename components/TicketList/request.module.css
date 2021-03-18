@@ -38,3 +38,7 @@
 .cardButton {
   background-color: blue;
 }
+
+.grid [class*='MuiFormControl-root'] {
+  display: unset !important;
+}
