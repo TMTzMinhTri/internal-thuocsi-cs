@@ -261,10 +261,10 @@ const TicketEdit = ({
                         <LabelFormCs>Tên Tài Khoản:</LabelFormCs>
                       </Typography>
                       <TextField
-                        name="bankAcountName"
+                        name="bankAccountName"
                         inputRef={register({ required: 'Vui lòng nhập thông tin' })}
-                        error={!!errors.bankAcountName}
-                        helperText={errors.bankAcountName?.message}
+                        error={!!errors.bankAccountName}
+                        helperText={errors.bankAccountName?.message}
                         variant="outlined"
                         size="small"
                         type="text"

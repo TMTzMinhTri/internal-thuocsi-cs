@@ -302,9 +302,9 @@ const PageNewCS = ({
                           size="small"
                           type="text"
                           fullWidth
-                          name="bankAcountName"
-                          error={!!errors.bankAcountName}
-                          helperText={errors.bankAcountName?.message}
+                          name="bankAccountName"
+                          error={!!errors.bankAccountName}
+                          helperText={errors.bankAccountName?.message}
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
                           })}
