@@ -25,8 +25,9 @@ import styles from './request.module.css';
 import { getTicketClient } from 'client';
 
 const TicketList = ({ total, tickets, listReason, action, filter = {}, formData = {} }) => {
-  const ticketClient = getTicketClient('', {});
+  const ticketClient = getTicketClient();
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
   const fileName = `Danh_Sach_Yeu_Cau_${new Date().toLocaleString().replace(/[ :]/g,'_').replace(/[,]/g,'')}`
   const limit = 50;
   const totalPageSize = Math.ceil(total/limit);
@@ -108,6 +109,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
   }, []);
 
   const csvData = useCallback( async () => {
+    setLoading(true);
     const requestGetAllData = [] ;
     for (let i = 0; i < totalPageSize; ++i) {
       let offset = i * limit;
@@ -119,6 +121,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
     let data = []
     
     arrayResult.map( res => { data = data.concat(getData(res) ) } ) ;
+    setLoading(false);
     return data; 
      
     } , [] );
@@ -236,7 +239,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
                       </Grid>
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <ExportCSV csvData={csvData} fileName={fileName}/>
+                          <ExportCSV csvData={csvData} fileName={fileName} loading={loading}/>
                         </Grid>
                         <Grid item>
                           <Link href="/cs/new">
