@@ -117,9 +117,14 @@ const TicketEdit = ({
         const tmpData = [];
         accountResp.data.forEach((account) => {
           if (account && account.username) {
-            tmpData.push({ value: account.accountId, label: account.username });
+            tmpData.push({
+              value: account.accountId,
+              name: account.username,
+              label: account.username,
+            });
           }
         });
+        console.log(tmpData);
         setListAssignUser(tmpData);
       } else {
         setListAssignUser([{ value: '', label: '' }]);

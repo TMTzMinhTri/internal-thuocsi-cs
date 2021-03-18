@@ -119,7 +119,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
     loadData(ticketSelected);
   }, [ticketSelected]);
 
-  console.log('list status ', listStatus);
   return (
     <>
       <TableContainer component={Paper}>
