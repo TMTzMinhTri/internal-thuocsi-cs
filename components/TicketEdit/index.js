@@ -124,7 +124,7 @@ const TicketEdit = ({
             });
           }
         });
-        console.log(tmpData);
+
         setListAssignUser(tmpData);
       } else {
         setListAssignUser([{ value: '', label: '' }]);
@@ -461,22 +461,25 @@ const TicketEdit = ({
                       <div style={{ display: 'flex', flexDirection: 'row' }}>
                         {images.length !== 0 ? (
                           images.map((image) => (
-                            <div style={{ padding: '15px' }}>
-                              <div
-                                style={{
-                                  borderRadius: '5px',
-                                  border: '2px solid rgba(0, 0, 0, 0.87)',
-                                  lineHeight: '0.43',
-                                }}
-                              >
-                                <Image
-                                  src={image}
-                                  width="90"
-                                  height="90"
-                                  onClick={() => handleShowImage(image)}
-                                />
+                            <>
+                              <div style={{ paddingRight: '30px', paddingTop: '15px' }}>
+                                <div
+                                  style={{
+                                    borderRadius: '5px',
+                                    border: '2px solid rgba(0, 0, 0, 0.87)',
+                                    lineHeight: '0.43',
+                                  }}
+                                >
+                                  <Image
+                                    src={image}
+                                    quality={100}
+                                    width={220}
+                                    height={220}
+                                    onClick={() => handleShowImage(image)}
+                                  />
+                                </div>
                               </div>
-                            </div>
+                            </>
                           ))
                         ) : (
                           <div>Không có hình ảnh</div>
