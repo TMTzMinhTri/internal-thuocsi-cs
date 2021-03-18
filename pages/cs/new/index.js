@@ -12,7 +12,7 @@ import {
 
 import Head from 'next/head';
 import Link from 'next/link';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import ImageUploadField from 'components/image-upload-field';
 import AppCS from 'pages/_layout';
 

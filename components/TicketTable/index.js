@@ -10,6 +10,7 @@ import {
   TableRow,
   Tooltip,
 } from '@material-ui/core';
+import COLORS from 'data/colors';
 
 import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, listStatus } from 'components/global';
@@ -29,7 +30,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
   const [detail, setDetail] = useState(null);
   const [listDepartment, setListDepartment] = useState([]);
   const [listUserAssign, setListUserAssign] = useState([]);
-  console.log(data);
 
   // query + params
   const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
@@ -142,7 +142,9 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
               <TableCell align="left">Lỗi</TableCell>
               <TableCell align="left">Ghi chú của KH</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
-              <TableCell align="center">Thao tác</TableCell>
+              <TableCell align="center">Người tạo</TableCell>
+              <TableCell align="center">Người cập nhật</TableCell>
+              <TableCell align="right">Thao tác</TableCell>
             </TableRow>
           </TableHead>
           {!data || data.length === 0 ? (
@@ -171,10 +173,22 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                   </TableCell>
                   <TableCell align="left">{item.note}</TableCell>
                   <TableCell align="center">
-                    {listStatus.find((status) => status.value && status.value === item.status)
-                      ?.label || ''}
+                    <Chip
+                      key={uuidv4()}
+                      style={{
+                        margin: '3px',
+                        borderRadius: '4px',
+                        backgroundColor:
+                          listStatus.find(({ value }) => value === item.status)?.color ||
+                          COLORS.palette.grey[500],
+                      }}
+                      size="small"
+                      label={listStatus.find(({ value }) => value === item.status)?.label || ''}
+                    />
                   </TableCell>
-                  <TableCell align="center">
+                  <TableCell align="center">{item.createdBy}</TableCell>
+                  <TableCell align="center">{item.assignName}</TableCell>
+                  <TableCell align="right">
                     <a onClick={() => onClickBtnEdit(item.code)}>
                       <Tooltip title="Cập nhật thông tin của yêu cầu">
                         <IconButton>

@@ -45,7 +45,14 @@ export async function loadRequestData(ctx) {
   ]);
 
   const total = ticketResult?.total || 0;
-  const tickets = ticketResult?.data || [];
+  const tickets =
+    ticketResult?.data.map(async (ticket) => {
+      if (ticket) {
+        await accountClient.get;
+      }
+
+      return ticket;
+    }) || [];
 
   const listReason = listReasonRes?.data?.map((item) => ({ value: item.code, label: item.name }));
 
@@ -70,14 +77,14 @@ const breadcrumb = [
     link: '/cs',
   },
   {
-    name: 'DS phiếu yêu cầu cuả tôi',
+    name: 'DS phiếu yêu cầu của tôi',
   },
 ];
 
 const ListTicketPage = (props) => (
   <AppCS select="/cs/my" breadcrumb={breadcrumb}>
     <Head>
-      <title>DS phiếu yêu cầu cuả tôi</title>
+      <title>DS phiếu yêu cầu của tôi</title>
     </Head>
     <MyTicketList {...props} />
   </AppCS>

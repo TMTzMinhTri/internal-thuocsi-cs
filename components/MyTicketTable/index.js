@@ -21,6 +21,7 @@ import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagin
 import TicketEdit from 'components/TicketEdit';
 import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
+import colors from 'data/colors';
 
 const TicketTable = ({ data, total, listReasons = [] }) => {
   const router = useRouter();
@@ -29,7 +30,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
   const [detail, setDetail] = useState(null);
   const [listDepartment, setListDepartment] = useState([]);
   const [listUserAssign, setListUserAssign] = useState([]);
-  console.log(data);
 
   // query + params
   const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
@@ -142,6 +142,8 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
               <TableCell align="left">Lỗi</TableCell>
               <TableCell align="left">Ghi chú của KH</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
+              <TableCell align="center">Người tạo</TableCell>
+              <TableCell align="center">Người cập nhật</TableCell>
               <TableCell align="center">Thao tác</TableCell>
             </TableRow>
           </TableHead>
@@ -165,15 +167,27 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                         key={uuidv4()}
                         style={{ margin: '3px', borderRadius: '4px!important' }}
                         size="small"
-                        label={listReasons.find((reason) => reason.value === code)?.label || ''}
+                        label={listReasons.find((reason) => reason.value === code)?.label || 'xxx'}
                       />
                     ))}
                   </TableCell>
                   <TableCell align="left">{item.note}</TableCell>
                   <TableCell align="center">
-                    {listStatus.find((status) => status.value && status.value === item.status)
-                      ?.label || ''}
+                    <Chip
+                      key={uuidv4()}
+                      style={{
+                        margin: '3px',
+                        borderRadius: '4px',
+                        backgroundColor:
+                          listStatus.find(({ value }) => value === item.status)?.color ||
+                          colors.palette.grey[500],
+                      }}
+                      size="small"
+                      label={listStatus.find(({ value }) => value === item.status)?.label || ''}
+                    />
                   </TableCell>
+                  <TableCell align="center">{item.createdBy}</TableCell>
+                  <TableCell align="center">{item.assignName}</TableCell>
                   <TableCell align="center">
                     <a onClick={() => onClickBtnEdit(item.code)}>
                       <Tooltip title="Cập nhật thông tin của yêu cầu">

@@ -79,6 +79,7 @@ const TicketEdit = ({
       code: ticketDetail.code,
       ...data,
       assignUser: data?.assignUser?.value,
+      assignName: data?.assignUser?.name,
       departmentCode: data?.departmentCode?.code,
       reasons: data?.reasons?.map((item) => item.value) || [],
       cashback: parseInt(data?.cashback || 0, 10),
@@ -196,17 +197,17 @@ const TicketEdit = ({
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Gía đơn hàng:{' '}
+                          Giá trị đơn hàng:{' '}
                           <span style={{ color: 'green' }}>
                             {formatNumber(ticketDetail?.totalPrice)} đ
                           </span>
                         </FormLabel>
-                        <FormLabel
+                        {/* <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
                           Số lượng sản phẩm: __
-                        </FormLabel>
+                        </FormLabel> */}
                         <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
@@ -411,7 +412,7 @@ const TicketEdit = ({
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
                       <Typography gutterBottom>
-                        <LabelFormCs>Nôi dung tin nhắn vơi khách hàng:</LabelFormCs>
+                        <LabelFormCs>Nôi dung tin nhắn với khách hàng:</LabelFormCs>
                       </Typography>
                       <TextField
                         name="chatURL"
@@ -420,7 +421,7 @@ const TicketEdit = ({
                         size="small"
                         type="text"
                         fullWidth
-                        placeholder="https://messenger.comthuocsivn"
+                        placeholder="https://messenger.com/thuocsivn"
                       />
                     </Grid>
                     <Grid item xs={6} sm={6} md={6}>

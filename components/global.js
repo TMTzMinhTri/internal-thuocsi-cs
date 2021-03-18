@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { palette } from 'data/colors';
 
 export const department = [
   {
@@ -21,16 +22,34 @@ export const department = [
 
 export const listStatus = [
   {
-    value: 'NEW',
-    label: 'Mới',
+    value: 'PENDING',
+    label: 'Chưa xử lý',
+    color: palette.secondary.default,
   },
   {
-    value: 'PENDING',
-    label: 'Đang chờ',
+    value: 'ASSIGNED',
+    label: 'Đã tiếp nhận',
+    color: palette.warning.default,
+  },
+  {
+    value: 'IN_PROCESS',
+    label: 'Đang xử lý',
+    color: palette.info.default,
+  },
+  {
+    value: 'DONE',
+    label: 'Đã xử lý',
+    color: palette.success.default,
   },
   {
     value: 'COMPLETED',
-    label: 'Hoàn tất',
+    label: 'Đã xử lý',
+    color: palette.success.default,
+  },
+  {
+    value: 'CANCELED',
+    label: 'Đã huỷ',
+    color: palette.error.default,
   },
 ];
 
