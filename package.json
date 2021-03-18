@@ -6,7 +6,7 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 80",
-    "lint:check": "eslint --ext=js,jsx pages"
+    "lint:check": "eslint --ext=js,jsx pages components context data hooks utils client"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",

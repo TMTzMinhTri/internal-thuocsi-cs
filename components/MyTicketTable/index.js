@@ -9,9 +9,7 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  Grid,
 } from '@material-ui/core';
-import { palette } from 'data/colors';
 
 import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, listStatus } from 'components/global';
@@ -23,7 +21,7 @@ import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagin
 import TicketEdit from 'components/TicketEdit';
 import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
-import moment from 'moment';
+import { palette } from 'data/colors';
 
 const TicketTable = ({ data, total, listReasons = [] }) => {
   const router = useRouter();
@@ -146,7 +144,7 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
               <TableCell align="center">Trạng thái</TableCell>
               <TableCell align="center">Người tạo</TableCell>
               <TableCell align="center">Người cập nhật</TableCell>
-              <TableCell align="right">Thao tác</TableCell>
+              <TableCell align="center">Thao tác</TableCell>
             </TableRow>
           </TableHead>
           {!data || data.length === 0 ? (
@@ -167,35 +165,30 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                     {item?.reasons?.map((code) => (
                       <Chip
                         key={uuidv4()}
-                        style={{ margin: '3px', borderRadius: '4px' }}
+                        style={{ margin: '3px', borderRadius: '4px!important' }}
                         size="small"
-                        label={listReasons.find((reason) => reason.value === code)?.label || ''}
+                        label={listReasons.find((reason) => reason.value === code)?.label || 'xxx'}
                       />
                     ))}
                   </TableCell>
                   <TableCell align="left">{item.note}</TableCell>
                   <TableCell align="center">
-                    <Grid container direction="column">
-                      <Grid item>
-                        <Chip
-                          key={uuidv4()}
-                          style={{
-                            margin: '3px',
-                            borderRadius: '4px',
-                            backgroundColor:
-                              listStatus.find(({ value }) => value === item.status)?.color ||
-                              palette.grey[500],
-                          }}
-                          size="small"
-                          label={listStatus.find(({ value }) => value === item.status)?.label || ''}
-                        />
-                      </Grid>
-                      <Grid item>{moment(item.createdTime).locale('vi').fromNow()}</Grid>
-                    </Grid>
+                    <Chip
+                      key={uuidv4()}
+                      style={{
+                        margin: '3px',
+                        borderRadius: '4px',
+                        backgroundColor:
+                          listStatus.find(({ value }) => value === item.status)?.color ||
+                          palette.grey[500],
+                      }}
+                      size="small"
+                      label={listStatus.find(({ value }) => value === item.status)?.label || ''}
+                    />
                   </TableCell>
                   <TableCell align="center">{item.createdBy}</TableCell>
                   <TableCell align="center">{item.assignName}</TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     <a onClick={() => onClickBtnEdit(item.code)}>
                       <Tooltip title="Cập nhật thông tin của yêu cầu">
                         <IconButton>

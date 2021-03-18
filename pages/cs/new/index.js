@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   Paper,
@@ -13,6 +13,7 @@ import {
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import ImageUploadField from 'components/image-upload-field';
 import AppCS from 'pages/_layout';
 
 import { actionErrorText, unknownErrorText } from 'components/commonErrors';
@@ -116,6 +117,7 @@ const PageNewCS = ({
     { value: '', label: 'Không có nguời tiếp nhận' },
   ]);
   const [ticketImages, setTicketImages] = useState([]);
+  const [currentDepartment, setCurrentDepartment] = useState('');
   const { error, success } = useToast();
 
   const { register, handleSubmit, errors, control, getValues, setValue } = useForm({
@@ -300,9 +302,9 @@ const PageNewCS = ({
                           size="small"
                           type="text"
                           fullWidth
-                          name="bankAcountName"
-                          error={!!errors.bankAcountName}
-                          helperText={errors.bankAcountName?.message}
+                          name="bankAccountName"
+                          error={!!errors.bankAccountName}
+                          helperText={errors.bankAccountName?.message}
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
                           })}
@@ -398,7 +400,10 @@ const PageNewCS = ({
                         </Typography>
                         <MuiSingleAuto
                           required
-                          onValueChange={(data) => updateListAssignUser(data)}
+                          onValueChange={(department) => {
+                            updateListAssignUser(department);
+                            setCurrentDepartment(department?.code || '');
+                          }}
                           options={listDepartment}
                           placeholder="Chọn"
                           name="departmentCode"
@@ -420,6 +425,7 @@ const PageNewCS = ({
                           errors={errors}
                           control={control}
                           defaultValue=""
+                          disabled={!currentDepartment}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={3}>
@@ -438,7 +444,7 @@ const PageNewCS = ({
                           size="small"
                           type="text"
                           fullWidth
-                          placeholder="0"
+                          placeholder="X547PFD"
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={6}>
@@ -491,7 +497,7 @@ const PageNewCS = ({
                       </Grid>
                       <Grid item xs={12} sm={6} md={6}>
                         <Typography gutterBottom>
-                          <LabelFormCs>Nôi dung tin nhắn vơi khách hàng:</LabelFormCs>
+                          <LabelFormCs>Nôi dung tin nhắn với khách hàng:</LabelFormCs>
                         </Typography>
                         <TextField
                           name="chatURL"
@@ -500,7 +506,7 @@ const PageNewCS = ({
                           size="small"
                           type="text"
                           fullWidth
-                          placeholder="https://messenger.comthuocsivn"
+                          placeholder="https://messenger.com/thuocsivn"
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6}>

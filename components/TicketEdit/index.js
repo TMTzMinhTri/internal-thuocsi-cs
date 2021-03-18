@@ -67,6 +67,7 @@ const TicketEdit = ({
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
   const [listAssignUser, setListAssignUser] = useState(usersAssign);
+  const [currentDepartment, setCurrentDepartment] = useState('');
   const [imageSelected, setImageSelected] = useState('');
   const images = ticketDetail?.imageUrls || [];
   const anchor = '';
@@ -78,6 +79,7 @@ const TicketEdit = ({
       code: ticketDetail.code,
       ...data,
       assignUser: data?.assignUser?.value,
+      assignName: data?.assignUser?.name,
       departmentCode: data?.departmentCode?.code,
       reasons: data?.reasons?.map((item) => item.value) || [],
       cashback: parseInt(data?.cashback || 0, 10),
@@ -116,9 +118,14 @@ const TicketEdit = ({
         const tmpData = [];
         accountResp.data.forEach((account) => {
           if (account && account.username) {
-            tmpData.push({ value: account.accountId, label: account.username });
+            tmpData.push({
+              value: account.accountId,
+              name: account.username,
+              label: account.username,
+            });
           }
         });
+
         setListAssignUser(tmpData);
       } else {
         setListAssignUser([{ value: '', label: '' }]);
@@ -195,17 +202,17 @@ const TicketEdit = ({
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Gía đơn hàng:{' '}
+                          Giá trị đơn hàng:{' '}
                           <span style={{ color: 'green' }}>
                             {formatNumber(ticketDetail?.totalPrice)} đ
                           </span>
                         </FormLabel>
-                        <FormLabel
+                        {/* <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
                           Số lượng sản phẩm: __
-                        </FormLabel>
+                        </FormLabel> */}
                         <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
@@ -251,13 +258,13 @@ const TicketEdit = ({
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                       <Typography gutterBottom>
-                        <LabelFormCs>Tên khách hàng:</LabelFormCs>
+                        <LabelFormCs>Tên Tài Khoản:</LabelFormCs>
                       </Typography>
                       <TextField
-                        name="customerName"
+                        name="bankAccountName"
                         inputRef={register({ required: 'Vui lòng nhập thông tin' })}
-                        error={!!errors.customerName}
-                        helperText={errors.customerName?.message}
+                        error={!!errors.bankAccountName}
+                        helperText={errors.bankAccountName?.message}
                         variant="outlined"
                         size="small"
                         type="text"
@@ -329,7 +336,10 @@ const TicketEdit = ({
                       </Typography>
                       <MuiSingleAuto
                         name="departmentCode"
-                        onValueChange={(data) => updateListAssignUser(data)}
+                        onValueChange={(department) => {
+                          updateListAssignUser(department);
+                          setCurrentDepartment(department?.code || '');
+                        }}
                         options={listDepartment}
                         required
                         placeholder="Chọn"
@@ -348,6 +358,7 @@ const TicketEdit = ({
                         placeholder="Chọn"
                         errors={errors}
                         control={control}
+                        disabled={!currentDepartment}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -406,7 +417,7 @@ const TicketEdit = ({
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>
                       <Typography gutterBottom>
-                        <LabelFormCs>Nôi dung tin nhắn vơi khách hàng:</LabelFormCs>
+                        <LabelFormCs>Nôi dung tin nhắn với khách hàng:</LabelFormCs>
                       </Typography>
                       <TextField
                         name="chatURL"
@@ -415,7 +426,7 @@ const TicketEdit = ({
                         size="small"
                         type="text"
                         fullWidth
-                        placeholder="https://messenger.comthuocsivn"
+                        placeholder="https://messenger.com/thuocsivn"
                       />
                     </Grid>
                     <Grid item xs={6} sm={6} md={6}>
@@ -455,22 +466,25 @@ const TicketEdit = ({
                       <div style={{ display: 'flex', flexDirection: 'row' }}>
                         {images.length !== 0 ? (
                           images.map((image) => (
-                            <div style={{ padding: '15px' }}>
-                              <div
-                                style={{
-                                  borderRadius: '5px',
-                                  border: '2px solid rgba(0, 0, 0, 0.87)',
-                                  lineHeight: '0.43',
-                                }}
-                              >
-                                <Image
-                                  src={image}
-                                  width="90"
-                                  height="90"
-                                  onClick={() => handleShowImage(image)}
-                                />
+                            <>
+                              <div style={{ paddingRight: '30px', paddingTop: '15px' }}>
+                                <div
+                                  style={{
+                                    borderRadius: '5px',
+                                    border: '2px solid rgba(0, 0, 0, 0.87)',
+                                    lineHeight: '0.43',
+                                  }}
+                                >
+                                  <Image
+                                    src={image}
+                                    quality={100}
+                                    width={220}
+                                    height={220}
+                                    onClick={() => handleShowImage(image)}
+                                  />
+                                </div>
                               </div>
-                            </div>
+                            </>
                           ))
                         ) : (
                           <div>Không có hình ảnh</div>

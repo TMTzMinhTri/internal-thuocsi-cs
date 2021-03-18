@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { palette } from 'data/colors';
 
 export const department = [
   {
@@ -21,16 +22,34 @@ export const department = [
 
 export const listStatus = [
   {
-    value: 'NEW',
-    label: 'Mới',
+    value: 'PENDING',
+    label: 'Chưa xử lý',
+    color: palette.secondary.default,
   },
   {
-    value: 'PENDING',
-    label: 'Đang chờ',
+    value: 'ASSIGNED',
+    label: 'Đã tiếp nhận',
+    color: palette.warning.default,
+  },
+  {
+    value: 'IN_PROCESS',
+    label: 'Đang xử lý',
+    color: palette.info.default,
+  },
+  {
+    value: 'DONE',
+    label: 'Đã xử lý',
+    color: palette.success.default,
   },
   {
     value: 'COMPLETED',
-    label: 'Hoàn tất',
+    label: 'Đã xử lý',
+    color: palette.success.default,
+  },
+  {
+    value: 'CANCELED',
+    label: 'Đã huỷ',
+    color: palette.error.default,
   },
 ];
 
@@ -59,15 +78,16 @@ export const ErrorCode = {
 // with note: last func may be return props
 
 export const ssrPipe = (...functions) => async (input) => {
+  const rs = await functions.reduce((chain, func) => chain.then(func), Promise.resolve(input));
   return {
-    props: await functions.reduce((chain, func) => chain.then(func), Promise.resolve(input)),
+    props: rs,
   };
 };
 
 export function formatEllipsisText(text, len = 100) {
   if (text) {
     if (text.length > 50) {
-      return text.substring(0, len) + '...';
+      return `${text.substring(0, len)}...`;
     }
     return text;
   }
@@ -89,13 +109,13 @@ export function formatUrlSearch(str) {
 
 export function formatUTCTime(time) {
   let result = '';
-  let date = new Date(time);
-  let year = date.getUTCFullYear();
-  let month =
-    date.getMonth() + 1 < 10 ? ('0' + (date.getMonth() + 1)).slice(-2) : date.getMonth() + 1;
-  let day = date.getDate() < 10 ? ('0' + date.getDate()).slice(-2) : date.getDate();
-  let hour = date.getHours() < 10 ? ('0' + date.getHours()).slice(-2) : date.getHours();
-  let minute = date.getMinutes() < 10 ? ('0' + date.getMinutes()).slice(-2) : date.getMinutes();
-  result = year + '-' + month + '-' + day + 'T' + hour + ':' + minute;
+  const date = new Date(time);
+  const year = date.getUTCFullYear();
+  const month =
+    date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}`.slice(-2) : date.getMonth() + 1;
+  const day = date.getDate() < 10 ? `0${date.getDate()}`.slice(-2) : date.getDate();
+  const hour = date.getHours() < 10 ? `0${date.getHours()}`.slice(-2) : date.getHours();
+  const minute = date.getMinutes() < 10 ? `0${date.getMinutes()}`.slice(-2) : date.getMinutes();
+  result = `${year}-${month}-${day}T${hour}:${minute}`;
   return result;
 }
