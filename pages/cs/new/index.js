@@ -501,7 +501,7 @@ const PageNewCS = ({
                           size="small"
                           type="text"
                           fullWidth
-                          placeholder="https://messenger.comthuocsivn"
+                          placeholder="https://messenger.com/thuocsivn"
                         />
                       </Grid>
                       <Grid item xs={12} sm={12} md={6}>
