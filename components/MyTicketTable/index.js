@@ -21,7 +21,7 @@ import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagin
 import TicketEdit from 'components/TicketEdit';
 import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
-import colors from 'data/colors';
+import { palette } from 'data/colors';
 
 const TicketTable = ({ data, total, listReasons = [] }) => {
   const router = useRouter();
@@ -180,7 +180,7 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                         borderRadius: '4px',
                         backgroundColor:
                           listStatus.find(({ value }) => value === item.status)?.color ||
-                          colors.palette.grey[500],
+                          palette.grey[500],
                       }}
                       size="small"
                       label={listStatus.find(({ value }) => value === item.status)?.label || ''}

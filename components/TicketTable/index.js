@@ -11,7 +11,7 @@ import {
   Tooltip,
   Grid,
 } from '@material-ui/core';
-import COLORS from 'data/colors';
+import { palette } from 'data/colors';
 
 import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, listStatus } from 'components/global';
@@ -184,7 +184,7 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                             borderRadius: '4px',
                             backgroundColor:
                               listStatus.find(({ value }) => value === item.status)?.color ||
-                              COLORS.palette.grey[500],
+                              palette.grey[500],
                           }}
                           size="small"
                           label={listStatus.find(({ value }) => value === item.status)?.label || ''}

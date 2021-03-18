@@ -9,7 +9,6 @@ import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useForm } from 'react-hook-form';
-import { getAccountClient } from 'client';
 
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
@@ -17,7 +16,7 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 
 import useModal from 'hooks/useModal';
 import { useRouter } from 'next/router';
-import { cleanObj, convertObjectToParameter, isValid } from 'utils';
+import { cleanObj, convertObjectToParameter } from 'utils';
 import MyTicketTable from '../MyTicketTable';
 import LabelFormCs from '../LabelFormCs';
 
@@ -25,7 +24,6 @@ import styles from './request.module.css';
 
 const TicketList = ({ total, tickets, listReason, action, filter = {} }) => {
   const [search, setSearch] = useState('');
-  const [listUserAssign] = useState([]);
 
   // Modal
   const [showHideFilter, toggleFilter] = useModal(action === 'filter');
