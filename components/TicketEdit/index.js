@@ -257,13 +257,13 @@ const TicketEdit = ({
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
                       <Typography gutterBottom>
-                        <LabelFormCs>Tên khách hàng:</LabelFormCs>
+                        <LabelFormCs>Tên Tài Khoản:</LabelFormCs>
                       </Typography>
                       <TextField
-                        name="customerName"
+                        name="bankAcountName"
                         inputRef={register({ required: 'Vui lòng nhập thông tin' })}
-                        error={!!errors.customerName}
-                        helperText={errors.customerName?.message}
+                        error={!!errors.bankAcountName}
+                        helperText={errors.bankAcountName?.message}
                         variant="outlined"
                         size="small"
                         type="text"
