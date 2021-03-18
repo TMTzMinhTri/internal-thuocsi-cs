@@ -165,7 +165,7 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                     {item?.reasons?.map((code) => (
                       <Chip
                         key={uuidv4()}
-                        style={{ margin: '3px' }}
+                        style={{ margin: '3px', borderRadius: '4px' }}
                         size="small"
                         label={listReasons.find((reason) => reason.value === code)?.label || ''}
                       />
