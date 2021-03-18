@@ -22,7 +22,7 @@ class TicketClient extends APIClient {
     return this.callFromNextJS('GET', `${URI}/tasks`, { saleOrderCode });
   }
 
-  getTicketByFilter(offset,limit,formData) {
+  getTicketByFilter({offset,limit,formData}) {
     return this.callFromClient('POST', `${URI}/tasks/list?offset=${offset}&limit=${limit}`, formData);
   }
 

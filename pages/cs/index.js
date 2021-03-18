@@ -50,7 +50,7 @@ export async function loadRequestData(ctx) {
       tickets,
       action,
       filter: { ...restProps },
-      filterObject: filterValue
+      formData: filterValue
     },
   };
 }

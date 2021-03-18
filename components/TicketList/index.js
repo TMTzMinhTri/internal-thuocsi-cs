@@ -17,21 +17,21 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 
 import useModal from 'hooks/useModal';
 import { useRouter } from 'next/router';
-import { cleanObj, convertObjectToParameter, isValid } from 'utils';
+import { cleanObj, convertObjectToParameter, isValid, getData } from 'utils';
 import TicketTable from '../TicketTable';
 import LabelFormCs from '../LabelFormCs';
 import { ExportCSV } from '../ExportCSV';
 import styles from './request.module.css';
 import { getTicketClient } from 'client';
 
-const TicketList = ({ total, tickets, listReason, action, filter = {}, filterObject = {} }) => {
+const TicketList = ({ total, tickets, listReason, action, filter = {}, formData = {} }) => {
   const ticketClient = getTicketClient('', {});
   const [search, setSearch] = useState('');
   const [listUserAssign] = useState([]);
   const [ticketAll, setTicketAll] = useState([]);
   const fileName = `Danh_Sach_Yeu_Cau_${new Date().toLocaleString().replace(/[ :]/g,'_').replace(/[,]/g,'')}`
-  const OFFSET = 1000;
-  const totalPageSize = Math.ceil(total/OFFSET);
+  const limit = 50;
+  const totalPageSize = Math.ceil(total/limit);
 
   // Modal
   const [showHideFilter, toggleFilter] = useModal(action === 'filter');
@@ -110,34 +110,20 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, filterObj
     );
   }, []);
 
-  const doAsync = (value) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve(value);
-        }, Math.floor(Math.random() * 1000));
-    });
-  }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const promises = [];
-      for (let i = 0; i < totalPageSize; ++i) {
-        promises.push(doAsync(ticketClient.getTicketByFilter(i,OFFSET,filterObject)));
-      }
-
-      Promise.all(promises)
-      .then((results) => {
-          let data = [];
-          results.forEach((value) => {
-            value.data.forEach((item) => {
-              data.push(item)
-            });
-          });
-          setTicketAll(data);
-      })
+  const csvData = useCallback( async () => {
+    const requestGetAllData = [] ;
+    for (let offset = 0; offset < totalPageSize; ++offset) {
+      requestGetAllData.push(ticketClient.getTicketByFilter({offset,limit,formData}));
     }
-    fetchData();
-  }, []);
+    
+    const arrayResult = await Promise.all(requestGetAllData);
+    
+    let data = []
+    
+    arrayResult.map( res => { data = data.concat(getData(res) ) } ) ;
+    return data; 
+     
+    } , [] );
 
   return (
     <>
@@ -290,7 +276,7 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, filterObj
                       </Grid> */}
                       <Grid item container xs={12} justify="flex-end" spacing={1}>
                         <Grid item>
-                          <ExportCSV csvData={ticketAll} fileName={fileName}/>
+                          <ExportCSV csvData={csvData} fileName={fileName}/>
                         </Grid>
                         <Grid item>
                           <Link href="/cs/new">
