@@ -38,3 +38,7 @@
 .cardButton {
   background-color: blue;
 }
+
+.image [class*='MuiInputLabel-shrink'] {
+  width: 150px;
+}

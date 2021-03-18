@@ -1,4 +1,5 @@
 import { APIClient } from '@thuocsi/nextjs-components/lib/utils';
+import { constURL } from './constant';
 
 const URI = `/marketplace/ticket/v1`;
 class TicketClient extends APIClient {
@@ -62,6 +63,12 @@ class TicketClient extends APIClient {
 
   clientGetTicketDetail({ code }) {
     return this.callFromClient('GET', `${URI}/task`, { code });
+  }
+
+  uploadImage(data) {
+    return this.callFromClient(
+      "POST",
+      `${constURL.PREFIX_PRODUCT}/upload`, data)
   }
 }
 
