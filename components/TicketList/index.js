@@ -24,7 +24,15 @@ import LabelFormCs from '../LabelFormCs';
 import { ExportCSV } from '../ExportCSV';
 import styles from './request.module.css';
 
-const TicketList = ({ total, tickets, listReason, action, filter = {}, formData = {} }) => {
+const TicketList = ({
+  total,
+  tickets,
+  listReason,
+  action,
+  filter = {},
+  formData = {},
+  isMyTicket = false,
+}) => {
   const ticketClient = getTicketClient();
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -247,7 +255,13 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
           </form>
         </MyCard>
       </div>
-      <TicketTable listReasons={listReason} data={tickets} total={total} search={search} />
+      <TicketTable
+        listReasons={listReason}
+        data={tickets}
+        total={total}
+        search={search}
+        isMyTicket={isMyTicket}
+      />
     </>
   );
 };
