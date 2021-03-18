@@ -196,17 +196,17 @@ const TicketEdit = ({
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
-                          Gía đơn hàng:{' '}
+                          Giá trị đơn hàng:{' '}
                           <span style={{ color: 'green' }}>
                             {formatNumber(ticketDetail?.totalPrice)} đ
                           </span>
                         </FormLabel>
-                        <FormLabel
+                        {/* <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
                         >
                           Số lượng sản phẩm: __
-                        </FormLabel>
+                        </FormLabel> */}
                         <FormLabel
                           component="legend"
                           style={{ color: 'black', marginBottom: '15px' }}
