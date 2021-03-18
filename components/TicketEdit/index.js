@@ -98,7 +98,7 @@ const TicketEdit = ({
     return null;
   }
 
-  const { register, handleSubmit, errors, control } = useForm({
+  const { register, handleSubmit, errors, control, setValue } = useForm({
     mode: 'onChange',
     defaultValues: {
       ...ticketDetail,
@@ -337,8 +337,14 @@ const TicketEdit = ({
                       <MuiSingleAuto
                         name="departmentCode"
                         onValueChange={(department) => {
-                          updateListAssignUser(department);
-                          setCurrentDepartment(department?.code || '');
+                          if (department?.code) {
+                            updateListAssignUser(department);
+                            setCurrentDepartment(department.code);
+                          } else {
+                            updateListAssignUser(null);
+                            setValue('assignUser', '');
+                            setCurrentDepartment(department?.code || '');
+                          }
                         }}
                         options={listDepartment}
                         required

@@ -46,7 +46,7 @@ export async function loadRequestData(ctx) {
 
   const total = ticketResult?.total || 0;
   const tickets =
-    ticketResult?.data.map(async (ticket) => {
+    ticketResult?.data?.map(async (ticket) => {
       if (ticket) {
         await accountClient.get;
       }
