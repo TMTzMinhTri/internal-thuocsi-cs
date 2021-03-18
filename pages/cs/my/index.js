@@ -45,7 +45,14 @@ export async function loadRequestData(ctx) {
   ]);
 
   const total = ticketResult?.total || 0;
-  const tickets = ticketResult?.data || [];
+  const tickets =
+    ticketResult?.data.map(async (ticket) => {
+      if (ticket) {
+        await accountClient.get;
+      }
+
+      return ticket;
+    }) || [];
 
   const listReason = listReasonRes?.data?.map((item) => ({ value: item.code, label: item.name }));
 

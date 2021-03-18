@@ -78,6 +78,7 @@ const TicketEdit = ({
       code: ticketDetail.code,
       ...data,
       assignUser: data?.assignUser?.value,
+      assignName: data?.assignUser?.name,
       departmentCode: data?.departmentCode?.code,
       reasons: data?.reasons?.map((item) => item.value) || [],
       cashback: parseInt(data?.cashback || 0, 10),
