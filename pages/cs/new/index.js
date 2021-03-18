@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Button,
   Paper,
@@ -12,7 +12,7 @@ import {
 
 import Head from 'next/head';
 import Link from 'next/link';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 
 import AppCS from 'pages/_layout';
 
