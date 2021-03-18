@@ -12,7 +12,7 @@ import {
 
 import Head from 'next/head';
 import Link from 'next/link';
-import Router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import ImageUploadField from 'components/image-upload-field';
 import AppCS from 'pages/_layout';
 
@@ -439,7 +439,7 @@ const PageNewCS = ({
                           size="small"
                           type="text"
                           fullWidth
-                          placeholder="0"
+                          placeholder=" "
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={6}>

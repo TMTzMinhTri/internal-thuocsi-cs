@@ -77,14 +77,14 @@ const breadcrumb = [
     link: '/cs',
   },
   {
-    name: 'DS phiếu yêu cầu cuả tôi',
+    name: 'DS phiếu yêu cầu của tôi',
   },
 ];
 
 const ListTicketPage = (props) => (
   <AppCS select="/cs/my" breadcrumb={breadcrumb}>
     <Head>
-      <title>DS phiếu yêu cầu cuả tôi</title>
+      <title>DS phiếu yêu cầu của tôi</title>
     </Head>
     <MyTicketList {...props} />
   </AppCS>
