@@ -29,7 +29,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
   const [detail, setDetail] = useState(null);
   const [listDepartment, setListDepartment] = useState([]);
   const [listUserAssign, setListUserAssign] = useState([]);
-  console.log(data);
 
   // query + params
   const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
@@ -119,6 +118,7 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
     loadData(ticketSelected);
   }, [ticketSelected]);
 
+  console.log('list status ', listStatus);
   return (
     <>
       <TableContainer component={Paper}>
@@ -139,11 +139,11 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
             <TableRow>
               <TableCell align="center">#Mã Phiếu</TableCell>
               <TableCell align="center">SO#</TableCell>
-              <TableCell align="center">Số lượng#</TableCell>
+              {/* <TableCell align="center">Số lượng#</TableCell> */}
               <TableCell align="left">Lỗi</TableCell>
               <TableCell align="left">Ghi chú của KH</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
-              <TableCell align="center">Thao tác</TableCell>
+              <TableCell align="right">Thao tác</TableCell>
             </TableRow>
           </TableHead>
           {!data || data.length === 0 ? (
@@ -160,12 +160,12 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                 <TableRow key={uuidv4()}>
                   <TableCell align="center">{item.code}</TableCell>
                   <TableCell align="center">{item.saleOrderCode}</TableCell>
-                  <TableCell align="center"></TableCell>
+                  {/* <TableCell align="center"></TableCell> */}
                   <TableCell align="left">
                     {item?.reasons?.map((code) => (
                       <Chip
                         key={uuidv4()}
-                        style={{ margin: '3px' }}
+                        style={{ margin: '3px', borderRadius: '4px' }}
                         size="small"
                         label={listReasons.find((reason) => reason.value === code)?.label || ''}
                       />
@@ -173,10 +173,20 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                   </TableCell>
                   <TableCell align="left">{item.note}</TableCell>
                   <TableCell align="center">
-                    {listStatus.find((status) => status.value && status.value === item.status)
-                      ?.label || ''}
+                    <Chip
+                      key={uuidv4()}
+                      style={{
+                        margin: '3px',
+                        borderRadius: '4px',
+                        backgroundColor: 'success',
+                        // backgroundColor: listStatus.find(({ value }) => value === item.status)
+                        //   ?.color,
+                      }}
+                      size="small"
+                      label={listStatus.find(({ value }) => value === item.status)?.label || ''}
+                    />
                   </TableCell>
-                  <TableCell align="center">
+                  <TableCell align="right">
                     <a onClick={() => onClickBtnEdit(item.code)}>
                       <Tooltip title="Cập nhật thông tin của yêu cầu">
                         <IconButton>

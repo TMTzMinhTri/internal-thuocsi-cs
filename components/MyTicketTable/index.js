@@ -23,13 +23,13 @@ import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 
 const TicketTable = ({ data, total, listReasons = [] }) => {
+  console.log('list reasons > ', listReasons);
   const router = useRouter();
   const { ticketId } = router.query;
   const [ticketSelected] = useState(ticketId);
   const [detail, setDetail] = useState(null);
   const [listDepartment, setListDepartment] = useState([]);
   const [listUserAssign, setListUserAssign] = useState([]);
-  console.log(data);
 
   // query + params
   const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
@@ -165,7 +165,7 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                         key={uuidv4()}
                         style={{ margin: '3px', borderRadius: '4px!important' }}
                         size="small"
-                        label={listReasons.find((reason) => reason.value === code)?.label || ''}
+                        label={listReasons.find((reason) => reason.value === code)?.label || 'xxx'}
                       />
                     ))}
                   </TableCell>

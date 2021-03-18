@@ -21,16 +21,34 @@ export const department = [
 
 export const listStatus = [
   {
-    value: 'NEW',
-    label: 'Mới',
+    value: 'PENDING',
+    label: 'Chưa xử lý',
+    color: 'warning',
   },
   {
-    value: 'PENDING',
-    label: 'Đang chờ',
+    value: 'ASSIGNED',
+    label: 'Đã tiếp nhận',
+    color: 'secondary',
+  },
+  {
+    value: 'IN_PROCESS',
+    label: 'Đang xử lý',
+    color: 'primary',
+  },
+  {
+    value: 'DONE',
+    label: 'Đã xử lý',
+    color: 'success',
   },
   {
     value: 'COMPLETED',
-    label: 'Hoàn tất',
+    label: 'Đã xử lý',
+    color: 'success',
+  },
+  {
+    value: 'CANCELED',
+    label: 'Đã huỷ',
+    color: 'error',
   },
 ];
 
