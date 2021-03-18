@@ -9,11 +9,12 @@ import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useForm } from 'react-hook-form';
-import { getAccountClient } from 'client';
 
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
+
+import { getTicketClient } from 'client';
 
 import useModal from 'hooks/useModal';
 import { useRouter } from 'next/router';
@@ -22,7 +23,6 @@ import TicketTable from '../TicketTable';
 import LabelFormCs from '../LabelFormCs';
 import { ExportCSV } from '../ExportCSV';
 import styles from './request.module.css';
-import { getTicketClient } from 'client';
 
 const TicketList = ({ total, tickets, listReason, action, filter = {}, formData = {} }) => {
   const ticketClient = getTicketClient();
@@ -93,6 +93,24 @@ const TicketList = ({ total, tickets, listReason, action, filter = {}, formData 
     },
     [],
   );
+  const csvData = useCallback(async () => {
+    setLoading(true);
+    const requestGetAllData = [];
+    for (let i = 0; i < totalPageSize; ++i) {
+      const offset = i * limit;
+      requestGetAllData.push(ticketClient.getTicketByFilter({ offset, limit, formData }));
+    }
+
+    const arrayResult = await Promise.all(requestGetAllData);
+
+    let data = [];
+
+    arrayResult.forEach((res) => {
+      data = data.concat(getData(res));
+    });
+    setLoading(false);
+    return data;
+  }, []);
 
   return (
     <>
