@@ -67,6 +67,7 @@ const TicketEdit = ({
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
   const [listAssignUser, setListAssignUser] = useState(usersAssign);
+  const [currentDepartment, setCurrentDepartment] = useState('');
   const [imageSelected, setImageSelected] = useState('');
   const images = ticketDetail?.imageUrls || [];
   const anchor = '';
@@ -329,7 +330,10 @@ const TicketEdit = ({
                       </Typography>
                       <MuiSingleAuto
                         name="departmentCode"
-                        onValueChange={(data) => updateListAssignUser(data)}
+                        onValueChange={(department) => {
+                          updateListAssignUser(department);
+                          setCurrentDepartment(department?.code || '');
+                        }}
                         options={listDepartment}
                         required
                         placeholder="Chọn"
@@ -348,6 +352,7 @@ const TicketEdit = ({
                         placeholder="Chọn"
                         errors={errors}
                         control={control}
+                        disabled={!currentDepartment}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>

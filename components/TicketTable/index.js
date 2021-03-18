@@ -139,7 +139,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
             <TableRow>
               <TableCell align="center">#Mã Phiếu</TableCell>
               <TableCell align="center">SO#</TableCell>
-              <TableCell align="center">Số lượng#</TableCell>
               <TableCell align="left">Lỗi</TableCell>
               <TableCell align="left">Ghi chú của KH</TableCell>
               <TableCell align="center">Trạng thái</TableCell>
@@ -160,7 +159,6 @@ const TicketTable = ({ data, total, listReasons = [] }) => {
                 <TableRow key={uuidv4()}>
                   <TableCell align="center">{item.code}</TableCell>
                   <TableCell align="center">{item.saleOrderCode}</TableCell>
-                  <TableCell align="center"></TableCell>
                   <TableCell align="left">
                     {item?.reasons?.map((code) => (
                       <Chip
