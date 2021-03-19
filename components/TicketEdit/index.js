@@ -67,11 +67,10 @@ const TicketEdit = ({
   const styles = makeStyles(useStyles);
   const { success, error } = useToast();
   const [listAssignUser, setListAssignUser] = useState(usersAssign);
-  const [currentDepartment, setCurrentDepartment] = useState('');
+  const [currentDepartment, setCurrentDepartment] = useState(ticketDetail.departmentCode);
   const [imageSelected, setImageSelected] = useState('');
   const images = ticketDetail?.imageUrls || [];
   const anchor = '';
-
   const [open, toggle] = useModal();
 
   const onSubmit = async (data) => {
@@ -97,7 +96,6 @@ const TicketEdit = ({
   if (!ticketDetail) {
     return null;
   }
-
   const { register, handleSubmit, errors, control, setValue } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -284,6 +282,12 @@ const TicketEdit = ({
                         size="small"
                         type="text"
                         fullWidth
+                        inputRef={register({
+                          pattern: {
+                            value: /^\d+$/,
+                            message: 'Số tài khoản phải là số',
+                          },
+                        })}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={3}>
@@ -342,9 +346,9 @@ const TicketEdit = ({
                             setCurrentDepartment(department.code);
                           } else {
                             updateListAssignUser(null);
-                            setValue('assignUser', '');
                             setCurrentDepartment(department?.code || '');
                           }
+                          setValue('assignUser', '');
                         }}
                         options={listDepartment}
                         required
@@ -390,7 +394,7 @@ const TicketEdit = ({
                         size="small"
                         type="text"
                         fullWidth
-                        placeholder="0"
+                        placeholder="XP50AP"
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} md={6}>

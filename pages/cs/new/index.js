@@ -85,10 +85,8 @@ export async function loadRequestData(ctx) {
         orderData.bankInfo = getFirst(bankResult);
       }
     }
-
     tickets = getData(ticketResult);
   }
-
   return {
     props: {
       listDepartment,
@@ -112,9 +110,8 @@ const PageNewCS = ({
   orderNo = '',
 }) => {
   const router = useRouter();
-
   const [listAssignUser, setListAssignUser] = useState([
-    { value: '', label: 'Không có nguời tiếp nhận' },
+    { value: '', label: 'Không có nguời tiếp nhận', name: '' },
   ]);
   const [ticketImages, setTicketImages] = useState([]);
   const [currentDepartment, setCurrentDepartment] = useState('');
@@ -173,6 +170,7 @@ const PageNewCS = ({
         cashback: +formData.cashback,
         note: formData.note,
         assignUser: parseInt(formData.assignUser.value, 10),
+        assignName: formData.assignUser.name,
         bankName: formData.bankName,
         bankAccountName: formData.bankAccountName,
         bankCode: formData.bankCode,
@@ -214,15 +212,19 @@ const PageNewCS = ({
         const tmpData = [];
         accountResp.data.forEach((account) => {
           if (account && account.username) {
-            tmpData.push({ value: account.accountId, label: account.username });
+            tmpData.push({
+              value: account.accountId,
+              label: account.username,
+              name: account.username,
+            });
           }
         });
         setListAssignUser(tmpData);
       } else {
-        setListAssignUser([{ value: '', label: 'Không có người tiếp nhận' }]);
+        setListAssignUser([{ value: '', label: 'Không có người tiếp nhận', name: '' }]);
       }
     } else {
-      setListAssignUser([{ value: '', label: 'Không có người tiếp nhận' }]);
+      setListAssignUser([{ value: '', label: 'Không có người tiếp nhận', name: '' }]);
     }
   }, []);
   useEffect(() => {
@@ -281,6 +283,7 @@ const PageNewCS = ({
                   data={tickets}
                   listReasons={listReasons}
                   refreshData={handleRefreshData}
+                  isNew
                 />
                 <Paper className={`${styles.search}`}>
                   <FormControl size="small">
@@ -294,7 +297,9 @@ const PageNewCS = ({
                     >
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
-                          <LabelFormCs>Tên tài khoản:</LabelFormCs>
+                          <LabelFormCs>
+                            Tên tài khoản: <span style={{ color: 'red' }}>(*)</span>
+                          </LabelFormCs>
                         </Typography>
                         <TextField
                           disabled={!orderData}
@@ -313,7 +318,9 @@ const PageNewCS = ({
                       </Grid>
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
-                          <LabelFormCs>Số tài khoản:</LabelFormCs>
+                          <LabelFormCs>
+                            Số tài khoản: <span style={{ color: 'red' }}>(*)</span>
+                          </LabelFormCs>
                         </Typography>
                         <TextField
                           disabled={!orderData}
@@ -326,13 +333,19 @@ const PageNewCS = ({
                           helperText={errors.bankCode?.message}
                           inputRef={register({
                             required: 'Vui lòng nhập thông tin',
+                            pattern: {
+                              value: /^\d+$/,
+                              message: 'Số tài khoản phải là số',
+                            },
                           })}
                           defaultValue={orderData?.bankInfo?.bankCode}
                         />
                       </Grid>
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
-                          <LabelFormCs>Ngân hàng:</LabelFormCs>
+                          <LabelFormCs>
+                            Ngân hàng: <span style={{ color: 'red' }}>(*)</span>
+                          </LabelFormCs>
                         </Typography>
                         <TextField
                           disabled={!orderData}
@@ -351,7 +364,9 @@ const PageNewCS = ({
                       </Grid>
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography gutterBottom>
-                          <LabelFormCs>Chi nhánh:</LabelFormCs>
+                          <LabelFormCs>
+                            Chi nhánh: <span style={{ color: 'red' }}>(*)</span>
+                          </LabelFormCs>
                         </Typography>
                         <TextField
                           disabled={!orderData}
@@ -401,8 +416,14 @@ const PageNewCS = ({
                         <MuiSingleAuto
                           required
                           onValueChange={(department) => {
-                            updateListAssignUser(department);
-                            setCurrentDepartment(department?.code || '');
+                            if (department?.code) {
+                              updateListAssignUser(department);
+                              setCurrentDepartment(department.code);
+                            } else {
+                              updateListAssignUser(null);
+                              setCurrentDepartment(department?.code || '');
+                            }
+                            setValue('assignUser', '');
                           }}
                           options={listDepartment}
                           placeholder="Chọn"
@@ -463,17 +484,10 @@ const PageNewCS = ({
                       </Grid>
                       <Grid item xs={12} sm={6} md={6}>
                         <Typography gutterBottom>
-                          <LabelFormCs>
-                            Ghi chú (hàng trả về): <span style={{ color: 'red' }}>(*)</span>
-                          </LabelFormCs>
+                          <LabelFormCs>Ghi chú (hàng trả về):</LabelFormCs>
                         </Typography>
                         <TextField
                           name="note"
-                          error={!!errors.note}
-                          helperText={errors.note?.message}
-                          inputRef={register({
-                            required: 'Vui lòng nhập thông tin',
-                          })}
                           variant="outlined"
                           size="small"
                           type="text"
