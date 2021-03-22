@@ -2,71 +2,80 @@ import moment from 'moment';
 import { palette } from 'data/colors';
 
 export const department = [
-  {
-    value: 'TECH',
-    label: 'Công nghệ',
-  },
-  {
-    value: 'HEADQUARTER',
-    label: 'Trụ sở chính',
-  },
-  {
-    value: 'FA',
-    label: 'Kế toán',
-  },
-  {
-    value: 'WAREHOUSE',
-    label: 'Kho',
-  },
+    {
+        value: 'TECH',
+        label: 'Công nghệ',
+    },
+    {
+        value: 'HEADQUARTER',
+        label: 'Trụ sở chính',
+    },
+    {
+        value: 'FA',
+        label: 'Kế toán',
+    },
+    {
+        value: 'WAREHOUSE',
+        label: 'Kho',
+    },
 ];
 
 export const listStatus = [
-  {
-    value: 'PENDING',
-    label: 'Chưa xử lý',
-    color: palette.secondary.default,
-  },
-  {
-    value: 'ASSIGNED',
-    label: 'Đã tiếp nhận',
-    color: palette.warning.default,
-  },
-  {
-    value: 'IN_PROCESS',
-    label: 'Đang xử lý',
-    color: palette.info.default,
-  },
-  {
-    value: 'DONE',
-    label: 'Đã xử lý',
-    color: palette.success.default,
-  },
-  {
-    value: 'COMPLETED',
-    label: 'Đã xử lý',
-    color: palette.success.default,
-  },
-  {
-    value: 'CANCELED',
-    label: 'Đã huỷ',
-    color: palette.error.default,
-  },
+    {
+        value: 'PENDING',
+        label: 'Chưa xử lý',
+        color: '#cc5555',
+    },
+    {
+        value: 'ASSIGNED',
+        label: 'Đã tiếp nhận',
+        color: '#0066dd',
+    },
+    {
+        value: 'IN_PROCESS',
+        label: 'Đang xử lý',
+        color: '#0066dd',
+    },
+    {
+        value: 'DONE',
+        label: 'Đã xử lý',
+        color: '#2b6',
+    },
+    {
+        value: 'CANCELED',
+        label: 'Đã huỷ',
+        color: '#bbb',
+    },
+
+
+    // old status
+    {
+        value: 'COMPLETED',
+        label: 'Đã xử lý',
+        color: '#2b6',
+    },
+
 ];
 
+export const mapStatus = {}
+listStatus.forEach((status) => {
+    mapStatus[status.value] = status
+})
+
 export function formatDateTime(datetime) {
-  if (datetime) {
-    return moment(datetime).utcOffset('+0700').format('DD-MM-YYYY HH:mm:ss');
-  }
-  return '';
+    if (datetime) {
+        return moment(datetime).utcOffset('+0700').format('DD-MM-YYYY HH:mm:ss');
+    }
+    return '';
 }
 
 export function formatNumber(num) {
-  return num?.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    return num?.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 }
 
 export const ErrorCode = {
-  NOT_FOUND: 'không tồn tại',
-  NOT_FOUND_TABLE: 'Tìm kiếm không có kết quả phù hợp',
+    NOT_FOUND: 'không tồn tại',
+    NOT_FOUND_TABLE: 'Tìm kiếm không có kết quả phù hợp',
 };
 
 // ssrPipe is function run pipeline any function async await
@@ -78,44 +87,44 @@ export const ErrorCode = {
 // with note: last func may be return props
 
 export const ssrPipe = (...functions) => async (input) => {
-  const rs = await functions.reduce((chain, func) => chain.then(func), Promise.resolve(input));
-  return {
-    props: rs,
-  };
+    const rs = await functions.reduce((chain, func) => chain.then(func), Promise.resolve(input));
+    return {
+        props: rs,
+    };
 };
 
 export function formatEllipsisText(text, len = 100) {
-  if (text) {
-    if (text.length > 50) {
-      return `${text.substring(0, len)}...`;
+    if (text) {
+        if (text.length > 50) {
+            return `${text.substring(0, len)}...`;
+        }
+        return text;
     }
-    return text;
-  }
-  return '-';
+    return '-';
 }
 
 export function formatMessageError(code) {
-  return `${ErrorCode[code]}`;
+    return `${ErrorCode[code]}`;
 }
 
 export function formatUrlSearch(str) {
-  return str
-    .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/[&]/, '%26')
-    .replace(/[+]/, '%2B')
-    .replace(/[#]/, '%23');
+    return str
+        .trim()
+        .replace(/\s+/g, ' ')
+        .replace(/[&]/, '%26')
+        .replace(/[+]/, '%2B')
+        .replace(/[#]/, '%23');
 }
 
 export function formatUTCTime(time) {
-  let result = '';
-  const date = new Date(time);
-  const year = date.getUTCFullYear();
-  const month =
-    date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}`.slice(-2) : date.getMonth() + 1;
-  const day = date.getDate() < 10 ? `0${date.getDate()}`.slice(-2) : date.getDate();
-  const hour = date.getHours() < 10 ? `0${date.getHours()}`.slice(-2) : date.getHours();
-  const minute = date.getMinutes() < 10 ? `0${date.getMinutes()}`.slice(-2) : date.getMinutes();
-  result = `${year}-${month}-${day}T${hour}:${minute}`;
-  return result;
+    let result = '';
+    const date = new Date(time);
+    const year = date.getUTCFullYear();
+    const month =
+        date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}`.slice(-2) : date.getMonth() + 1;
+    const day = date.getDate() < 10 ? `0${date.getDate()}`.slice(-2) : date.getDate();
+    const hour = date.getHours() < 10 ? `0${date.getHours()}`.slice(-2) : date.getHours();
+    const minute = date.getMinutes() < 10 ? `0${date.getMinutes()}`.slice(-2) : date.getMinutes();
+    result = `${year}-${month}-${day}T${hour}:${minute}`;
+    return result;
 }
