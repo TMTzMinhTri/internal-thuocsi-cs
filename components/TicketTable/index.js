@@ -11,7 +11,6 @@ import {
     Tooltip,
     Grid,
 } from '@material-ui/core';
-import { palette } from 'data/colors';
 
 import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, listStatus } from 'components/global';
@@ -25,6 +24,7 @@ import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import moment from 'moment';
 import { TicketStatus } from 'components/ticket/ticket-status';
+import { mapStatus } from 'components/global';
 
 const TicketTable = ({ data, total, listReasons = [], isMyTicket = false }) => {
     const router = useRouter();
@@ -176,8 +176,14 @@ const TicketTable = ({ data, total, listReasons = [], isMyTicket = false }) => {
                                             ))}
                                         </TableCell>
                                         <TableCell align="left">{item.note}</TableCell>
-                                        <TableCell align="left">
-                                            <TicketStatus status={item.status} />
+                                        <TableCell align="left"> {
+                                            (() => {
+                                                let statusInfo = mapStatus[item.status]
+                                                return statusInfo ? <TicketStatus
+                                                    color={statusInfo.color}
+                                                    label={statusInfo.label} /> : ""
+                                            })()
+                                        }
                                         </TableCell>
                                         <TableCell align="left"> {moment(item.createdTime).locale('vi').fromNow()}
                                         </TableCell>
