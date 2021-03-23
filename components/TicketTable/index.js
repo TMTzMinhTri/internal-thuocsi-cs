@@ -191,7 +191,7 @@ const TicketTable = ({ data, total, listReasons = [], isMyTicket = false }) => {
                                         {!isMyTicket && <TableCell align="left">{item.assignName}</TableCell>}
                                         <TableCell align="right">
                                             <a onClick={() => onClickBtnEdit(item.code)}>
-                                                <Tooltip title="Cập nhật thông tin của yêu cầu">
+                                                <Tooltip title="Cập nhật thông tin của phiếu hỗ trợ">
                                                     <IconButton>
                                                         <EditIcon fontSize="small" />
                                                     </IconButton>
@@ -205,7 +205,7 @@ const TicketTable = ({ data, total, listReasons = [], isMyTicket = false }) => {
 
                     {total > 0 && (
                         <MyTablePagination
-                            labelUnit="yêu cầu"
+                            labelUnit="phiếu"
                             count={total}
                             rowsPerPage={limit}
                             page={page}
