@@ -40,12 +40,16 @@ const menu = [
             },
             {
                 key: 'NEW_TICKET',
-                name: 'Tạo mới yêu cầu',
+                name: 'Tạo phiếu mới',
                 link: '/cs/new',
                 icon: faPlus,
             },
         ]
-    },
+    }, {
+        key: 'CUSTOMER_LOOKUP',
+        name: 'Tra cứu khách hàng',
+        link: '/crm/customer/detail',
+    }
 ];
 
 export default function App(props) {
