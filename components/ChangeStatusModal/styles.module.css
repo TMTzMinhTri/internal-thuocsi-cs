@@ -1,8 +1,0 @@
-.dialog_title {
-  background-color: rgb(26, 115, 184);
-  color: white !important;
-}
-
-.dialog_title [class*='MuiIconButton-root'] {
-  color: white !important;
-}
