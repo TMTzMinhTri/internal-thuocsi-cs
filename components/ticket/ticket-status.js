@@ -1,5 +1,6 @@
 
 import { Box } from '@material-ui/core';
+import styles from './ticket.module.css'
 
 export function TicketStatus({ status, options }) {
     let info = options[status]
@@ -7,12 +8,9 @@ export function TicketStatus({ status, options }) {
         return ""
     }
 
-    return <Box style={{
+    return <Box className={styles.ticketStatus} style={{
         border: "solid 2px " + info.color,
         color: info.color,
-        borderRadius: 7,
-        padding: "4px 0",
-        textAlign: "center"
     }}>
         {info.label}
     </Box>
