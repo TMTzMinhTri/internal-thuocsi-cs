@@ -3,73 +3,55 @@ import { constURL } from './constant';
 
 const URI = `/marketplace/ticket/v1`;
 class TicketClient extends APIClient {
-  constructor(ctx, data) {
-    super(ctx, data);
-  }
+    constructor(ctx, data) {
+        super(ctx, data);
+    }
 
-  createTicket(formData) {
-    return this.callFromClient('POST', `${URI}/tasks`, formData);
-  }
+    createTicket(formData) {
+        return this.call('POST', `${URI}/ticket`, formData);
+    }
 
-  updateTicket(formData) {
-    return this.callFromClient('PUT', `${URI}/task`, formData);
-  }
+    updateTicket(formData) {
+        return this.call('PUT', `${URI}/ticket`, formData);
+    }
 
-  getTicketBySaleOrderCode({ saleOrderCode }) {
-    return this.callFromClient('GET', `${URI}/tasks`, { saleOrderCode });
-  }
+    getMyTicket(query, offset, limit) {
+        return this.call('GET', `${URI}/ticket/me`, {
+            q: JSON.stringify(query),
+            offset,
+            limit,
+            getTotal: true,
+        });
+    }
 
-  getTicketBySaleOrderCodeServer({ saleOrderCode }) {
-    return this.callFromNextJS('GET', `${URI}/tasks`, { saleOrderCode });
-  }
+    getAllTicket(query, offset, limit) {
+        return this.call('GET', `${URI}/ticket/all`, {
+            q: JSON.stringify(query),
+            offset,
+            limit,
+            getTotal: true,
+        });
+    }
 
-  getTicketByFilter({offset,limit,formData}) {
-    return this.callFromClient('POST', `${URI}/tasks/list?offset=${offset}&limit=${limit}`, formData);
-  }
+    getStatusList() {
+        return this.call('GET', `${URI}/status/list`);
+    }
 
-  getTicketByFilterServer(formData) {
-    return this.callFromNextJS('POST', `${URI}/tasks/list`, formData);
-  }
+    getReasonList() {
+        return this.call('GET', `${URI}/reasons/list`);
+    }
 
-  getTicketByAssignUser() {
-    return this.callFromNextJS('GET', `${URI}/me/tasks/list`);
-  }
+    getTicketDetail(ticketCode) {
+        return this.call('GET', `${URI}/ticket`,
+            { code: ticketCode }
+        );
+    }
 
-  getList(offset, limit, q) {
-    return this.callFromNextJS('GET', `${URI}/tasks/list`, {
-      q,
-      offset,
-      limit,
-      getTotal: true,
-    });
-  }
-
-  getListByClient(offset, limit, q) {
-    return this.callFromClient('GET', `${URI}/tasks/list`, {
-      q,
-      offset,
-      limit,
-      getTotal: true,
-    });
-  }
-
-  getListReason() {
-    return this.callFromNextJS('GET', `${URI}/tasks/reasons/list`);
-  }
-
-  getTicketDetail({ code }) {
-    return this.callFromNextJS('GET', `${URI}/task`, { code });
-  }
-
-  clientGetTicketDetail({ code }) {
-    return this.callFromClient('GET', `${URI}/task`, { code });
-  }
-
-  uploadImage(data) {
-    return this.callFromClient('POST', `${constURL.PREFIX_PRODUCT}/upload`, data);
-  }
+    uploadImage(data) {
+        return this.call('POST', `${constURL.PREFIX_PRODUCT}/upload`, data);
+    }
 }
 
 export default function getTicketClient(ctx, data) {
-  return new TicketClient(ctx, data);
+    return new TicketClient(ctx, data);
 }
