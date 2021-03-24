@@ -34,7 +34,7 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
     const router = useRouter();
     const { ticketCode } = router.query;
     const [ticketSelected, setTicketSelected] = useState(ticketCode);
-    const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
+    const limit = parseInt(router.query.limit, 20) || LIMIT_DEFAULT;
     const page = parseInt(router.query.page, 10) || PAGE_DEFAULT;
 
     useEffect(() => {
@@ -46,10 +46,17 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
 
     const changeUrl = ({ ticketCode, clear = false }) => {
         const query = {
-            ...router.query,
-            page: page,
-            limit: limit
+            ...router.query
         };
+
+        // add page query only for listing page
+        if (router.query.limit) {
+            query.limit = limit
+        }
+        if (router.query.page) {
+            query.page = page
+        }
+
         if (clear) {
             query.ticketCode && (delete query['ticketCode'])
         } else {

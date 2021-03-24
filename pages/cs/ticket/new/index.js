@@ -8,6 +8,7 @@ import {
     Typography,
     Grid,
     TextareaAutosize,
+    Box
 } from '@material-ui/core';
 
 import Head from 'next/head';
@@ -22,7 +23,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { useForm } from 'react-hook-form';
 
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
-import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
+import { MyCard, MyCardActions, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
@@ -45,38 +46,38 @@ const breadcrumb = [
 ];
 
 export async function loadRequestData(ctx) {
-    const { orderNo = '' } = ctx?.query;
 
-    const accountClient = getAccountClient(ctx, {});
-    const ticketClient = getTicketClient(ctx, {});
-    const orderClient = getOrderClient(ctx, {});
-    const customerClient = getCustomerClient(ctx, {});
+    let props = {}
+    let data = { props }
 
-    const [listDepartmentResult, listReasonsResult] = await Promise.all([
-        accountClient.getListDepartment(0, 20, ''),
-        ticketClient.getListReason(),
-    ]);
+    const { so = '' } = ctx?.query;
 
-    const listDepartment =
-        listDepartmentResult?.data?.map((department) => ({
-            ...department,
-            value: department.code,
-            label: department.name,
-        })) || [];
+    const accountClient = getAccountClient(ctx, data);
+    const ticketClient = getTicketClient(ctx, data);
+    const orderClient = getOrderClient(ctx, data);
+    const customerClient = getCustomerClient(ctx, data);
 
-    const listReasons = listReasonsResult?.data?.map((item) => ({
-        value: item.code,
-        label: item.name,
-    }));
-
-    let orderData = null;
-    let tickets = [];
-
-    if (orderNo && orderNo.length > 0) {
-        const [orderResult, ticketResult] = await Promise.all([
-            orderClient.getByOrderNo(orderNo),
-            ticketClient.getTicketBySaleOrderCodeServer({ saleOrderCode: orderNo }),
+    // fetch data from APIs
+    if (so && so.length > 0) {
+        const [listDepartmentResult, listReasonsResult, orderResult, ticketResult] = await Promise.all([
+            accountClient.getListDepartment(0, 100, ''),
+            ticketClient.getReasonList(),
+            orderClient.getByOrderNo(so),
+            ticketClient.getAllTicket({ saleOrderCode: so }),
         ]);
+
+        const listDepartment =
+            listDepartmentResult?.data?.map((department) => ({
+                ...department,
+                value: department.code,
+                label: department.name,
+            })) || [];
+
+        const listReasons = listReasonsResult?.data || []
+
+        let orderData = null;
+        let tickets = [];
+
 
         orderData = getFirst(orderResult);
 
@@ -87,16 +88,17 @@ export async function loadRequestData(ctx) {
             }
         }
         tickets = getData(ticketResult);
+
+        // data mapping
+        props.tickets = tickets
+        props.listReasons = listReasons
+        props.listDepartment = listDepartment
+        props.orderData = orderData
+        props.so = so
     }
-    return {
-        props: {
-            listDepartment,
-            listReasons,
-            orderData,
-            tickets,
-            orderNo,
-        },
-    };
+
+
+    return data
 }
 
 export async function getServerSideProps(ctx) {
@@ -108,7 +110,7 @@ const PageNewCS = ({
     listDepartment,
     orderData = null,
     tickets = [],
-    orderNo = '',
+    so = '',
 }) => {
     const router = useRouter();
     const [listAssignUser, setListAssignUser] = useState([
@@ -126,11 +128,11 @@ const PageNewCS = ({
     });
 
     const onSearchOrder = useCallback(async (code) => {
-        router.push(`?orderNo=${code}`);
+        router.push(`?so=${code}`);
     }, []);
 
     const handleRefreshData = () => {
-        onSearchOrder(orderNo);
+        onSearchOrder(so);
     };
     const ticketClient = getTicketClient();
     async function uploadImage(img) {
@@ -198,6 +200,9 @@ const PageNewCS = ({
                 error(ticketResp.message ?? actionErrorText);
             } else {
                 success('Tạo yêu cầu thành công');
+                setTimeout(() => {
+                    router.reload()
+                }, 1500)
             }
         } catch (err) {
             error(err ?? unknownErrorText);
@@ -238,55 +243,63 @@ const PageNewCS = ({
             </Head>
             <div className={styles.grid}>
                 <MyCard>
-                    <MyCardHeader title="Thêm phiếu hỗ trợ mới" />
-                    <form>
-                        <MyCardContent>
-                            <FormControl size="small">
-                                <Grid
-                                    container
-                                    spacing={3}
-                                    direction="row"
-                                    justify="space-between"
-                                    alignItems="center"
-                                >
-                                    <Grid item xs={12} sm={12} md={7}>
-                                        <TextField
-                                            variant="outlined"
-                                            name="orderNo"
-                                            error={!!errors.orderNo}
-                                            helperText={errors.orderNo?.message}
-                                            inputRef={register({
-                                                required: 'Vui lòng nhập thông tin',
-                                            })}
-                                            size="small"
-                                            type="text"
-                                            placeholder="Nhập Mã SO"
-                                            defaultValue={orderNo}
-                                            onKeyDown={(e) => e.key === 'Enter' && onSearchOrder(getValues('orderNo'))}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={12} md={5}>
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => onSearchOrder(getValues('orderNo'))}
-                                        >
-                                            Tìm kiếm
-                    </Button>
-                                    </Grid>
+                    <MyCardHeader title="Tìm đơn theo SO" small={true} />
+                    <MyCardContent>
+                        <FormControl size="small">
+                            <Grid
+                                container
+                                spacing={3}
+                                direction="row"
+                                justify="space-between"
+                                alignItems="center"
+                            >
+                                <Grid item xs={12} sm={12} md={7}>
+                                    <TextField
+                                        variant="outlined"
+                                        name="orderNo"
+                                        error={!!errors.orderNo}
+                                        helperText={errors.orderNo?.message}
+                                        inputRef={register({
+                                            required: 'Vui lòng nhập thông tin',
+                                        })}
+                                        size="small"
+                                        type="text"
+                                        placeholder="Nhập Mã SO"
+                                        defaultValue={so}
+                                        onKeyDown={(e) => e.key === 'Enter' && onSearchOrder(getValues('orderNo'))}
+                                    />
                                 </Grid>
-                            </FormControl>
-                        </MyCardContent>
-                        {orderData && (
-                            <>
-                                {/* table cs  */}
-                                <TicketTable
-                                    data={tickets}
-                                    reasonList={listReasons}
-                                    refreshData={handleRefreshData}
-                                    isNew
-                                />
-                                <Paper className={`${styles.search}`}>
+                                <Grid item xs={12} sm={12} md={5}>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => onSearchOrder(getValues('orderNo'))}
+                                    >
+                                        Tìm kiếm
+                                </Button>
+                                </Grid>
+                            </Grid>
+                        </FormControl>
+                    </MyCardContent>
+                </MyCard>
+
+                {orderData && (
+                    <Box>
+                        <MyCard>
+                            <MyCardHeader title={`Các phiếu hỗ trợ đang có của đơn ${so}`} small={true} />
+                            <TicketTable
+                                data={tickets}
+                                reasonList={listReasons}
+                                refreshData={handleRefreshData}
+                                isNew
+                            />
+                        </MyCard>
+
+                        <MyCard>
+                            <MyCardHeader title="Thêm phiếu hỗ trợ mới" small={true} />
+                            <form>
+                                <MyCardContent>
+
                                     <FormControl size="small">
                                         <Grid
                                             container
@@ -393,10 +406,10 @@ const PageNewCS = ({
                                             alignItems="center"
                                             style={{ marginTop: '10px' }}
                                         >
-                                            <Grid item xs={12} sm={6} md={3}>
+                                            <Grid item xs={12} sm={6} md={6}>
                                                 <Typography gutterBottom>
                                                     <LabelFormCs>
-                                                        Chọn lý do: <span style={{ color: 'red' }}>(*)</span>
+                                                        Chọn nguyên nhân: <span style={{ color: 'red' }}>(*)</span>
                                                     </LabelFormCs>
                                                 </Typography>
                                                 <MuiMultipleAuto
@@ -408,6 +421,7 @@ const PageNewCS = ({
                                                     control={control}
                                                 />
                                             </Grid>
+
                                             <Grid item xs={12} sm={6} md={3}>
                                                 <Typography gutterBottom>
                                                     <LabelFormCs>
@@ -450,14 +464,15 @@ const PageNewCS = ({
                                                     disabled={!currentDepartment}
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} sm={6} md={3}>
+
+                                            <Grid item xs={12} sm={6} md={6}>
                                                 <Typography gutterBottom>
                                                     <FormLabel
                                                         component="legend"
                                                         style={{ fontWeight: 'bold', color: 'black' }}
                                                     >
-                                                        Mã giao hàng tiết kiệm: (Mã return)
-                          </FormLabel>
+                                                        Mã trả hàng:
+                                                </FormLabel>
                                                 </Typography>
                                                 <TextField
                                                     name="returnCode"
@@ -483,19 +498,7 @@ const PageNewCS = ({
                                                     placeholder="0"
                                                 />
                                             </Grid>
-                                            <Grid item xs={12} sm={6} md={6}>
-                                                <Typography gutterBottom>
-                                                    <LabelFormCs>Ghi chú (hàng trả về):</LabelFormCs>
-                                                </Typography>
-                                                <TextField
-                                                    name="note"
-                                                    variant="outlined"
-                                                    size="small"
-                                                    type="text"
-                                                    fullWidth
-                                                    placeholder="Ghi chú..."
-                                                />
-                                            </Grid>
+
                                             <Grid item xs={12} sm={6} md={6}>
                                                 <Typography gutterBottom>
                                                     <LabelFormCs>Facebook khách hàng:</LabelFormCs>
@@ -526,10 +529,10 @@ const PageNewCS = ({
                                             </Grid>
                                             <Grid item xs={12} sm={12} md={6}>
                                                 <Typography gutterBottom>
-                                                    <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
+                                                    <LabelFormCs>Phản hồi của khách hàng</LabelFormCs>
                                                 </Typography>
                                                 <TextareaAutosize
-                                                    style={{ width: '100%' }}
+                                                    style={{ width: '100%', resize: 'none', padding: 5 }}
                                                     name="feedBackContent"
                                                     ref={register}
                                                     variant="outlined"
@@ -541,10 +544,10 @@ const PageNewCS = ({
                                             </Grid>
                                             <Grid item xs={12} sm={12} md={6}>
                                                 <Typography gutterBottom>
-                                                    <LabelFormCs>Mô tả (CS)</LabelFormCs>
+                                                    <LabelFormCs>Mô tả của nhân viên thuocsi</LabelFormCs>
                                                 </Typography>
                                                 <TextareaAutosize
-                                                    style={{ width: '100%' }}
+                                                    style={{ width: '100%', resize: 'none', padding: 5 }}
                                                     name="note"
                                                     ref={register}
                                                     variant="outlined"
@@ -564,33 +567,29 @@ const PageNewCS = ({
                                                     />
                                                 </LabelBox>
                                             </Grid>
-                                            <Grid item container xs={12} justify="flex-end" spacing={1}>
-                                                <Grid item>
-                                                    <Link href="/cs">
-                                                        <Button variant="contained" color="default">
-                                                            Quay lại
-                            </Button>
-                                                    </Link>
-                                                </Grid>
-                                                <Grid item>
-                                                    <Link href="#id">
-                                                        <Button
-                                                            variant="contained"
-                                                            color="primary"
-                                                            onClick={handleSubmit(onSubmit)}
-                                                        >
-                                                            Lưu
-                            </Button>
-                                                    </Link>
-                                                </Grid>
-                                            </Grid>
+
                                         </Grid>
                                     </FormControl>
-                                </Paper>
-                            </>
-                        )}
-                    </form>
-                </MyCard>
+                                </MyCardContent>
+                                <MyCardActions>
+                                    <Grid item container xs={12} justify="flex-end" spacing={1}>
+                                        <Grid item>
+                                            <Link href="#id">
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    onClick={handleSubmit(onSubmit)}
+                                                >
+                                                    Tạo phiếu
+                                                </Button>
+                                            </Link>
+                                        </Grid>
+                                    </Grid>
+                                </MyCardActions>
+                            </form>
+                        </MyCard>
+                    </Box>
+                )}
             </div>
         </AppCS>
     );
