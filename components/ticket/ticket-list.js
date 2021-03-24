@@ -89,9 +89,10 @@ const TicketList = ({
 
         const ticketClient = getTicketClient();
         const requestGetAllData = [];
-        for (let page = 0; page < totalPageSize; ++i) {
+        for (let page = 0; page < totalPageSize; ++page) {
             requestGetAllData.push(
-                (isMyTicket ? ticketClient.getMyTicket : ticketClient.getAllTicket)({ q: getValues(), offset: page * limit, limit, }));
+                (isMyTicket ? ticketClient.getMyTicket(({ q: getValues(), offset: page * limit, limit, }))
+                    : ticketClient.getAllTicket(({ q: getValues(), offset: page * limit, limit, }))));
         }
 
         const arrayResult = await Promise.all(requestGetAllData);
@@ -102,6 +103,9 @@ const TicketList = ({
             data = data.concat(getData(res));
         });
         setLoading(false);
+        data.forEach((row) => {
+            row.reasons && (row.reasons = row.reasons.join(","))
+        })
         return data;
     }, []);
 
