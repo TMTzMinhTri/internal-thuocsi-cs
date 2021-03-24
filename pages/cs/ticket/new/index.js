@@ -27,11 +27,12 @@ import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import LabelBox from '@thuocsi/nextjs-components/editor/label-box';
-import { LabelFormCs, TicketTable } from 'components';
+import { LabelFormCs } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
 import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
 import styles from './request.module.css';
+import TicketTable from 'components/ticket/ticket-table';
 
 const breadcrumb = [
     {
@@ -281,7 +282,7 @@ const PageNewCS = ({
                                 {/* table cs  */}
                                 <TicketTable
                                     data={tickets}
-                                    listReasons={listReasons}
+                                    reasonList={listReasons}
                                     refreshData={handleRefreshData}
                                     isNew
                                 />
