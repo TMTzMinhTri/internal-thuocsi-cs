@@ -144,7 +144,7 @@ const ChangeStatusModal = ({ open, toggle }) => {
                     </Grid>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="contained" color="secondary" style={{ textTransform: 'none' }} onClick={toggle}>
+                    <Button variant="contained" color="secondary" style={{ textTransform: 'none' }} onClick={handleOnClose}>
                         Đóng
                     </Button>
                 </DialogActions>
