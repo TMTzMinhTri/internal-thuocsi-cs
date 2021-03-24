@@ -19,7 +19,7 @@ export async function loadRequestData(ctx) {
 
     // call APIs
     const [ticketResult, listReasonRes] = await Promise.all([ticketClient.getAllTicket(filter, offset, limit), ticketClient.getReasonList()]);
-
+    console.log(ticketResult);
     // set value to props
     props.total = ticketResult?.total || 0;
     props.tickets = ticketResult?.data || [];
