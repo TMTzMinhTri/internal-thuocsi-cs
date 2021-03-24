@@ -58,27 +58,24 @@ const TicketList = ({
             status,
             reasons,
             assignUser,
-            createdTime,
-            lastUpdatedTime,
+            fromTime,
+            toTime,
         }) => {
             const filterData = cleanObj({
-                action: 'filter',
                 saleOrderCode: saleOrderCode.length === 0 ? null : saleOrderCode,
                 saleOrderID: saleOrderID && saleOrderID > 0 ? parseInt(saleOrderID, 10) : null,
                 status: status?.value || null,
                 reasons: reasons?.length > 0 ? reasons.map((reason) => reason.value) : null,
                 assignUser: assignUser?.value || null,
-                createdTime: createdTime ? new Date(formatUTCTime(createdTime)).toISOString() : null,
-                lastUpdatedTime: lastUpdatedTime
-                    ? new Date(formatUTCTime(lastUpdatedTime)).toISOString()
-                    : null,
+                fromTime: fromTime,
+                toTime: toTime
             });
             router.push(
                 {
                     pathname: '',
-                    query: filterData,
+                    query: { q: JSON.stringify(filterData) },
                 },
-                `?${convertObjectToParameter(filterData)}`,
+                `?q=${JSON.stringify(filterData)}`,
                 { shallow: false },
             );
             return false;

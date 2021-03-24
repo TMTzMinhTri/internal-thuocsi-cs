@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
-import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
+import { MyCard, MyCardActions, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import { getAccountClient, getTicketClient, getOrderClient } from 'client';
 import clsx from 'clsx';
@@ -102,19 +102,11 @@ export async function loadTicketDetail(ticketCode) {
 export default function TicketDetail(props) {
     const classes = useStyles();
     return <Drawer
-        // ModalProps={{
-        //     BackdropProps: {
-        //         classes: {
-        //             root: classes.BackdropProps,
-        //         },
-        //     },
-        // }}
         PaperProps={{
             classes: {
                 elevation16: classes.muiDrawerRoot,
             },
         }}
-        anchor="center"
         open={!!props.ticketCode}
         onClose={() => props.onClose()}
     >
@@ -231,8 +223,8 @@ function TicketDetailContent({
             role="presentation"
         >
             <div className={styles.grid}>
-                {!!ticketDetail ? <MyCard style={{ marginBottom: 0 }}>
-                    <MyCardHeader title="Thông tin yêu cầu">
+                {!!ticketDetail ? <MyCard style={{ marginBottom: 0, borderRadius: 0 }}>
+                    <MyCardHeader title={`Thông tin phiếu hỗ trợ ${ticketDetail?.code}`}>
                         <Grid item container xs={12} justify="flex-end" spacing={1}>
                             <Grid item>
                                 <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
@@ -261,9 +253,9 @@ function TicketDetailContent({
                                             </FormLabel>
                                             <FormLabel
                                                 component="legend"
-                                                style={{ color: 'black', marginBottom: '15px', fontSize: '40px' }}
+                                                style={{ color: 'black', marginBottom: '15px', fontSize: '32px' }}
                                             >
-                                                {ticketDetail?.code} - {ticketDetail?.saleOrderCode}
+                                                SO: <b>{ticketDetail?.saleOrderCode}</b>
                                             </FormLabel>
                                             <FormLabel
                                                 component="legend"
@@ -274,12 +266,6 @@ function TicketDetailContent({
                                                     {formatNumber(ticketDetail?.totalPrice)} đ
                             </span>
                                             </FormLabel>
-                                            {/* <FormLabel
-                            component="legend"
-                            style={{ color: 'black', marginBottom: '15px' }}
-                          >
-                            Số lượng sản phẩm: __
-                          </FormLabel> */}
                                             <FormLabel
                                                 component="legend"
                                                 style={{ color: 'black', marginBottom: '15px' }}
@@ -301,19 +287,19 @@ function TicketDetailContent({
                                                 component="legend"
                                                 style={{ color: 'black', marginBottom: '15px' }}
                                             >
-                                                User ID: {ticketDetail?.customerID}
+                                                ID khách hàng: {ticketDetail?.customerID}
                                             </FormLabel>
                                             <FormLabel
                                                 component="legend"
                                                 style={{ color: 'black', marginBottom: '15px' }}
                                             >
-                                                Tên doanh nghiệp:
-                          </FormLabel>
+                                                Mã khách hàng: {ticketDetail?.customerCode}
+                                            </FormLabel>
                                             <FormLabel
                                                 component="legend"
                                                 style={{ color: 'black', marginBottom: '15px' }}
                                             >
-                                                Họ tên khách hàng: {ticketDetail?.customerName}
+                                                Tên khách hàng: {ticketDetail?.customerName}
                                             </FormLabel>
                                             <FormLabel
                                                 component="legend"
@@ -464,7 +450,7 @@ function TicketDetailContent({
                                             size="small"
                                             type="text"
                                             fullWidth
-                                            placeholder="XP50AP"
+                                            placeholder=""
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={6}>
@@ -511,10 +497,10 @@ function TicketDetailContent({
                                     </Grid>
                                     <Grid item xs={6} sm={6} md={6}>
                                         <Typography gutterBottom>
-                                            <LabelFormCs>Phản hồi khách hàng</LabelFormCs>
+                                            <LabelFormCs>Phản hồi của khách hàng</LabelFormCs>
                                         </Typography>
                                         <TextareaAutosize
-                                            style={{ width: '100%' }}
+                                            style={{ width: '100%', resize: 'none', padding: 5 }}
                                             name="feedBackContent"
                                             ref={register}
                                             variant="outlined"
@@ -526,10 +512,10 @@ function TicketDetailContent({
                                     </Grid>
                                     <Grid item xs={6} sm={6} md={6}>
                                         <Typography gutterBottom>
-                                            <LabelFormCs>Mô tả (CS)</LabelFormCs>
+                                            <LabelFormCs>Mô tả của nhân viên thuocsi</LabelFormCs>
                                         </Typography>
                                         <TextareaAutosize
-                                            style={{ width: '100%' }}
+                                            style={{ width: '100%', resize: 'none', padding: 5 }}
                                             name="note"
                                             ref={register}
                                             variant="outlined"
@@ -581,25 +567,23 @@ function TicketDetailContent({
                                     >
                                         <Image src={imageSelected} width="1000" height="600" />
                                     </Dialog>
-                                    <Grid item container xs={12} justify="flex-end" spacing={1}>
-                                        <Grid item>
-                                            <Button variant="contained" color="default" onClick={() => onClose()}>
-                                                Quay lại
-                          </Button>
-                                        </Grid>
-                                        <Grid item>
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                onClick={handleSubmit(onSubmit)}
-                                            >
-                                                Lưu
-                          </Button>
-                                        </Grid>
-                                    </Grid>
+
                                 </Grid>
                             </FormControl>
                         </MyCardContent>
+                        <MyCardActions>
+                            <Grid item container xs={12} justify="flex-end" spacing={1}>
+                                <Grid item>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={handleSubmit(onSubmit)}
+                                    >
+                                        Lưu
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </MyCardActions>
                     </form>
                 </MyCard> : <div style={{ textAlign: "center", padding: 60, fontSize: 24, color: "#555", background: "#fff", height: '90vh' }}>Đang tải dữ liệu</div>}
             </div>
