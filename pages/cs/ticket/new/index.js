@@ -26,7 +26,7 @@ import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
-import LabelBox from '@thuocsi/nextjs-components/editor/label-box/index';
+import LabelBox from '@thuocsi/nextjs-components/editor/label-box';
 import { LabelFormCs, TicketTable } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
