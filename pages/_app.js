@@ -24,24 +24,24 @@ const menu = [
     {
         key: 'CS_TICKET',
         name: 'Phiếu hỗ trợ',
-        required: '/cs',
+        required: '/cs/my-ticket',
         subMenu: [
             {
                 key: 'ALL_TICKET',
                 name: 'Tất cả phiếu hỗ trợ',
-                link: '/cs',
+                link: '/cs/ticket/all',
                 icon: faList,
             },
             {
                 key: 'MY_TICKET',
                 name: 'Phiếu hỗ trợ của tôi',
-                link: '/cs/my-ticket',
+                link: '/cs/ticket/my-ticket',
                 icon: faList,
             },
             {
                 key: 'NEW_TICKET',
                 name: 'Tạo phiếu mới',
-                link: '/cs/new',
+                link: '/cs/ticket/new',
                 icon: faPlus,
             },
         ]

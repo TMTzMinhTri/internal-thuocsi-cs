@@ -42,18 +42,18 @@ export const listStatus = [
         color: '#2b6',
     },
     {
-        value: 'CANCELED',
+        value: 'CANCELLED',
         label: 'Đã huỷ',
         color: '#bbb',
     },
 
 
     // old status
-    {
-        value: 'COMPLETED',
-        label: 'Đã xử lý',
-        color: '#2b6',
-    },
+    // {
+    //     value: 'COMPLETED',
+    //     label: 'Đã xử lý',
+    //     color: '#2b6',
+    // },
 
 ];
 

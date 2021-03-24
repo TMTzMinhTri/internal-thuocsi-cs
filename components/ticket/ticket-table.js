@@ -19,107 +19,80 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getAccountClient, getOrderClient, getTicketClient } from 'client';
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
-import TicketEdit from 'components/TicketEdit';
 import { getFirst, isValid, convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import moment from 'moment';
 import { TicketStatus } from 'components/ticket/ticket-status';
 import { mapStatus } from 'components/global';
+import { TicketReason } from './ticket-reason';
+import TicketDetail, { loadTicketDetail } from './ticket-detail';
 
-const TicketTable = ({ data, total, listReasons = [], isMyTicket = false }) => {
+const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
+    const reasonMap = {}
+    reasonList.forEach((item) => reasonMap[item.value] = item.label)
+
     const router = useRouter();
-    const { ticketId } = router.query;
-    const [ticketSelected] = useState(ticketId);
-    const [detail, setDetail] = useState(null);
-    const [listDepartment, setListDepartment] = useState([]);
-    const [listUserAssign, setListUserAssign] = useState([]);
-
-    // query + params
+    const { ticketCode } = router.query;
+    const [ticketSelected, setTicketSelected] = useState(ticketCode);
     const limit = parseInt(router.query.limit, 10) || LIMIT_DEFAULT;
     const page = parseInt(router.query.page, 10) || PAGE_DEFAULT;
 
-    const changeUrl = ({ ticketId, orderNo, search, page, limit, reload = false }) => {
+    useEffect(() => {
+        window.addEventListener('popstate', () => {
+            const { ticketCode } = router.query;
+            setTicketSelected(ticketCode)
+        })
+    }, [])
+
+    const changeUrl = ({ ticketCode, clear = false }) => {
         const query = {
-            ...(ticketId && { ticketId }),
-            ...(orderNo && { orderNo }),
-            ...(search && { search }),
-            ...(page && { page }),
-            ...(limit && { limit }),
+            ...router.query,
+            page: page,
+            limit: limit
         };
-        router.push(
-            {
-                pathname: '',
-                query,
-            },
-            `?${convertObjectToParameter(query)}`,
-            { shallow: !reload },
+        if (clear) {
+            query.ticketCode && (delete query['ticketCode'])
+        } else {
+            query.ticketCode = ticketCode
+        }
+        // use window.history to avoid loading screen
+        window.history.pushState(
+            // {
+            //     pathname: '',
+            //     query,
+            // },
+            {}, '', `?${convertObjectToParameter(query)}`,
+            // { shallow: false },
         );
     };
 
     const onClickBtnEdit = useCallback(async (code) => {
         // todo
-        const { orderNo = null } = router.query;
-        changeUrl({ orderNo, ticketId: code });
+        setTicketSelected(code)
+        changeUrl({ ticketCode: code });
     }, []);
 
     const handleCloseBtnEdit = useCallback(async () => {
-        const { orderNo = null } = router.query;
+        changeUrl({ clear: true });
+        setTicketSelected(null);
 
-        changeUrl({ orderNo, reload: true });
-        setDetail(null);
     });
 
+    const [departments, setDepartments] = useState([])
+    const [ticketData, setTicketData] = useState()
     useEffect(() => {
-        const loadData = async (code) => {
-            // init client
-            const ticketClient = getTicketClient();
-            const orderClient = getOrderClient();
-            const accountClient = getAccountClient();
-
-            // validate list department
-            if (listDepartment.length === 0) {
-                const listDepartmentRes = await accountClient.clientGetListDepartment(0, 20, '');
-                if (isValid(listDepartmentRes)) {
-                    setListDepartment(
-                        listDepartmentRes?.data?.map((depart) => ({
-                            ...depart,
-                            value: depart.code,
-                            label: depart.name,
-                        })) || [],
-                    );
-                }
+        (async () => {
+            if (ticketSelected) {
+                let { departments, ticketData } = await loadTicketDetail(ticketSelected)
+                console.log(ticketData)
+                setDepartments(departments)
+                setTicketData(ticketData)
+            } else {
+                setTicketData(null);
             }
 
-            // validate user assign
-            if (listUserAssign.length === 0) {
-                const listUserAssignRes = await accountClient.clientGetListEmployee(0, 10, '');
-                if (isValid(listUserAssignRes)) {
-                    setListUserAssign(
-                        listUserAssignRes?.data?.map((acc) => ({
-                            value: acc.accountId || '',
-                            label: acc.username || '',
-                        })) || [],
-                    );
-                }
-            }
-            // always get data detail
-            const [ticketRes] = await Promise.all([ticketClient.clientGetTicketDetail({ code })]);
-            if (isValid(ticketRes)) {
-                const ticketData = getFirst(ticketRes);
-                const orderRes = await orderClient.getOrderByOrderNo(ticketData.saleOrderCode);
-                if (isValid(orderRes)) {
-                    const orderInfo = getFirst(orderRes);
-                    ticketData.customerName = orderInfo.customerName;
-                    ticketData.customerPhone = orderInfo.customerPhone;
-                    ticketData.totalPrice = orderInfo.totalPrice;
-                    ticketData.orderCreatedTime = orderInfo.createdTime;
-                }
-
-                setDetail(ticketData);
-            }
-        };
-        loadData(ticketSelected);
-    }, [ticketSelected]);
+        })()
+    }, [ticketSelected])
 
     return (
         <>
@@ -166,23 +139,15 @@ const TicketTable = ({ data, total, listReasons = [], isMyTicket = false }) => {
                                         <TableCell align="left">{item.code}</TableCell>
                                         <TableCell align="left">{item.saleOrderCode}</TableCell>
                                         <TableCell align="left">
-                                            {item?.reasons?.map((code) => (
-                                                <Chip
-                                                    key={uuidv4()}
-                                                    style={{ margin: '3px', borderRadius: '4px' }}
-                                                    size="small"
-                                                    label={listReasons.find((reason) => reason.value === code)?.label || ''}
-                                                />
-                                            ))}
+                                            {item.reasons.map((reason) =>
+                                                <TicketReason key={reason} label={reasonMap[reason]} />)}
+
                                         </TableCell>
                                         <TableCell align="left">{item.note}</TableCell>
                                         <TableCell align="left"> {
-                                            (() => {
-                                                let statusInfo = mapStatus[item.status]
-                                                return statusInfo ? <TicketStatus
-                                                    color={statusInfo.color}
-                                                    label={statusInfo.label} /> : ""
-                                            })()
+                                            <TicketStatus
+                                                status={item.status}
+                                                options={mapStatus} />
                                         }
                                         </TableCell>
                                         <TableCell align="left"> {moment(item.createdTime).locale('vi').fromNow()}
@@ -224,16 +189,14 @@ const TicketTable = ({ data, total, listReasons = [], isMyTicket = false }) => {
                     )}
                 </Table>
             </TableContainer>
-            {detail && (
-                <TicketEdit
-                    isOpen
-                    onClose={handleCloseBtnEdit}
-                    listReason={listReasons}
-                    listAssignUser={listUserAssign}
-                    listDepartment={listDepartment}
-                    ticketDetail={detail}
-                />
-            )}
+            {ticketSelected && <TicketDetail
+                key={+new Date()}
+                onClose={handleCloseBtnEdit}
+                reasonList={reasonList}
+                ticketCode={ticketSelected}
+                departments={departments}
+                ticketDetail={ticketData}
+            />}
         </>
     );
 };

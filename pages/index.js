@@ -1,11 +1,11 @@
 import { doWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
-import ProductPage, { loadRequestData } from 'pages/cs';
+import ProductPage, { loadRequestData } from 'pages/cs/ticket/my-ticket/index';
 
 export async function getServerSideProps(ctx) {
-  const res = await doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
-  return res;
+    const res = await doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
+    return res;
 }
 
 export default function CSIndexPage(props) {
-  return ProductPage(props);
+    return ProductPage(props);
 }
