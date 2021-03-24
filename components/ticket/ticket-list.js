@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-import ChangeStatusModal from '../ChangeStatusModal';
+import ChangeStatusModal from '../changes-status-modal';
 import { getTicketClient } from 'client';
 
 import useModal from 'hooks/useModal';

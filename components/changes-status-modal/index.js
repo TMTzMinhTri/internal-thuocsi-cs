@@ -109,7 +109,7 @@ const ChangeStatusModal = ({ open, toggle }) => {
                         <Grid item xs={12}>
                             Chọn file muốn đổi trạng thái hàng loạt
                             <a
-                                href="https://cs-new.stg.thuocsi.vn/sample_change_status_so.xlsx"
+                                href="/sample_change_status_so.xlsx"
                                 style={{
                                     fontWeight: '500',
                                     fontStyle: 'italic',
