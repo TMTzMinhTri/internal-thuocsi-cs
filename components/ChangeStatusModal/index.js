@@ -95,20 +95,16 @@ const ChangeStatusModal = ({ open, toggle }) => {
   const handleOnClose = () => {
     setText('');
     toggle();
-    Router.push(Router.pathname);
+    Router.push(Router.asPath);
   };
   return (
     <>
       <Dialog onClose={handleOnClose} aria-labelledby="simple-dialog-title" open={open}>
-        <DialogTitle
-          id="simple-dialog-title"
-          style={{ backgroundColor: 'rgb(26, 115, 184)', color: 'white!important' }}
-          className={styles.dialog_title}
-        >
+        <DialogTitle id="simple-dialog-title" className={styles.dialog_title}>
           Công cụ đổi trạng thái hàng loạt
           <IconButton
             aria-label="close"
-            onClick={toggle}
+            onClick={handleOnClose}
             style={{ position: 'absolute', right: 0, top: 0 }}
           >
             <CloseIcon />
