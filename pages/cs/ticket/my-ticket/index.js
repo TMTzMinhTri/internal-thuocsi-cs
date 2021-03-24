@@ -23,7 +23,7 @@ export async function loadRequestData(ctx) {
     const ticketClient = getTicketClient(ctx, data);
 
     const [ticketResult, listReasonRes] = await Promise.all([
-        ticketClient.getAllTicket(filter, offset, limit),
+        ticketClient.getMyTicket(filter, offset, limit),
         ticketClient.getReasonList(),
     ]);
 

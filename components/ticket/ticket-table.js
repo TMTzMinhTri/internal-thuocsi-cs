@@ -1,13 +1,12 @@
-import { Chip, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Grid } from '@material-ui/core';
+import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@material-ui/core';
 
 import { Edit as EditIcon } from '@material-ui/icons';
-import { ErrorCode, listStatus } from 'components/global';
+import { ErrorCode, formatDateTime } from 'components/global';
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { getAccountClient, getOrderClient, getTicketClient } from 'client';
 import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagination';
-import { getFirst, isValid, convertObjectToParameter } from 'utils';
+import { convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import moment from 'moment';
 import { TicketStatus } from 'components/ticket/ticket-status';
@@ -139,7 +138,11 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                                     </TableCell>
                                     <TableCell align="left">{item.note}</TableCell>
                                     <TableCell align="left"> {<TicketStatus status={item.status} options={mapStatus} />}</TableCell>
-                                    <TableCell align="left"> {moment(item.createdTime).locale('vi').fromNow()}</TableCell>
+                                    <TableCell align="left">
+                                        <Tooltip title={formatDateTime(item.createdTime)}>
+                                            <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
+                                        </Tooltip>
+                                    </TableCell>
                                     <TableCell align="left">{item.createdBy}</TableCell>
                                     {!isMyTicket && <TableCell align="left">{item.assignName}</TableCell>}
                                     <TableCell align="right">
