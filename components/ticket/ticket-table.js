@@ -127,7 +127,7 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                             <TableCell align="left">Trạng thái</TableCell>
                             <TableCell align="left">Thời gian tạo</TableCell>
                             <TableCell align="left">Người tạo</TableCell>
-                            {!isMyTicket && <TableCell align="left">Người cập nhật</TableCell>}
+                            {!isMyTicket && <TableCell align="left">Người tiếp nhận</TableCell>}
                             <TableCell align="right">Thao tác</TableCell>
                         </TableRow>
                     </TableHead>
