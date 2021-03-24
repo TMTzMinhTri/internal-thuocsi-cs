@@ -1,11 +1,7 @@
 import React from 'react';
-
 import Head from 'next/head';
-
 import AppCS from 'pages/_layout';
-
 import { getTicketClient } from 'client';
-
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import TicketList from 'components/ticket/ticket-list';
