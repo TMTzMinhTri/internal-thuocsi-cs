@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import { formatUTCTime, listStatus } from 'components/global';
 
-import { faPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useForm } from 'react-hook-form';
@@ -13,7 +13,7 @@ import { useForm } from 'react-hook-form';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-
+import ChangeStatusModal from '../changes-status-modal';
 import { getTicketClient } from 'client';
 
 import useModal from 'hooks/useModal';
@@ -24,19 +24,11 @@ import LabelFormCs from '../LabelFormCs';
 import { ExportCSV } from '../ExportCSV';
 import styles from './ticket.module.css';
 
-const TicketList = ({
-    total,
-    tickets,
-    reasonList,
-    filter = {},
-    isMyTicket = false,
-}) => {
+const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = false }) => {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
-    const fileName = `Danh_Sach_Phieu_Ho_Tro_${new Date()
-        .toLocaleString()
-        .replace(/[ :]/g, '_')
-        .replace(/[,]/g, '')}`;
+    const [openChangeStatus, toggleChangeStatus] = useModal();
+    const fileName = `Danh_Sach_Phieu_Ho_Tro_${new Date().toLocaleString().replace(/[ :]/g, '_').replace(/[,]/g, '')}`;
 
     // setup default values
     filter.statusFilter = filter?.status && listStatus.find((item) => item.value === filter.status);
@@ -51,37 +43,26 @@ const TicketList = ({
 
     // TODO:
     // function
-    const onSearch = useCallback(
-        async ({
-            saleOrderCode,
-            saleOrderID = 0,
-            status,
-            reasons,
-            assignUser,
-            fromTime,
-            toTime,
-        }) => {
-            const filterData = cleanObj({
-                saleOrderCode: saleOrderCode.length === 0 ? null : saleOrderCode,
-                saleOrderID: saleOrderID && saleOrderID > 0 ? parseInt(saleOrderID, 10) : null,
-                status: status?.value || null,
-                reasons: reasons?.length > 0 ? reasons.map((reason) => reason.value) : null,
-                assignUser: assignUser?.value || null,
-                fromTime: fromTime,
-                toTime: toTime
-            });
-            router.push(
-                {
-                    pathname: '',
-                    query: { q: JSON.stringify(filterData) },
-                },
-                `?q=${JSON.stringify(filterData)}`,
-                { shallow: false },
-            );
-            return false;
-        },
-        [],
-    );
+    const onSearch = useCallback(async ({ saleOrderCode, saleOrderID = 0, status, reasons, assignUser, fromTime, toTime }) => {
+        const filterData = cleanObj({
+            saleOrderCode: saleOrderCode.length === 0 ? null : saleOrderCode,
+            saleOrderID: saleOrderID && saleOrderID > 0 ? parseInt(saleOrderID, 10) : null,
+            status: status?.value || null,
+            reasons: reasons?.length > 0 ? reasons.map((reason) => reason.value) : null,
+            assignUser: assignUser?.value || null,
+            fromTime: fromTime,
+            toTime: toTime,
+        });
+        router.push(
+            {
+                pathname: '',
+                query: { q: JSON.stringify(filterData) },
+            },
+            `?q=${JSON.stringify(filterData)}`,
+            { shallow: false },
+        );
+        return false;
+    }, []);
     const csvData = useCallback(async () => {
         setLoading(true);
         const limit = 100;
@@ -91,8 +72,10 @@ const TicketList = ({
         const requestGetAllData = [];
         for (let page = 0; page < totalPageSize; ++page) {
             requestGetAllData.push(
-                (isMyTicket ? ticketClient.getMyTicket(({ q: getValues(), offset: page * limit, limit, }))
-                    : ticketClient.getAllTicket(({ q: getValues(), offset: page * limit, limit, }))));
+                isMyTicket
+                    ? ticketClient.getMyTicket({ q: getValues(), offset: page * limit, limit })
+                    : ticketClient.getAllTicket({ q: getValues(), offset: page * limit, limit }),
+            );
         }
 
         const arrayResult = await Promise.all(requestGetAllData);
@@ -104,8 +87,8 @@ const TicketList = ({
         });
         setLoading(false);
         data.forEach((row) => {
-            row.reasons && (row.reasons = row.reasons.join(","))
-        })
+            row.reasons && (row.reasons = row.reasons.join(','));
+        });
         return data;
     }, []);
 
@@ -115,23 +98,18 @@ const TicketList = ({
                 <MyCard>
                     <MyCardHeader title="Danh sách phiếu hỗ trợ">
                         <Link href="/cs/ticket/new">
-                            <Button variant="contained" color="primary" className={styles.cardButton}>
-                                <FontAwesomeIcon icon={faPlus} style={{ marginRight: 8 }} />                Thêm phiếu
+                            <Button variant="contained" color="primary" className={styles.cardButton} style={{ marginRight: 8 }}>
+                                <FontAwesomeIcon icon={faPlus} style={{ marginRight: 8 }} /> Thêm phiếu
                             </Button>
                         </Link>
+                        <Button variant="contained" color="primary" className={styles.cardButton} onClick={toggleChangeStatus}>
+                            <FontAwesomeIcon icon={faCog} style={{ marginRight: 8 }} /> Thay đổi trạng thái hàng loạt
+                        </Button>
                     </MyCardHeader>
                     <form>
                         <MyCardContent>
                             <FormControl size="medium">
-                                <Grid
-                                    container
-                                    spacing={3}
-                                    direction="row"
-                                    justify="space-between"
-                                    alignItems="center"
-                                    className={styles.filter}
-                                >
-
+                                <Grid container spacing={3} direction="row" justify="space-between" alignItems="center" className={styles.filter}>
                                     <>
                                         <Grid item xs={12} sm={6} md={3}>
                                             <Typography gutterBottom>
@@ -163,15 +141,23 @@ const TicketList = ({
                                         </Grid>
                                         <Grid item xs={12} sm={6} md={3}>
                                             <Typography gutterBottom>
+                                                <LabelFormCs>Customer ID:</LabelFormCs>
+                                            </Typography>
+                                            <TextField
+                                                name="customerID"
+                                                inputRef={register}
+                                                variant="outlined"
+                                                size="small"
+                                                type="text"
+                                                fullWidth
+                                                placeholder="Nhập Customer ID"
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Typography gutterBottom>
                                                 <LabelFormCs>Trạng thái:</LabelFormCs>
                                             </Typography>
-                                            <MuiSingleAuto
-                                                options={listStatus}
-                                                placeholder="Chọn"
-                                                name="status"
-                                                errors={errors}
-                                                control={control}
-                                            />
+                                            <MuiSingleAuto options={listStatus} placeholder="Chọn" name="status" errors={errors} control={control} />
                                         </Grid>
                                         <Grid item xs={12} sm={6} md={3}>
                                             <Typography gutterBottom>
@@ -191,13 +177,9 @@ const TicketList = ({
                                             </Grid>
                                             <Grid item>
                                                 <Link href="/cs/new">
-                                                    <Button
-                                                        variant="contained"
-                                                        color="primary"
-                                                        onClick={handleSubmit(onSearch)}
-                                                    >
+                                                    <Button variant="contained" color="primary" onClick={handleSubmit(onSearch)}>
                                                         Tìm kiếm
-                                                        </Button>
+                                                    </Button>
                                                 </Link>
                                             </Grid>
                                         </Grid>
@@ -208,13 +190,8 @@ const TicketList = ({
                     </form>
                 </MyCard>
             </div>
-            <TicketTable
-                reasonList={reasonList}
-                data={tickets}
-                total={total}
-                search={search}
-                isMyTicket={isMyTicket}
-            />
+            <TicketTable reasonList={reasonList} data={tickets} total={total} search={search} isMyTicket={isMyTicket} />
+            <ChangeStatusModal open={openChangeStatus} toggle={toggleChangeStatus} />
         </>
     );
 };
