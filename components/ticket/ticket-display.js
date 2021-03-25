@@ -1,4 +1,5 @@
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Chip, Box, Tooltip } from '@material-ui/core';
 import styles from './ticket.module.css'
 
@@ -8,11 +9,11 @@ export function TicketStatus({ status, options }) {
         return ""
     }
 
-    return <Box className={styles.ticketStatus} style={{
-        border: "solid 2px " + info.color,
-        color: info.color,
-    }}>
-        {info.label}
+    return <Box className={styles.ticketStatus} >
+        <FontAwesomeIcon icon={info.icon} style={{ color: info.iconColor, marginRight: 5, width: 24 }} />
+        <span style={{
+            color: info.color, fontWeight: "bold"
+        }}>{info.label}</span>
     </Box>
 }
 
