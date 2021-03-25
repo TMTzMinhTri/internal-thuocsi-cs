@@ -1,6 +1,4 @@
 import moment from 'moment';
-import { palette } from 'data/colors';
-import { faHourglassHalf, faCheckCircle, faHourglass, faInbox, faPlayCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export const department = [
     {
@@ -20,50 +18,6 @@ export const department = [
         label: 'Kho',
     },
 ];
-
-export const listStatus = [
-    {
-        value: 'PENDING',
-        label: 'Chưa xử lý',
-        color: '#cc5555',
-        iconColor: '#cc5555',
-        icon: faHourglass
-    },
-    {
-        value: 'ASSIGNED',
-        label: 'Đã tiếp nhận',
-        color: '#000',
-        iconColor: '#55cccc',
-        icon: faInbox
-    },
-    {
-        value: 'IN_PROCESS',
-        label: 'Đang xử lý',
-        color: '#000',
-        iconColor: '#55cccc',
-        icon: faHourglassHalf
-    },
-    {
-        value: 'DONE',
-        label: 'Đã xử lý',
-        color: '#5b5',
-        iconColor: '#5b5',
-        icon: faCheckCircle
-    },
-    {
-        value: 'CANCELLED',
-        label: 'Đã huỷ',
-        color: '#bbb',
-        iconColor: '#bbb',
-        icon: faTimes
-    },
-
-];
-
-export const mapStatus = {}
-listStatus.forEach((status) => {
-    mapStatus[status.value] = status
-})
 
 export function formatDateTime(datetime) {
     if (datetime) {

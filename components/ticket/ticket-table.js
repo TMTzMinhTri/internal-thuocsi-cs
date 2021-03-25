@@ -136,7 +136,9 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                                             ))}
                                         </TableCell>
                                         <TableCell align="left">{item.note}</TableCell>
-                                        <TableCell align="left"> {<TicketStatus status={item.status} options={mapStatus} />}</TableCell>
+                                        <TableCell align="left">
+                                            <TicketStatus status={item.status} />
+                                        </TableCell>
                                         <TableCell align="left">
                                             <Tooltip title={formatDateTime(item.createdTime)}>
                                                 <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
