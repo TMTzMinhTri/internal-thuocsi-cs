@@ -125,31 +125,21 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                             </TableRow>
                         </TableBody>
                     ) : (
-                        <TableBody>
-                            {data.map((item) => (
-                                <TableRow key={uuidv4()}>
-                                    <TableCell align="left">{item.code}</TableCell>
-                                    <TableCell align="left">{item.saleOrderCode}</TableCell>
-                                    <TableCell align="left">
-                                        {item.reasons.map((reason) => (
-                                            <TicketReason key={reason} label={reasonMap[reason]} />
-                                        ))}
-                                    </TableCell>
-                                    <TableCell align="left">{item.note}</TableCell>
-                                    <TableCell align="left"> {<TicketStatus status={item.status} options={mapStatus} />}</TableCell>
-                                    <TableCell align="left">
-                                        <Tooltip title={formatDateTime(item.createdTime)}>
-                                            <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
-                                        </Tooltip>
-                                    </TableCell>
-                                    <TableCell align="left">{item.createdBy}</TableCell>
-                                    {!isMyTicket && <TableCell align="left">{item.assignName}</TableCell>}
-                                    <TableCell align="right">
-                                        <a onClick={() => onClickBtnEdit(item.code)}>
-                                            <Tooltip title="Cập nhật thông tin của phiếu hỗ trợ">
-                                                <IconButton>
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
+                            <TableBody>
+                                {data.map((item) => (
+                                    <TableRow key={uuidv4()}>
+                                        <TableCell align="left">{item.code}</TableCell>
+                                        <TableCell align="left">{item.saleOrderCode}</TableCell>
+                                        <TableCell align="left">
+                                            {item.reasons.map((reason) => (
+                                                <TicketReason key={reason} label={reasonMap[reason]} />
+                                            ))}
+                                        </TableCell>
+                                        <TableCell align="left">{item.note}</TableCell>
+                                        <TableCell align="left"> {<TicketStatus status={item.status} options={mapStatus} />}</TableCell>
+                                        <TableCell align="left">
+                                            <Tooltip title={formatDateTime(item.createdTime)}>
+                                                <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
                                             </Tooltip>
                                         </TableCell>
                                         <TableCell align="left">
