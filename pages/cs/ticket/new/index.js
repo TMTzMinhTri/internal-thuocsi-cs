@@ -146,6 +146,7 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                 saleOrderCode: orderData.orderNo,
                 saleOrderID: orderData.orderId,
                 customerID: orderData.customerID,
+                customerCode: orderData.customerCode,
                 departmentCode: formData.departmentCode.code,
                 reasons: formData.reasons.map(({ value }) => value),
                 returnCode: formData.returnCode,
