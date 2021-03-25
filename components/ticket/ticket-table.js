@@ -9,9 +9,8 @@ import MyTablePagination from '@thuocsi/nextjs-components/my-pagination/my-pagin
 import { convertObjectToParameter } from 'utils';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import moment from 'moment';
-import { TicketStatus } from 'components/ticket/ticket-status';
+import { TicketStatus, TicketReason, AccountType } from 'components/ticket/ticket-display';
 import { mapStatus } from 'components/global';
-import { TicketReason } from './ticket-reason';
 import TicketDetail, { loadTicketDetail } from './ticket-detail';
 
 const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
@@ -126,38 +125,40 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                             </TableRow>
                         </TableBody>
                     ) : (
-                        <TableBody>
-                            {data.map((item) => (
-                                <TableRow key={uuidv4()}>
-                                    <TableCell align="left">{item.code}</TableCell>
-                                    <TableCell align="left">{item.saleOrderCode}</TableCell>
-                                    <TableCell align="left">
-                                        {item.reasons.map((reason) => (
-                                            <TicketReason key={reason} label={reasonMap[reason]} />
-                                        ))}
-                                    </TableCell>
-                                    <TableCell align="left">{item.note}</TableCell>
-                                    <TableCell align="left"> {<TicketStatus status={item.status} options={mapStatus} />}</TableCell>
-                                    <TableCell align="left">
-                                        <Tooltip title={formatDateTime(item.createdTime)}>
-                                            <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
-                                        </Tooltip>
-                                    </TableCell>
-                                    <TableCell align="left">{item.createdBy}</TableCell>
-                                    {!isMyTicket && <TableCell align="left">{item.assignName}</TableCell>}
-                                    <TableCell align="right">
-                                        <a onClick={() => onClickBtnEdit(item.code)}>
-                                            <Tooltip title="Cập nhật thông tin của phiếu hỗ trợ">
-                                                <IconButton>
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
+                            <TableBody>
+                                {data.map((item) => (
+                                    <TableRow key={uuidv4()}>
+                                        <TableCell align="left">{item.code}</TableCell>
+                                        <TableCell align="left">{item.saleOrderCode}</TableCell>
+                                        <TableCell align="left">
+                                            {item.reasons.map((reason) => (
+                                                <TicketReason key={reason} label={reasonMap[reason]} />
+                                            ))}
+                                        </TableCell>
+                                        <TableCell align="left">{item.note}</TableCell>
+                                        <TableCell align="left"> {<TicketStatus status={item.status} options={mapStatus} />}</TableCell>
+                                        <TableCell align="left">
+                                            <Tooltip title={formatDateTime(item.createdTime)}>
+                                                <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
                                             </Tooltip>
-                                        </a>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    )}
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            <AccountType type={item.createdByType} /> {item.createdBy}
+                                        </TableCell>
+                                        {!isMyTicket && <TableCell align="left">{item.assignName}</TableCell>}
+                                        <TableCell align="right">
+                                            <a onClick={() => onClickBtnEdit(item.code)}>
+                                                <Tooltip title="Cập nhật thông tin của phiếu hỗ trợ">
+                                                    <IconButton>
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </a>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        )}
 
                     {total > 0 && (
                         <MyTablePagination
