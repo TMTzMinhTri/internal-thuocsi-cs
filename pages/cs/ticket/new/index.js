@@ -1,15 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-    Button,
-    Paper,
-    FormControl,
-    FormLabel,
-    TextField,
-    Typography,
-    Grid,
-    TextareaAutosize,
-    Box
-} from '@material-ui/core';
+import { Button, Paper, FormControl, FormLabel, TextField, Typography, Grid, TextareaAutosize, Box } from '@material-ui/core';
 
 import Head from 'next/head';
 import Link from 'next/link';
@@ -46,9 +36,8 @@ const breadcrumb = [
 ];
 
 export async function loadRequestData(ctx) {
-
-    let props = {}
-    let data = { props }
+    let props = {};
+    let data = { props };
 
     const { so = '' } = ctx?.query;
 
@@ -73,11 +62,10 @@ export async function loadRequestData(ctx) {
                 label: department.name,
             })) || [];
 
-        const listReasons = listReasonsResult?.data || []
+        const listReasons = listReasonsResult?.data || [];
 
         let orderData = null;
         let tickets = [];
-
 
         orderData = getFirst(orderResult);
 
@@ -90,32 +78,23 @@ export async function loadRequestData(ctx) {
         tickets = getData(ticketResult);
 
         // data mapping
-        props.tickets = tickets
-        props.listReasons = listReasons
-        props.listDepartment = listDepartment
-        props.orderData = orderData
-        props.so = so
+        props.tickets = tickets;
+        props.listReasons = listReasons;
+        props.listDepartment = listDepartment;
+        props.orderData = orderData;
+        props.so = so;
     }
 
-
-    return data
+    return data;
 }
 
 export async function getServerSideProps(ctx) {
     return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
 
-const PageNewCS = ({
-    listReasons,
-    listDepartment,
-    orderData = null,
-    tickets = [],
-    so = '',
-}) => {
+const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = [], so = '' }) => {
     const router = useRouter();
-    const [listAssignUser, setListAssignUser] = useState([
-        { value: '', label: 'Không có nguời tiếp nhận', name: '' },
-    ]);
+    const [listAssignUser, setListAssignUser] = useState([{ value: '', label: 'Không có nguời tiếp nhận', name: '' }]);
     const [ticketImages, setTicketImages] = useState([]);
     const [currentDepartment, setCurrentDepartment] = useState('');
     const { error, success } = useToast();
@@ -201,8 +180,8 @@ const PageNewCS = ({
             } else {
                 success('Tạo yêu cầu thành công');
                 setTimeout(() => {
-                    router.reload()
-                }, 1500)
+                    router.reload();
+                }, 1500);
             }
         } catch (err) {
             error(err ?? unknownErrorText);
@@ -246,13 +225,7 @@ const PageNewCS = ({
                     <MyCardHeader title="Tìm đơn theo SO" small={true} />
                     <MyCardContent>
                         <FormControl size="small">
-                            <Grid
-                                container
-                                spacing={3}
-                                direction="row"
-                                justify="space-between"
-                                alignItems="center"
-                            >
+                            <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
                                 <Grid item xs={12} sm={12} md={7}>
                                     <TextField
                                         variant="outlined"
@@ -270,13 +243,9 @@ const PageNewCS = ({
                                     />
                                 </Grid>
                                 <Grid item xs={12} sm={12} md={5}>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={() => onSearchOrder(getValues('orderNo'))}
-                                    >
+                                    <Button variant="contained" color="primary" onClick={() => onSearchOrder(getValues('orderNo'))}>
                                         Tìm kiếm
-                                </Button>
+                                    </Button>
                                 </Grid>
                             </Grid>
                         </FormControl>
@@ -287,19 +256,13 @@ const PageNewCS = ({
                     <Box>
                         <MyCard>
                             <MyCardHeader title={`Các phiếu hỗ trợ đang có của đơn ${so}`} small={true} />
-                            <TicketTable
-                                data={tickets}
-                                reasonList={listReasons}
-                                refreshData={handleRefreshData}
-                                isNew
-                            />
+                            <TicketTable data={tickets} reasonList={listReasons} refreshData={handleRefreshData} isNew />
                         </MyCard>
 
                         <MyCard>
                             <MyCardHeader title="Thêm phiếu hỗ trợ mới" small={true} />
                             <form>
                                 <MyCardContent>
-
                                     <FormControl size="small">
                                         <Grid
                                             container
@@ -311,9 +274,7 @@ const PageNewCS = ({
                                         >
                                             <Grid item xs={12} sm={6} md={3}>
                                                 <Typography gutterBottom>
-                                                    <LabelFormCs>
-                                                        Tên tài khoản: <span style={{ color: 'red' }}>(*)</span>
-                                                    </LabelFormCs>
+                                                    <LabelFormCs>Tên tài khoản:</LabelFormCs>
                                                 </Typography>
                                                 <TextField
                                                     disabled={!orderData}
@@ -325,16 +286,14 @@ const PageNewCS = ({
                                                     error={!!errors.bankAccountName}
                                                     helperText={errors.bankAccountName?.message}
                                                     inputRef={register({
-                                                        required: 'Vui lòng nhập thông tin',
+                                                        // required: 'Vui lòng nhập thông tin',
                                                     })}
                                                     defaultValue={orderData?.bankInfo?.bankAccountName}
                                                 />
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
                                                 <Typography gutterBottom>
-                                                    <LabelFormCs>
-                                                        Số tài khoản: <span style={{ color: 'red' }}>(*)</span>
-                                                    </LabelFormCs>
+                                                    <LabelFormCs>Số tài khoản:</LabelFormCs>
                                                 </Typography>
                                                 <TextField
                                                     disabled={!orderData}
@@ -346,7 +305,6 @@ const PageNewCS = ({
                                                     error={!!errors.bankCode}
                                                     helperText={errors.bankCode?.message}
                                                     inputRef={register({
-                                                        required: 'Vui lòng nhập thông tin',
                                                         pattern: {
                                                             value: /^\d+$/,
                                                             message: 'Số tài khoản phải là số',
@@ -357,9 +315,7 @@ const PageNewCS = ({
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
                                                 <Typography gutterBottom>
-                                                    <LabelFormCs>
-                                                        Ngân hàng: <span style={{ color: 'red' }}>(*)</span>
-                                                    </LabelFormCs>
+                                                    <LabelFormCs>Ngân hàng:</LabelFormCs>
                                                 </Typography>
                                                 <TextField
                                                     disabled={!orderData}
@@ -370,17 +326,13 @@ const PageNewCS = ({
                                                     name="bankName"
                                                     error={!!errors.bankName}
                                                     helperText={errors.bankName?.message}
-                                                    inputRef={register({
-                                                        required: 'Vui lòng nhập thông tin',
-                                                    })}
-                                                    defaultValue={orderData?.bankInfo?.bankCode}
+                                                    inputRef={register({})}
+                                                    defaultValue={orderData?.bankInfo?.bankName}
                                                 />
                                             </Grid>
                                             <Grid item xs={12} sm={6} md={3}>
                                                 <Typography gutterBottom>
-                                                    <LabelFormCs>
-                                                        Chi nhánh: <span style={{ color: 'red' }}>(*)</span>
-                                                    </LabelFormCs>
+                                                    <LabelFormCs>Chi nhánh:</LabelFormCs>
                                                 </Typography>
                                                 <TextField
                                                     disabled={!orderData}
@@ -391,9 +343,7 @@ const PageNewCS = ({
                                                     name="bankBranch"
                                                     error={!!errors.bankBranch}
                                                     helperText={errors.bankBranch?.message}
-                                                    inputRef={register({
-                                                        required: 'Vui lòng nhập thông tin',
-                                                    })}
+                                                    inputRef={register({})}
                                                     defaultValue={orderData?.bankInfo?.bankBranch}
                                                 />
                                             </Grid>
@@ -467,12 +417,9 @@ const PageNewCS = ({
 
                                             <Grid item xs={12} sm={6} md={6}>
                                                 <Typography gutterBottom>
-                                                    <FormLabel
-                                                        component="legend"
-                                                        style={{ fontWeight: 'bold', color: 'black' }}
-                                                    >
+                                                    <FormLabel component="legend" style={{ fontWeight: 'bold', color: 'black' }}>
                                                         Mã trả hàng:
-                                                </FormLabel>
+                                                    </FormLabel>
                                                 </Typography>
                                                 <TextField
                                                     name="returnCode"
@@ -567,7 +514,6 @@ const PageNewCS = ({
                                                     />
                                                 </LabelBox>
                                             </Grid>
-
                                         </Grid>
                                     </FormControl>
                                 </MyCardContent>
@@ -575,11 +521,7 @@ const PageNewCS = ({
                                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                                         <Grid item>
                                             <Link href="#id">
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    onClick={handleSubmit(onSubmit)}
-                                                >
+                                                <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
                                                     Tạo phiếu
                                                 </Button>
                                             </Link>

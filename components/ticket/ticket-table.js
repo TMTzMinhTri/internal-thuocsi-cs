@@ -1,14 +1,4 @@
-import {
-    IconButton,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Tooltip,
-} from '@material-ui/core';
+import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@material-ui/core';
 
 import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, formatDateTime } from 'components/global';
@@ -25,8 +15,8 @@ import { TicketReason } from './ticket-reason';
 import TicketDetail, { loadTicketDetail } from './ticket-detail';
 
 const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
-    const reasonMap = {}
-    reasonList.forEach((item) => reasonMap[item.value] = item.label)
+    const reasonMap = {};
+    reasonList.forEach((item) => (reasonMap[item.value] = item.label));
 
     const router = useRouter();
     const { ticketCode } = router.query;
@@ -37,27 +27,27 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
     useEffect(() => {
         window.addEventListener('popstate', () => {
             const { ticketCode } = router.query;
-            setTicketSelected(ticketCode)
-        })
-    }, [])
+            setTicketSelected(ticketCode);
+        });
+    }, []);
 
     const changeUrl = ({ ticketCode, clear = false }) => {
         const query = {
-            ...router.query
+            ...router.query,
         };
 
         // add page query only for listing page
         if (router.query.limit) {
-            query.limit = limit
+            query.limit = limit;
         }
         if (router.query.page) {
-            query.page = page
+            query.page = page;
         }
 
         if (clear) {
-            query.ticketCode && (delete query['ticketCode'])
+            query.ticketCode && delete query['ticketCode'];
         } else {
-            query.ticketCode = ticketCode
+            query.ticketCode = ticketCode;
         }
         // use window.history to avoid loading screen
         window.history.pushState(
@@ -65,38 +55,37 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
             //     pathname: '',
             //     query,
             // },
-            {}, '', `?${convertObjectToParameter(query)}`,
+            {},
+            '',
+            `?${convertObjectToParameter(query)}`,
             // { shallow: false },
         );
     };
 
     const onClickBtnEdit = useCallback(async (code) => {
         // todo
-        setTicketSelected(code)
+        setTicketSelected(code);
         changeUrl({ ticketCode: code });
     }, []);
 
     const handleCloseBtnEdit = useCallback(async () => {
         changeUrl({ clear: true });
         setTicketSelected(null);
-
     });
 
-    const [departments, setDepartments] = useState([])
-    const [ticketData, setTicketData] = useState()
+    const [departments, setDepartments] = useState([]);
+    const [ticketData, setTicketData] = useState();
     useEffect(() => {
         (async () => {
             if (ticketSelected) {
-                let { departments, ticketData } = await loadTicketDetail(ticketSelected)
-                console.log(ticketData)
-                setDepartments(departments)
-                setTicketData(ticketData)
+                let { departments, ticketData } = await loadTicketDetail(ticketSelected);
+                setDepartments(departments);
+                setTicketData(ticketData);
             } else {
                 setTicketData(null);
             }
-
-        })()
-    }, [ticketSelected])
+        })();
+    }, [ticketSelected]);
 
     return (
         <>
@@ -137,43 +126,38 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                             </TableRow>
                         </TableBody>
                     ) : (
-                            <TableBody>
-                                {data.map((item) => (
-                                    <TableRow key={uuidv4()}>
-                                        <TableCell align="left">{item.code}</TableCell>
-                                        <TableCell align="left">{item.saleOrderCode}</TableCell>
-                                        <TableCell align="left">
-                                            {item.reasons.map((reason) =>
-                                                <TicketReason key={reason} label={reasonMap[reason]} />)}
-
-                                        </TableCell>
-                                        <TableCell align="left">{item.note}</TableCell>
-                                        <TableCell align="left"> {
-                                            <TicketStatus
-                                                status={item.status}
-                                                options={mapStatus} />
-                                        }
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            <Tooltip title={formatDateTime(item.createdTime)}>
-                                                <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
+                        <TableBody>
+                            {data.map((item) => (
+                                <TableRow key={uuidv4()}>
+                                    <TableCell align="left">{item.code}</TableCell>
+                                    <TableCell align="left">{item.saleOrderCode}</TableCell>
+                                    <TableCell align="left">
+                                        {item.reasons.map((reason) => (
+                                            <TicketReason key={reason} label={reasonMap[reason]} />
+                                        ))}
+                                    </TableCell>
+                                    <TableCell align="left">{item.note}</TableCell>
+                                    <TableCell align="left"> {<TicketStatus status={item.status} options={mapStatus} />}</TableCell>
+                                    <TableCell align="left">
+                                        <Tooltip title={formatDateTime(item.createdTime)}>
+                                            <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
+                                        </Tooltip>
+                                    </TableCell>
+                                    <TableCell align="left">{item.createdBy}</TableCell>
+                                    {!isMyTicket && <TableCell align="left">{item.assignName}</TableCell>}
+                                    <TableCell align="right">
+                                        <a onClick={() => onClickBtnEdit(item.code)}>
+                                            <Tooltip title="Cập nhật thông tin của phiếu hỗ trợ">
+                                                <IconButton>
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
                                             </Tooltip>
-                                        </TableCell>
-                                        <TableCell align="left">{item.createdBy}</TableCell>
-                                        {!isMyTicket && <TableCell align="left">{item.assignName}</TableCell>}
-                                        <TableCell align="right">
-                                            <a onClick={() => onClickBtnEdit(item.code)}>
-                                                <Tooltip title="Cập nhật thông tin của phiếu hỗ trợ">
-                                                    <IconButton>
-                                                        <EditIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </a>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        )}
+                                        </a>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    )}
 
                     {total > 0 && (
                         <MyTablePagination
@@ -196,14 +180,16 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                     )}
                 </Table>
             </TableContainer>
-            {ticketSelected && <TicketDetail
-                key={+new Date()}
-                onClose={handleCloseBtnEdit}
-                reasonList={reasonList}
-                ticketCode={ticketSelected}
-                departments={departments}
-                ticketDetail={ticketData}
-            />}
+            {ticketSelected && (
+                <TicketDetail
+                    key={+new Date()}
+                    onClose={handleCloseBtnEdit}
+                    reasonList={reasonList}
+                    ticketCode={ticketSelected}
+                    departments={departments}
+                    ticketDetail={ticketData}
+                />
+            )}
         </>
     );
 };
