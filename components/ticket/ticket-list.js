@@ -3,7 +3,7 @@ import { Button, FormControl, TextField, Typography, Grid } from '@material-ui/c
 
 import Link from 'next/link';
 
-import { formatUTCTime, listStatus } from 'components/global';
+import { formatUTCTime } from 'components/global';
 
 import { faPlus, faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -23,6 +23,7 @@ import TicketTable from './ticket-table';
 import LabelFormCs from '../LabelFormCs';
 import { ExportCSV } from '../ExportCSV';
 import styles from './ticket.module.css';
+import { listStatus } from './ticket-display';
 
 const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = false }) => {
     const [search, setSearch] = useState('');

@@ -16,13 +16,14 @@ import { MyCard, MyCardActions, MyCardContent, MyCardHeader } from '@thuocsi/nex
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import { getAccountClient, getTicketClient, getOrderClient } from 'client';
 import clsx from 'clsx';
-import { formatDateTime, formatNumber, listStatus } from 'components/global';
+import { formatDateTime, formatNumber } from 'components/global';
 import { useCallback, useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { isValid, getFirst } from 'utils';
 import Image from 'next/image';
 import useModal from 'hooks/useModal';
 import LabelFormCs from '../LabelFormCs';
+import { listStatus } from './ticket-display';
 
 
 const useStyles = makeStyles((theme) => ({
