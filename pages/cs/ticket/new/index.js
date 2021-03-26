@@ -173,7 +173,7 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                 bankCode: formData.bankCode,
                 bankBranch: formData.bankBranch,
                 bankAccountName: formData.bankAccountName,
-                accountID: orderData.customerID,
+                customerID: orderData.customerID,
             });
 
             if (ticketResp.status !== 'OK') {
