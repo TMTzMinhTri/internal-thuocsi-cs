@@ -49,6 +49,11 @@ const menu = [
         key: 'CUSTOMER_LOOKUP',
         name: 'Tra cứu khách hàng',
         link: '/crm/customer/detail',
+    },
+    {
+        key: 'ORDER_LOOKUP',
+        name: 'Tra cứu đơn hàng',
+        link: '/crm/order/detail',
     }
 ];
 
