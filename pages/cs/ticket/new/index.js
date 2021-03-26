@@ -271,7 +271,6 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                                             direction="row"
                                             justify="space-between"
                                             alignItems="center"
-                                            F
                                             style={{ marginTop: '10px' }}
                                         >
                                             <Grid item xs={12} sm={6} md={3}>
