@@ -192,11 +192,11 @@ function TicketDetailContent({
 
     }, [ticketDetail])
 
-    const updateListAssignUser = useCallback(async (departmentCode) => {
-        if (departmentCode) {
+    const updateListAssignUser = useCallback(async (department) => {
+        if (department) {
             setListAssignUser([]);
             const accountClient = getAccountClient();
-            const accountResp = await accountClient.getListEmployeeByDepartment(departmentCode);
+            const accountResp = await accountClient.getListEmployeeByDepartment(department);
             if (accountResp.status === 'OK') {
                 // cheat to err data
                 const tmpData = [];
@@ -220,7 +220,7 @@ function TicketDetailContent({
     }, []);
 
     useEffect(() => {
-        if(ticketDetail?.departmentCode) updateListAssignUser(ticketDetail.departmentCode);
+        if(ticketDetail?.departmentCode) updateListAssignUser({ code: ticketDetail.departmentCode });
     },[])
 
     const handleShowImage = (image) => {
@@ -410,7 +410,7 @@ function TicketDetailContent({
                                             name="departmentCode"
                                             onValueChange={(department) => {
                                                 if (department?.code) {
-                                                    updateListAssignUser(department.code);
+                                                    updateListAssignUser(department);
                                                     setCurrentDepartment(department.code);
                                                 } else {
                                                     updateListAssignUser(null);
