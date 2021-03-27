@@ -192,11 +192,11 @@ function TicketDetailContent({
 
     }, [ticketDetail])
 
-    const updateListAssignUser = useCallback(async (department) => {
-        if (department) {
+    const updateListAssignUser = useCallback(async (departmentCode) => {
+        if (departmentCode) {
             setListAssignUser([]);
             const accountClient = getAccountClient();
-            const accountResp = await accountClient.getListEmployeeByDepartment(department.code);
+            const accountResp = await accountClient.getListEmployeeByDepartment(departmentCode);
             if (accountResp.status === 'OK') {
                 // cheat to err data
                 const tmpData = [];
@@ -222,18 +222,7 @@ function TicketDetailContent({
     useEffect(() => {
         async function fetchAssignUser(departmentCode) {
             if(departmentCode) {
-                const accountClient = getAccountClient();
-                const accountResp = await accountClient.getListEmployeeByDepartment(ticketDetail.departmentCode);
-                if(isValid(accountResp)) {
-                    const employeeList = accountResp.data.map(account => {
-                        return {
-                            value: account.accountId,
-                            name: account.username,
-                            label: account.username,
-                        }
-                    })
-                    setListAssignUser(employeeList)
-                }
+                await updateListAssignUser(ticketDetail.departmentCode);
             }
         }
         if(ticketDetail?.departmentCode) fetchAssignUser(ticketDetail.departmentCode);
@@ -426,7 +415,7 @@ function TicketDetailContent({
                                             name="departmentCode"
                                             onValueChange={(department) => {
                                                 if (department?.code) {
-                                                    updateListAssignUser(department);
+                                                    updateListAssignUser(department.code);
                                                     setCurrentDepartment(department.code);
                                                 } else {
                                                     updateListAssignUser(null);
