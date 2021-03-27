@@ -133,6 +133,14 @@ function TicketDetailContent({
     const [open, toggle] = useModal();
 
     const onSubmit = async (data) => {
+        if( !data.departmentCode) {
+            error("Vui lòng chọn bộ phận tiếp nhận");
+            return;
+        }
+        if(!data.assignUser?.value) {
+            error("vui lòng chọn người tiếp nhận");
+            return;
+        }
         const ticketUpdateDetail = {
             code: ticketDetail.code,
             ...data,
@@ -460,12 +468,23 @@ function TicketDetailContent({
                                         </Typography>
                                         <TextField
                                             name="cashback"
-                                            inputRef={register}
+                                            inputRef={register({
+                                                min: {
+                                                    value: 1,
+                                                    message: "số tiển nhỏ nhất là 1"
+                                                },
+                                                max: {
+                                                    value: 100000000,
+                                                    message: "số tiền lớn nhất là 100.000.000"
+                                                }
+                                            })}
                                             variant="outlined"
                                             size="small"
                                             type="number"
                                             fullWidth
                                             placeholder="0"
+                                            error={!!errors?.cashback}
+                                            helperText={errors?.cashback?.message}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={6}>

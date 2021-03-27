@@ -140,6 +140,14 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
 
     // onSubmit
     const onSubmit = async (formData) => {
+        if( !formData.departmentCode.code) {
+            error("Vui lòng chọn bộ phận tiếp nhận");
+            return;
+        }
+        if(!formData.assignUser?.value) {
+            error("vui lòng chọn người tiếp nhận");
+            return;
+        }
         try {
             const customerClient = getCustomerClient();
             const ticketResp = await ticketClient.createTicket({
@@ -173,7 +181,7 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                 bankCode: formData.bankCode,
                 bankBranch: formData.bankBranch,
                 bankAccountName: formData.bankAccountName,
-                accountID: orderData.customerID,
+                customerID: orderData.customerID,
             });
 
             if (ticketResp.status !== 'OK') {
@@ -438,12 +446,23 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                                                 </Typography>
                                                 <TextField
                                                     name="cashback"
-                                                    inputRef={register}
+                                                    inputRef={register({
+                                                        min: {
+                                                            value: 1,
+                                                            message: "số tiển nhỏ nhất là 1"
+                                                        },
+                                                        max: {
+                                                            value: 100000000,
+                                                            message: "số tiền lớn nhất là 100.000.000"
+                                                        }
+                                                    })}
                                                     variant="outlined"
                                                     size="small"
                                                     type="number"
                                                     fullWidth
                                                     placeholder="0"
+                                                    error={!!errors.cashback}
+                                                    helperText={errors.cashback?.message}
                                                 />
                                             </Grid>
 
