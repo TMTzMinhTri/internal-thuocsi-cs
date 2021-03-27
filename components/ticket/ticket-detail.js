@@ -143,7 +143,6 @@ function TicketDetailContent({
         }
         const ticketUpdateDetail = {
             code: ticketDetail.code,
-           
             ...data,
             assignUser: data?.assignUser?.value,
             assignName: data?.assignUser?.name,
@@ -238,7 +237,6 @@ function TicketDetailContent({
             }
         }
         if(ticketDetail?.departmentCode) fetchAssignUser(ticketDetail.departmentCode);
-        
     },[])
 
     const handleShowImage = (image) => {
