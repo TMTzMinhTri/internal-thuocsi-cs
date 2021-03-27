@@ -158,7 +158,7 @@ function TicketDetailContent({
             return;
         }
         success('Cập nhập thành công.');
-    }; 
+    };
 
     const { register, handleSubmit, errors, control, reset, setValue, getValues } = useForm({
         mode: 'onChange',
