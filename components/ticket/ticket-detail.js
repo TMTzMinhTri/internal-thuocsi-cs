@@ -148,7 +148,7 @@ function TicketDetailContent({
             assignName: data?.assignUser?.name,
             departmentCode: data?.departmentCode?.code,
             reasons: data?.reasons?.map((item) => item.value) || [],
-            cashback: parseInt(data?.cashback || 0, 10),
+            cashback: +data?.cashback || null,
             status: data?.status?.value,
         };
 
@@ -218,6 +218,10 @@ function TicketDetailContent({
             setListAssignUser([{ value: '', label: '' }]);
         }
     }, []);
+
+    useEffect(() => {
+        if(ticketDetail?.departmentCode) updateListAssignUser({ code: ticketDetail.departmentCode });
+    },[])
 
     const handleShowImage = (image) => {
         setImageSelected(image);
