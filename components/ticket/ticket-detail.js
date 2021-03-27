@@ -220,12 +220,7 @@ function TicketDetailContent({
     }, []);
 
     useEffect(() => {
-        async function fetchAssignUser(departmentCode) {
-            if(departmentCode) {
-                await updateListAssignUser(ticketDetail.departmentCode);
-            }
-        }
-        if(ticketDetail?.departmentCode) fetchAssignUser(ticketDetail.departmentCode);
+        if(ticketDetail?.departmentCode) updateListAssignUser(ticketDetail.departmentCode);
     },[])
 
     const handleShowImage = (image) => {
