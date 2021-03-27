@@ -158,7 +158,7 @@ function TicketDetailContent({
             return;
         }
         success('Cập nhập thành công.');
-    };  
+    }; 
 
     const { register, handleSubmit, errors, control, reset, setValue, getValues } = useForm({
         mode: 'onChange',
@@ -168,7 +168,6 @@ function TicketDetailContent({
             status: listStatus.find((item) => item.value === ticketDetail?.status),
             departmentCode: departments.find((item) => item.value === ticketDetail?.departmentCode),
             assignUser: listAssignUser.find((item) => item.value === ticketDetail?.assignUser),
-            cashback: null
         }
     });
 
