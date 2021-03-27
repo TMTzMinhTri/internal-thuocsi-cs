@@ -143,12 +143,13 @@ function TicketDetailContent({
         }
         const ticketUpdateDetail = {
             code: ticketDetail.code,
+           
             ...data,
             assignUser: data?.assignUser?.value,
             assignName: data?.assignUser?.name,
             departmentCode: data?.departmentCode?.code,
             reasons: data?.reasons?.map((item) => item.value) || [],
-            cashback: parseInt(data?.cashback || 0, 10),
+            cashback: +data?.cashback || null,
             status: data?.status?.value,
         };
 
@@ -218,6 +219,27 @@ function TicketDetailContent({
             setListAssignUser([{ value: '', label: '' }]);
         }
     }, []);
+
+    useEffect(() => {
+        async function fetchAssignUser(departmentCode) {
+            if(departmentCode) {
+                const accountClient = getAccountClient();
+                const accountResp = await accountClient.getListEmployeeByDepartment(ticketDetail.departmentCode);
+                if(isValid(accountResp)) {
+                    const employeeList = accountResp.data.map(account => {
+                        return {
+                            value: account.accountId,
+                            name: account.username,
+                            label: account.username,
+                        }
+                    })
+                    setListAssignUser(employeeList)
+                }
+            }
+        }
+        if(ticketDetail?.departmentCode) fetchAssignUser(ticketDetail.departmentCode);
+        
+    },[])
 
     const handleShowImage = (image) => {
         setImageSelected(image);
