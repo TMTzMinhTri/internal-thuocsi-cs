@@ -148,7 +148,7 @@ function TicketDetailContent({
             assignName: data?.assignUser?.name,
             departmentCode: data?.departmentCode?.code,
             reasons: data?.reasons?.map((item) => item.value) || [],
-            cashback: +data?.cashback || null,
+            cashback: +data?.cashback || 0,
             status: data?.status?.value,
         };
 
@@ -179,6 +179,7 @@ function TicketDetailContent({
                 departmentCode: departments.find((item) => item.value === ticketDetail?.departmentCode),
                 assignUser: listAssignUser.find((item) => item.value === ticketDetail?.assignUser),
                 status: listStatus.find((item) => item.value === ticketDetail?.status),
+                cashback: ticketDetail?.cashback || null,
             })
             setListAssignUser([{ label: ticketDetail?.assignName, value: ticketDetail?.assignUser }])
         }, 50)
