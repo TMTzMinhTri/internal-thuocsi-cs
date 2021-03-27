@@ -196,7 +196,7 @@ function TicketDetailContent({
         if (department) {
             setListAssignUser([]);
             const accountClient = getAccountClient();
-            const accountResp = await accountClient.getListEmployeeByDepartment(department);
+            const accountResp = await accountClient.getListEmployeeByDepartment(department.code);
             if (accountResp.status === 'OK') {
                 // cheat to err data
                 const tmpData = [];
