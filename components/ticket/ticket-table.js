@@ -12,6 +12,7 @@ import moment from 'moment';
 import { TicketStatus, TicketReason, AccountType } from 'components/ticket/ticket-display';
 import { mapStatus } from 'components/global';
 import TicketDetail, { loadTicketDetail } from './ticket-detail';
+import Link from 'next/link';
 
 const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
     const reasonMap = {};
@@ -101,14 +102,16 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                         <col />
                         <col />
                         <col />
+                        <col />
                         <col width={100} />
                     </colgroup>
                     <TableHead>
                         <TableRow>
                             <TableCell align="left">#Mã Phiếu</TableCell>
-                            <TableCell align="left">SO#</TableCell>
+                            <TableCell align="left">SO</TableCell>
+                            <TableCell align="left">Đơn hàng</TableCell>
                             <TableCell align="left">Lỗi</TableCell>
-                            <TableCell align="left">Ghi chú của KH</TableCell>
+                            <TableCell align="left">Ghi chú</TableCell>
                             <TableCell align="left">Trạng thái</TableCell>
                             <TableCell align="left">Thời gian tạo</TableCell>
                             <TableCell align="left">Người tạo</TableCell>
@@ -131,6 +134,11 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                                         <TableCell align="left">{item.code}</TableCell>
                                         <TableCell align="left">{item.saleOrderCode}</TableCell>
                                         <TableCell align="left">
+                                            <Link href={`/crm/order/detail?orderNo=${item.orderCode}`} prefetch={false}>
+                                                <a target="_blank" style={{ textDecoration: 'none', color: 'green' }}>{item.saleOrderID}-{item.orderCode}</a>
+                                            </Link>
+                                        </TableCell>
+                                        <TableCell align="left">
                                             {item.reasons.map((reason) => (
                                                 <TicketReason key={reason} label={reasonMap[reason]} />
                                             ))}
@@ -147,7 +155,7 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                                         <TableCell align="left">
                                             <AccountType type={item.createdByType} /> {item.createdBy}
                                         </TableCell>
-                                        {!isMyTicket && <TableCell align="left">{item.assignName}</TableCell>}
+                                        {!isMyTicket && <TableCell align="left">{item.assignName || '-'}</TableCell>}
                                         <TableCell align="right">
                                             <a onClick={() => onClickBtnEdit(item.code)}>
                                                 <Tooltip title="Cập nhật thông tin của phiếu hỗ trợ">
