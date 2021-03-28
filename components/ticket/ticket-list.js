@@ -111,80 +111,96 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
                         <MyCardContent>
                             <FormControl size="medium">
                                 <Grid container spacing={3} direction="row" justify="space-between" alignItems="center" className={styles.filter}>
-                                    <>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <LabelFormCs>Mã SO:</LabelFormCs>
-                                            </Typography>
-                                            <TextField
-                                                name="saleOrderCode"
-                                                inputRef={register}
-                                                variant="outlined"
-                                                size="small"
-                                                type="text"
-                                                fullWidth
-                                                placeholder="Nhập Mã SO"
-                                            />
+
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <LabelFormCs>SO:</LabelFormCs>
+                                        </Typography>
+                                        <TextField
+                                            name="saleOrderCode"
+                                            inputRef={register}
+                                            variant="outlined"
+                                            size="small"
+                                            type="text"
+                                            fullWidth
+                                            placeholder="Nhập SO"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <LabelFormCs>ID đơn hàng:</LabelFormCs>
+                                        </Typography>
+                                        <TextField
+                                            name="saleOrderID"
+                                            inputRef={register}
+                                            variant="outlined"
+                                            size="small"
+                                            type="text"
+                                            fullWidth
+                                            placeholder="Nhập ID đơn hàng"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <LabelFormCs>Mã đơn hàng:</LabelFormCs>
+                                        </Typography>
+                                        <TextField
+                                            name="orderCode"
+                                            inputRef={register}
+                                            variant="outlined"
+                                            size="small"
+                                            type="text"
+                                            fullWidth
+                                            placeholder="Nhập mã đơn hàng"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Typography gutterBottom>
+                                            <LabelFormCs>ID khách hàng:</LabelFormCs>
+                                        </Typography>
+                                        <TextField
+                                            name="customerID"
+                                            inputRef={register}
+                                            variant="outlined"
+                                            size="small"
+                                            type="text"
+                                            fullWidth
+                                            placeholder="Nhập ID khách hàng"
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container spacing={3} direction="row" justify="space-between" alignItems="center" className={styles.filter}>
+                                    <Grid item xs={12} sm={12} md={3}>
+                                        <Typography gutterBottom>
+                                            <LabelFormCs>Trạng thái:</LabelFormCs>
+                                        </Typography>
+                                        <MuiSingleAuto options={listStatus} placeholder="Chọn" name="status" errors={errors} control={control} />
+                                    </Grid>
+                                    <Grid item xs={12} sm={12} md={9}>
+                                        <Typography gutterBottom>
+                                            <LabelFormCs>Lý do:</LabelFormCs>
+                                        </Typography>
+                                        <MuiMultipleAuto
+                                            name="reasons"
+                                            options={reasonList}
+                                            placeholder="Chọn"
+                                            errors={errors}
+                                            control={control}
+                                        />
+                                    </Grid>
+                                    <Grid item container xs={12} justify="flex-end" spacing={1}>
+                                        <Grid item>
+                                            <ExportCSV csvData={csvData} fileName={fileName} loading={loading} />
                                         </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <LabelFormCs>Order ID:</LabelFormCs>
-                                            </Typography>
-                                            <TextField
-                                                name="saleOrderID"
-                                                inputRef={register}
-                                                variant="outlined"
-                                                size="small"
-                                                type="text"
-                                                fullWidth
-                                                placeholder="Nhập Order ID"
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <LabelFormCs>Customer ID:</LabelFormCs>
-                                            </Typography>
-                                            <TextField
-                                                name="customerID"
-                                                inputRef={register}
-                                                variant="outlined"
-                                                size="small"
-                                                type="text"
-                                                fullWidth
-                                                placeholder="Nhập Customer ID"
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <LabelFormCs>Trạng thái:</LabelFormCs>
-                                            </Typography>
-                                            <MuiSingleAuto options={listStatus} placeholder="Chọn" name="status" errors={errors} control={control} />
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={3}>
-                                            <Typography gutterBottom>
-                                                <LabelFormCs>Lý do:</LabelFormCs>
-                                            </Typography>
-                                            <MuiMultipleAuto
-                                                name="reasons"
-                                                options={reasonList}
-                                                placeholder="Chọn"
-                                                errors={errors}
-                                                control={control}
-                                            />
-                                        </Grid>
-                                        <Grid item container xs={12} justify="flex-end" spacing={1}>
-                                            <Grid item>
-                                                <ExportCSV csvData={csvData} fileName={fileName} loading={loading} />
-                                            </Grid>
-                                            <Grid item>
-                                                <Link href="/cs/new">
-                                                    <Button variant="contained" color="primary" onClick={handleSubmit(onSearch)}>
-                                                        Tìm kiếm
+                                        <Grid item>
+                                            <Link href="/cs/new">
+                                                <Button variant="contained" color="primary" onClick={handleSubmit(onSearch)}>
+                                                    Tìm kiếm
                                                     </Button>
-                                                </Link>
-                                            </Grid>
+                                            </Link>
                                         </Grid>
-                                    </>
+                                    </Grid>
+
                                 </Grid>
                             </FormControl>
                         </MyCardContent>
