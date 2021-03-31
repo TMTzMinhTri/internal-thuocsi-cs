@@ -75,7 +75,7 @@ export async function loadTicketDetail(ticketCode) {
 
     if (isValid(ticketRes)) {
         const ticketData = getFirst(ticketRes);
-        const orderRes = await orderClient.getOrderByOrderNo(ticketData.saleOrderCode);
+        const orderRes = await orderClient.getOrderByOrderNo(ticketData.orderCode);
         if (isValid(orderRes)) {
             const orderInfo = getFirst(orderRes);
             ticketData.customerName = orderInfo.customerName;
@@ -269,7 +269,7 @@ function TicketDetailContent({
                                                 component="legend"
                                                 style={{ color: 'black', marginBottom: '15px', fontSize: '32px' }}
                                             >
-                                                SO: <b>{ticketDetail?.saleOrderCode}</b>
+                                                SO: <b>{ticketDetail?.orderCode}</b>
                                             </FormLabel>
                                             <FormLabel
                                                 component="legend"
