@@ -276,7 +276,7 @@ function TicketDetailContent({
                                                 component="legend"
                                                 style={{ color: 'black', marginBottom: '15px', fontSize: '32px' }}
                                             >
-                                                Đơn hàng : <b>{ticketDetail?.saleOrderId - ticketDetail?.orderCode}</b>
+                                                Đơn hàng : <b>{ticketDetail?.orderId - ticketDetail?.orderCode}</b>
                                             </FormLabel>
                                             <FormLabel
                                                 component="legend"
