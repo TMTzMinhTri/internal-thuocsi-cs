@@ -44,8 +44,9 @@ const menu = [
                 link: '/cs/ticket/new',
                 icon: faPlus,
             },
-        ]
-    }, {
+        ],
+    },
+    {
         key: 'CUSTOMER_LOOKUP',
         name: 'Tra cứu khách hàng',
         link: '/crm/customer/detail',
@@ -54,28 +55,27 @@ const menu = [
         key: 'ORDER_LOOKUP',
         name: 'Tra cứu đơn hàng',
         link: '/crm/order/detail',
-    }
+    },
 ];
 
 export default function App(props) {
     const router = useRouter();
-    const [showLoader, setShowLoader] = React.useState(true)
-    const [showLoaderText, setShowLoaderText] = React.useState(true)
+    const [showLoader, setShowLoader] = React.useState(true);
+    const [showLoaderText, setShowLoaderText] = React.useState(true);
 
     // do once
     React.useEffect(() => {
-
         // setup first loading
         setTimeout(() => {
-            setShowLoaderText(false)
-            setShowLoader(false)
-        }, 500)
+            setShowLoaderText(false);
+            setShowLoader(false);
+        }, 500);
 
         // setup loading when navigate
-        return setupLoading(router, setShowLoader)
-    }, [])
+        return setupLoading(router, setShowLoader);
+    }, []);
 
-    const { Component, pageProps } = props
+    const { Component, pageProps } = props;
 
     if (pageProps.loggedIn) {
         return (
@@ -86,12 +86,13 @@ export default function App(props) {
                         <Component {...pageProps} />
                     </Layout>
                 </ToastProvider>
-                <Loader show={showLoader} showText={showLoaderText}></Loader>
+                <Loader show={showLoader} showText={showLoaderText} />
             </ThemeProvider>
-        )
-    } else {
-        return (<ThemeProvider theme={theme}>
-            <Component {...pageProps} />
-        </ThemeProvider>)
+        );
     }
+    return (
+        <ThemeProvider theme={theme}>
+            <Component {...pageProps} />
+        </ThemeProvider>
+    );
 }

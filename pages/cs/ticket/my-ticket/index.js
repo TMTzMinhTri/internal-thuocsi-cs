@@ -4,12 +4,12 @@ import AppCS from 'pages/_layout';
 import { getTicketClient } from 'client';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import TicketList from 'components/ticket/ticket-list';
-import { PAGE_DEFAULT, LIMIT_DEFAULT } from 'data/index';
+import { PAGE_DEFAULT, LIMIT_DEFAULT } from 'data';
 
 export async function loadRequestData(ctx) {
 
-    let props = {}
-    let data = { props: props }
+    const props = {}
+    const data = { props }
 
     // Setup
     const { query } = ctx;
@@ -19,7 +19,7 @@ export async function loadRequestData(ctx) {
         limit = LIMIT_DEFAULT,
     } = query;
     const offset = page * limit;
-    const filter = q != '' ? JSON.parse(q) : {}
+    const filter = q !== '' ? JSON.parse(q) : {}
     const ticketClient = getTicketClient(ctx, data);
 
     const [ticketResult, listReasonRes] = await Promise.all([

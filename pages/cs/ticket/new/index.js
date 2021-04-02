@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Paper, FormControl, FormLabel, TextField, Typography, Grid, TextareaAutosize, Box } from '@material-ui/core';
+import { Button, FormControl, FormLabel, TextField, Typography, Grid, TextareaAutosize, Box } from '@material-ui/core';
 
 import Head from 'next/head';
 import Link from 'next/link';
@@ -22,8 +22,8 @@ import { LabelFormCs } from 'components';
 import { getData, getFirst, isValid } from 'utils';
 import { PATH_URL } from 'data';
 import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
-import styles from './request.module.css';
 import TicketTable from 'components/ticket/ticket-table';
+import styles from './request.module.css';
 
 const breadcrumb = [
     {
@@ -36,8 +36,8 @@ const breadcrumb = [
 ];
 
 export async function loadRequestData(ctx) {
-    let props = {};
-    let data = { props };
+    const props = {};
+    const data = { props };
 
     const { so = '' } = ctx?.query;
 
@@ -48,11 +48,19 @@ export async function loadRequestData(ctx) {
 
     // fetch data from APIs
     if (so && so.length > 0) {
+        // nếu so là số thì sẽ gọi api get orderId , còn lại  là orderCode
+        let params = {};
+        if (so && +so > 0) {
+            params = { orderId: +so };
+        } else {
+            params = { orderCode: so };
+        }
+
         const [listDepartmentResult, listReasonsResult, orderResult, ticketResult] = await Promise.all([
             accountClient.getListDepartment(0, 100, ''),
             ticketClient.getReasonList(),
             orderClient.getByOrderNo(so),
-            ticketClient.getAllTicket({ saleOrderCode: so }),
+            ticketClient.getAllTicket(params, 0, 100),
         ]);
 
         const listDepartment =
@@ -140,12 +148,12 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
 
     // onSubmit
     const onSubmit = async (formData) => {
-        if( !formData.departmentCode.code) {
-            error("Vui lòng chọn bộ phận tiếp nhận");
+        if (!formData.departmentCode.code) {
+            error('Vui lòng chọn bộ phận tiếp nhận');
             return;
         }
-        if(!formData.assignUser?.value) {
-            error("vui lòng chọn người tiếp nhận");
+        if (!formData.assignUser?.value) {
+            error('vui lòng chọn người tiếp nhận');
             return;
         }
         try {
@@ -153,6 +161,7 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
             const ticketResp = await ticketClient.createTicket({
                 saleOrderCode: orderData.orderNo,
                 saleOrderID: orderData.orderId,
+                orderId: orderData.orderId,
                 customerID: orderData.customerID,
                 customerCode: orderData.customerCode,
                 departmentCode: formData.departmentCode.code,
@@ -231,7 +240,7 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
             </Head>
             <div className={styles.grid}>
                 <MyCard>
-                    <MyCardHeader title="Tìm đơn theo SO" small={true} />
+                    <MyCardHeader title="Tìm đơn theo SO" small />
                     <MyCardContent>
                         <FormControl size="small">
                             <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
@@ -264,12 +273,12 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                 {orderData && (
                     <Box>
                         <MyCard>
-                            <MyCardHeader title={`Các phiếu hỗ trợ đang có của đơn ${so}`} small={true} />
+                            <MyCardHeader title={`Các phiếu hỗ trợ đang có của đơn ${so}`} small />
                             <TicketTable data={tickets} reasonList={listReasons} refreshData={handleRefreshData} isNew />
                         </MyCard>
 
                         <MyCard>
-                            <MyCardHeader title="Thêm phiếu hỗ trợ mới" small={true} />
+                            <MyCardHeader title="Thêm phiếu hỗ trợ mới" small />
                             <form>
                                 <MyCardContent>
                                     <FormControl size="small">
@@ -449,12 +458,12 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                                                     inputRef={register({
                                                         min: {
                                                             value: 1,
-                                                            message: "số tiển nhỏ nhất là 1"
+                                                            message: 'số tiển nhỏ nhất là 1',
                                                         },
                                                         max: {
                                                             value: 100000000,
-                                                            message: "số tiền lớn nhất là 100.000.000"
-                                                        }
+                                                            message: 'số tiền lớn nhất là 100.000.000',
+                                                        },
                                                     })}
                                                     variant="outlined"
                                                     size="small"

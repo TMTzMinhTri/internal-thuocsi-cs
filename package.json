@@ -4,8 +4,10 @@
     "private": true,
     "scripts": {
         "dev": "next dev -p 3000",
+        "stg": "next dev -p 4000",
         "build": "next build",
         "start": "next start -p 80",
+        "start:prd": "next build && next start -p 8002",
         "lint:check": "eslint --ext=js,jsx pages components context data hooks utils client"
     },
     "dependencies": {
@@ -17,7 +19,7 @@
         "@material-ui/core": "4.11.2",
         "@material-ui/icons": "^4.11.2",
         "@material-ui/lab": "^4.0.0-alpha.57",
-        "@thuocsi/nextjs-components": "git+https://gitlab.com/thuocsi.vn-sdk/nextjs-components.git#v0.1.53",
+        "@thuocsi/nextjs-components": "git+https://gitlab.com/thuocsi.vn-sdk/nextjs-components.git#v0.1.54",
         "clsx": "^1.1.1",
         "cross-env": "^7.0.3",
         "draft-js": "^0.11.7",
