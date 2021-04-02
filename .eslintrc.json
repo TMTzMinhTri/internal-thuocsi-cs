@@ -56,7 +56,10 @@
     "object-curly-newline": "off",
     "implicit-arrow-linebreak": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "no-useless-constructor": "off"
+    "no-useless-constructor": "off",
+    "react/jsx-indent":"off",
+    "react/jsx-indent-props":"off",
+    "indent": 0
   },
   "plugins": []
 }

@@ -1,9 +1,7 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Button, FormControl, TextField, Typography, Grid } from '@material-ui/core';
 
 import Link from 'next/link';
-
-import { formatUTCTime } from 'components/global';
 
 import { faPlus, faCog } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,17 +11,18 @@ import { useForm } from 'react-hook-form';
 import MuiSingleAuto from '@thuocsi/nextjs-components/muiauto/single';
 import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { MyCard, MyCardContent, MyCardHeader } from '@thuocsi/nextjs-components/my-card/my-card';
-import ChangeStatusModal from '../changes-status-modal';
+
 import { getTicketClient } from 'client';
 
 import useModal from 'hooks/useModal';
 import { useRouter } from 'next/router';
-import { cleanObj, convertObjectToParameter, isValid, getData } from 'utils';
+import { cleanObj, getData } from 'utils';
 import TicketTable from './ticket-table';
 import LabelFormCs from '../LabelFormCs';
-import { ExportCSV } from '../ExportCSV';
+import { ExportCSV } from '../export-cvs';
 import styles from './ticket.module.css';
 import { listStatus } from './ticket-display';
+import ChangeStatusModal from '../changes-status-modal';
 
 const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = false }) => {
     const [search, setSearch] = useState('');
@@ -44,15 +43,15 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
 
     // TODO:
     // function
-    const onSearch = useCallback(async ({ saleOrderCode, saleOrderID = 0, status, reasons, assignUser, fromTime, toTime }) => {
+    const onSearch = useCallback(async ({ orderCode, orderId = 0, status, reasons, assignUser, fromTime, toTime }) => {
         const filterData = cleanObj({
-            saleOrderCode: saleOrderCode.length === 0 ? null : saleOrderCode,
-            saleOrderID: saleOrderID && saleOrderID > 0 ? parseInt(saleOrderID, 10) : null,
+            orderCode: orderCode.length === 0 ? null : orderCode,
+            orderId: orderId && orderId > 0 ? parseInt(orderId, 10) : null,
             status: status?.value || null,
             reasons: reasons?.length > 0 ? reasons.map((reason) => reason.value) : null,
             assignUser: assignUser?.value || null,
-            fromTime: fromTime,
-            toTime: toTime,
+            fromTime,
+            toTime,
         });
         router.push(
             {
@@ -111,7 +110,6 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
                         <MyCardContent>
                             <FormControl size="medium">
                                 <Grid container spacing={3} direction="row" justify="space-between" alignItems="center" className={styles.filter}>
-
                                     <Grid item xs={12} sm={6} md={3}>
                                         <Typography gutterBottom>
                                             <LabelFormCs>SO:</LabelFormCs>
@@ -131,7 +129,7 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
                                             <LabelFormCs>ID đơn hàng:</LabelFormCs>
                                         </Typography>
                                         <TextField
-                                            name="saleOrderID"
+                                            name="orderID"
                                             inputRef={register}
                                             variant="outlined"
                                             size="small"
@@ -180,13 +178,7 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
                                         <Typography gutterBottom>
                                             <LabelFormCs>Lý do:</LabelFormCs>
                                         </Typography>
-                                        <MuiMultipleAuto
-                                            name="reasons"
-                                            options={reasonList}
-                                            placeholder="Chọn"
-                                            errors={errors}
-                                            control={control}
-                                        />
+                                        <MuiMultipleAuto name="reasons" options={reasonList} placeholder="Chọn" errors={errors} control={control} />
                                     </Grid>
                                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                                         <Grid item>
@@ -196,11 +188,10 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
                                             <Link href="/cs/new">
                                                 <Button variant="contained" color="primary" onClick={handleSubmit(onSearch)}>
                                                     Tìm kiếm
-                                                    </Button>
+                                                </Button>
                                             </Link>
                                         </Grid>
                                     </Grid>
-
                                 </Grid>
                             </FormControl>
                         </MyCardContent>

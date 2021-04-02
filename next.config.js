@@ -3,7 +3,7 @@ const withTM = require('next-transpile-modules')(['@thuocsi/nextjs-components'])
 
 // disable log for built environment
 if (process.env.ENV !== 'local') {
-    console.log = function () { };
+    console.log = function () {};
 }
 
 module.exports = withPlugins([withTM], {
