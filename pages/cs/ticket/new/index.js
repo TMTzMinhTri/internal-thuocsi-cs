@@ -167,11 +167,11 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                 feedBackContent: formData.feedBackContent,
                 imageUrls: formData.imageUrls,
             });
+
             if (ticketResp.status !== 'OK') {
                 error(ticketResp.message ?? actionErrorText);
                 return;
             }
-
             await customerClient.updateBankCustomer({
                 bankName: formData.bankName,
                 bankCode: formData.bankCode,

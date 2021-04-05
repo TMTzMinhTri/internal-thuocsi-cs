@@ -66,15 +66,19 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
     const [departments, setDepartments] = useState([]);
     const [ticketData, setTicketData] = useState();
 
+    const handleReloadTicketData = useCallback(async () => {
+        if (ticketSelected) {
+            const { departments, ticketData } = await loadTicketDetail(ticketSelected);
+            setDepartments(departments);
+            setTicketData(ticketData);
+        } else {
+            setTicketData(null);
+        }
+    });
+
     useEffect(() => {
         (async () => {
-            if (ticketSelected) {
-                const { departments, ticketData } = await loadTicketDetail(ticketSelected);
-                setDepartments(departments);
-                setTicketData(ticketData);
-            } else {
-                setTicketData(null);
-            }
+            await handleReloadTicketData();
         })();
     }, [ticketSelected]);
 
@@ -188,6 +192,7 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                 <TicketDetail
                     key={+new Date()}
                     onClose={handleCloseBtnEdit}
+                    onReload={handleReloadTicketData}
                     reasonList={reasonList}
                     ticketCode={ticketSelected}
                     departments={departments}
