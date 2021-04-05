@@ -129,7 +129,7 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
                                             <LabelFormCs>ID đơn hàng:</LabelFormCs>
                                         </Typography>
                                         <TextField
-                                            name="orderID"
+                                            name="orderId"
                                             inputRef={register}
                                             variant="outlined"
                                             size="small"

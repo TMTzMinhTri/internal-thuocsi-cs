@@ -49,45 +49,32 @@ export async function loadRequestData(ctx) {
     // fetch data from APIs
     if (so && so.length > 0) {
         // nếu so là số thì sẽ gọi api get orderId , còn lại  là orderCode
+        let orderId = 0;
+        let orderCode = '';
         let params = {};
         if (so && +so > 0) {
-            params = { orderId: +so };
-        } else {
-            params = { orderCode: so };
+            orderId = +so;
+            const ticketResult = await ticketClient.getAllTicket({ orderId }, 0, 1);
+            orderCode = getFirst(ticketResult)?.orderCode || null;
+            params = { orderId };
         }
-
-        const [listDepartmentResult, listReasonsResult, orderResult, ticketResult] = await Promise.all([
-            accountClient.getListDepartment(0, 100, ''),
+        const [listDepartment, listReasonsResult, orderResult, ticketResult] = await Promise.all([
+            accountClient.getListDepartmentData(0, 100, ''),
             ticketClient.getReasonList(),
-            orderClient.getByOrderNo(so),
+            orderClient.getByOrderNo(orderCode),
             ticketClient.getAllTicket(params, 0, 100),
         ]);
 
-        const listDepartment =
-            listDepartmentResult?.data?.map((department) => ({
-                ...department,
-                value: department.code,
-                label: department.name,
-            })) || [];
-
-        const listReasons = listReasonsResult?.data || [];
-
-        let orderData = null;
-        let tickets = [];
-
-        orderData = getFirst(orderResult);
+        const orderData = getFirst(orderResult);
 
         if (orderData) {
             const bankResult = await customerClient.getListBankAccountServer(orderData.customerID);
-            if (isValid(bankResult)) {
-                orderData.bankInfo = getFirst(bankResult);
-            }
+            orderData.bankInfo = getFirst(bankResult);
         }
-        tickets = getData(ticketResult);
 
         // data mapping
-        props.tickets = tickets;
-        props.listReasons = listReasons;
+        props.tickets = getData(ticketResult);
+        props.listReasons = getData(listReasonsResult);
         props.listDepartment = listDepartment;
         props.orderData = orderData;
         props.so = so;
@@ -159,11 +146,11 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
         try {
             const customerClient = getCustomerClient();
             const ticketResp = await ticketClient.createTicket({
-                saleOrderCode: orderData.orderNo,
-                saleOrderID: orderData.orderId,
-                orderId: orderData.orderId,
-                customerID: orderData.customerID,
-                customerCode: orderData.customerCode,
+                saleOrderCode: orderData?.orderNo,
+                saleOrderID: orderData?.orderId,
+                orderId: orderData?.orderId,
+                customerID: orderData?.customerID,
+                customerCode: orderData?.customerCode,
                 departmentCode: formData.departmentCode.code,
                 reasons: formData.reasons.map(({ value }) => value),
                 returnCode: formData.returnCode,
@@ -230,9 +217,11 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
             setListAssignUser([{ value: '', label: 'Không có người tiếp nhận', name: '' }]);
         }
     }, []);
+
     useEffect(() => {
         register({ name: 'imageUrls' });
     }, []);
+
     return (
         <AppCS select={PATH_URL.ALL_TICKETS} breadcrumb={breadcrumb}>
             <Head>
@@ -240,7 +229,7 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
             </Head>
             <div className={styles.grid}>
                 <MyCard>
-                    <MyCardHeader title="Tìm đơn theo SO" small />
+                    <MyCardHeader title="Tìm đơn theo SO/ OrderId" small />
                     <MyCardContent>
                         <FormControl size="small">
                             <Grid container spacing={3} direction="row" justify="space-between" alignItems="center">
@@ -255,7 +244,7 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                                         })}
                                         size="small"
                                         type="text"
-                                        placeholder="Nhập Mã SO"
+                                        placeholder="Nhập Mã SO / OrderId"
                                         defaultValue={so}
                                         onKeyDown={(e) => e.key === 'Enter' && onSearchOrder(getValues('orderNo'))}
                                     />
