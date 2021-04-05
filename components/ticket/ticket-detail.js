@@ -80,6 +80,7 @@ export async function loadTicketDetail(ticketCode) {
                     label: depart.name,
                 })) || [],
             ticketData,
+            orderRes,
         };
     }
 

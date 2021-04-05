@@ -43,10 +43,11 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
 
     // TODO:
     // function
-    const onSearch = useCallback(async ({ orderCode, orderId = 0, status, reasons, assignUser, fromTime, toTime }) => {
+    const onSearch = useCallback(async ({ orderCode, orderId = 0, status, reasons, assignUser, fromTime, toTime, customerID }) => {
         const filterData = cleanObj({
             orderCode: orderCode.length === 0 ? null : orderCode,
             orderId: orderId && orderId > 0 ? parseInt(orderId, 10) : null,
+            customerId: customerID && customerID > 0 ? parseInt(customerID, 10) : null,
             status: status?.value || null,
             reasons: reasons?.length > 0 ? reasons.map((reason) => reason.value) : null,
             assignUser: assignUser?.value || null,
