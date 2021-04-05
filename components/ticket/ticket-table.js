@@ -49,16 +49,7 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
             query.ticketCode = ticketCode;
         }
         // use window.history to avoid loading screen
-        window.history.pushState(
-            // {
-            //     pathname: '',
-            //     query,
-            // },
-            {},
-            '',
-            `?${convertObjectToParameter(query)}`,
-            // { shallow: false },
-        );
+        window.history.pushState({}, '', `?${convertObjectToParameter(query)}`);
     };
 
     const onClickBtnEdit = useCallback(async (code) => {
@@ -74,15 +65,20 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
 
     const [departments, setDepartments] = useState([]);
     const [ticketData, setTicketData] = useState();
+
+    const handleReloadTicketData = useCallback(async () => {
+        if (ticketSelected) {
+            const { departments, ticketData } = await loadTicketDetail(ticketSelected);
+            setDepartments(departments);
+            setTicketData(ticketData);
+        } else {
+            setTicketData(null);
+        }
+    });
+
     useEffect(() => {
         (async () => {
-            if (ticketSelected) {
-                let { departments, ticketData } = await loadTicketDetail(ticketSelected);
-                setDepartments(departments);
-                setTicketData(ticketData);
-            } else {
-                setTicketData(null);
-            }
+            await handleReloadTicketData();
         })();
     }, [ticketSelected]);
 
@@ -128,37 +124,37 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                         </TableBody>
                     ) : (
                         <TableBody>
-                            {data.map((item) => (
+                            {data.map((ticket) => (
                                 <TableRow key={uuidv4()}>
-                                    <TableCell align="left">{item.code}</TableCell>
-                                    <TableCell align="left">{item.saleOrderCode}</TableCell>
+                                    <TableCell align="left">{ticket.code}</TableCell>
+                                    <TableCell align="left">{ticket.saleOrderCode}</TableCell>
                                     <TableCell align="left">
-                                        <Link href={`/crm/order/detail?orderNo=${item.orderCode}`} prefetch={false}>
+                                        <Link href={`/crm/order/detail?orderNo=${ticket.orderCode}`} prefetch={false}>
                                             <a target="_blank" style={{ textDecoration: 'none', color: 'green' }}>
-                                                {item.saleOrderID}-{item.orderCode}
+                                                {ticket.orderId}-{ticket.orderCode}
                                             </a>
                                         </Link>
                                     </TableCell>
                                     <TableCell align="left">
-                                        {item.reasons.map((reason) => (
+                                        {ticket.reasons.map((reason) => (
                                             <TicketReason key={reason} label={reasonMap[reason]} />
                                         ))}
                                     </TableCell>
-                                    <TableCell align="left">{item.note}</TableCell>
+                                    <TableCell align="left">{ticket.note}</TableCell>
                                     <TableCell align="left">
-                                        <TicketStatus status={item.status} />
+                                        <TicketStatus status={ticket.status} />
                                     </TableCell>
                                     <TableCell align="left">
-                                        <Tooltip title={formatDateTime(item.createdTime)}>
-                                            <span>{moment(item.createdTime).locale('vi').fromNow()}</span>
+                                        <Tooltip title={formatDateTime(ticket.createdTime)}>
+                                            <span>{moment(ticket.createdTime).locale('vi').fromNow()}</span>
                                         </Tooltip>
                                     </TableCell>
                                     <TableCell align="left">
-                                        <AccountType type={item.createdByType} /> {item.createdBy}
+                                        <AccountType type={ticket.createdByType} /> {ticket.createdBy}
                                     </TableCell>
-                                    {!isMyTicket && <TableCell align="left">{item.assignName || '-'}</TableCell>}
+                                    {!isMyTicket && <TableCell align="left">{ticket.assignName || '-'}</TableCell>}
                                     <TableCell align="right">
-                                        <a onClick={() => onClickBtnEdit(item.code)}>
+                                        <a onClick={() => onClickBtnEdit(ticket.code)}>
                                             <Tooltip title="Cập nhật thông tin của phiếu hỗ trợ">
                                                 <IconButton>
                                                     <EditIcon fontSize="small" />
@@ -196,6 +192,7 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                 <TicketDetail
                     key={+new Date()}
                     onClose={handleCloseBtnEdit}
+                    onReload={handleReloadTicketData}
                     reasonList={reasonList}
                     ticketCode={ticketSelected}
                     departments={departments}
