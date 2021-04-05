@@ -55,6 +55,7 @@ export async function loadRequestData(ctx) {
         if (so && +so > 0) {
             orderId = +so;
             const ticketResult = await ticketClient.getAllTicket({ orderId }, 0, 1);
+            console.log('ticket result ', ticketResult);
             orderCode = getFirst(ticketResult)?.orderCode || null;
             params = { orderId };
         }
@@ -146,7 +147,10 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
         try {
             const customerClient = getCustomerClient();
             const ticketResp = await ticketClient.createTicket({
-                saleOrderCode: orderData?.orderNo,
+                // SO : sale order Code / so
+                saleOrderCode: orderData?.saleOrderCode,
+                // orderCode ? / orderNo
+                orderCode: orderData?.orderNo,
                 saleOrderID: orderData?.orderId,
                 orderId: orderData?.orderId,
                 customerID: orderData?.customerID,
