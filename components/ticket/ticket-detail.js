@@ -106,7 +106,7 @@ export default function TicketDetail(props) {
     );
 }
 
-function TicketDetailContent({ onClose, reasonList, ticketCode, ticketDetail, departments }) {
+function TicketDetailContent({ onClose, onReload, reasonList, ticketCode, ticketDetail, departments }) {
     const classes = useStyles();
     const styles = makeStyles(useStyles);
     const { success, error } = useToast();
@@ -143,6 +143,7 @@ function TicketDetailContent({ onClose, reasonList, ticketCode, ticketDetail, de
             return;
         }
         success('Cập nhập thành công.');
+        onReload();
     };
 
     const { register, handleSubmit, errors, control, reset, setValue, getValues } = useForm({

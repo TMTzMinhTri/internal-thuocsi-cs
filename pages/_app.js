@@ -4,7 +4,6 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 import Layout from '@thuocsi/nextjs-components/layout/layout';
 import { ToastProvider } from '@thuocsi/nextjs-components/toast/providers/ToastProvider';
 
-import { GlobalProvider, LoadingRoute } from 'context/GlobalContext';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import styles from './global.css';
 import { useRouter } from 'next/router';

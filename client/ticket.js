@@ -42,9 +42,7 @@ class TicketClient extends APIClient {
     }
 
     getTicketDetail(ticketCode) {
-        return this.call('GET', `${URI}/ticket`,
-            { code: ticketCode }
-        );
+        return this.call('GET', `${URI}/ticket`, { code: ticketCode });
     }
 
     uploadImage(data) {
