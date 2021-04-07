@@ -225,13 +225,13 @@ function TicketDetailContent({ onClose, onReload, reasonList, ticketCode, ticket
                 {!!ticketDetail ? (
                     <MyCard style={{ marginBottom: 0, borderRadius: 0 }}>
                         <MyCardHeader title={`Thông tin phiếu hỗ trợ ${ticketDetail?.code}`}>
-                            <Grid item container xs={12} justify="flex-end" spacing={1}>
+                            {/* <Grid item container xs={12} justify="flex-end" spacing={1}>
                                 <Grid item>
                                     <Button variant="contained" color="primary" onClick={handleSubmit(onSubmit)}>
                                         Lưu
                                     </Button>
                                 </Grid>
-                            </Grid>
+                            </Grid> */}
                         </MyCardHeader>
                         <form key={ticketDetail?.code}>
                             <MyCardContent>

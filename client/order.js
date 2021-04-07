@@ -21,8 +21,12 @@ class OrderClient extends APIClient {
 
     getByOrderId(orderID) {
         return this.callFromNextJS('GET', `${URI}/order`, {
-          orderID,
+            orderID,
         });
+    }
+
+    filterOrder(filter) {
+        return this.callFromNextJS('POST', `${URI}/order/search`, filter);
     }
 }
 
