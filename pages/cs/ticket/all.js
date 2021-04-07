@@ -1,10 +1,11 @@
 import React from 'react';
 import Head from 'next/head';
 import AppCS from 'pages/_layout';
-import { getTicketClient } from 'client';
+import { getOrderClient, getTicketClient } from 'client';
 import { doWithLoggedInUser, renderWithLoggedInUser } from '@thuocsi/nextjs-components/lib/login';
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from 'data';
 import TicketList from 'components/ticket/ticket-list';
+import { getFirst } from 'utils';
 
 export async function loadRequestData(ctx) {
     const props = {};
@@ -16,6 +17,18 @@ export async function loadRequestData(ctx) {
     const offset = page * limit;
     const filter = q !== '' ? JSON.parse(q) : {};
     const ticketClient = getTicketClient(ctx, data);
+    const orderClient = getOrderClient(ctx, data);
+
+    const { saleOrderCode = '' } = filter;
+
+    if (saleOrderCode.length > 0) {
+        const orderResult = await orderClient.filterOrder({ saleOrderCode });
+        const orderInfo = getFirst(orderResult);
+        if (orderInfo) {
+            delete filter.saleOrderCode;
+            filter.orderId = orderInfo.orderId;
+        }
+    }
 
     // call APIs
     const [ticketResult, listReasonRes] = await Promise.all([ticketClient.getAllTicket(filter, offset, limit), ticketClient.getReasonList()]);

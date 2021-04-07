@@ -19,7 +19,7 @@ import MuiMultipleAuto from '@thuocsi/nextjs-components/muiauto/multiple';
 import { useToast } from '@thuocsi/nextjs-components/toast/useToast';
 import LabelBox from '@thuocsi/nextjs-components/editor/label-box';
 import { LabelFormCs } from 'components';
-import { getData, getFirst, isValid } from 'utils';
+import { getData, getFirst } from 'utils';
 import { PATH_URL } from 'data';
 import { getTicketClient, getCustomerClient, getAccountClient, getOrderClient } from 'client';
 import TicketTable from 'components/ticket/ticket-table';
@@ -39,7 +39,7 @@ export async function loadRequestData(ctx) {
     const props = {};
     const data = { props };
 
-    const { so = '' } = ctx?.query;
+    const { so = '', orderId = 0 } = ctx?.query;
 
     const accountClient = getAccountClient(ctx, data);
     const ticketClient = getTicketClient(ctx, data);
@@ -47,39 +47,43 @@ export async function loadRequestData(ctx) {
     const customerClient = getCustomerClient(ctx, data);
 
     // fetch data from APIs
-    if (so && so.length > 0) {
-        // nếu so là số thì sẽ gọi api get orderId , còn lại  là orderCode
-        let orderId = 0;
-        let orderCode = '';
-        let params = {};
-        if (so && +so > 0) {
-            orderId = +so;
-            const ticketResult = await ticketClient.getAllTicket({ orderId }, 0, 1);
-            console.log('ticket result ', ticketResult);
-            orderCode = getFirst(ticketResult)?.orderCode || null;
-            params = { orderId };
-        }
-        const [listDepartment, listReasonsResult, orderResult, ticketResult] = await Promise.all([
-            accountClient.getListDepartmentData(0, 100, ''),
-            ticketClient.getReasonList(),
-            orderClient.getByOrderNo(orderCode),
-            ticketClient.getAllTicket(params, 0, 100),
-        ]);
+    // nếu so là số thì sẽ gọi api get orderId , còn lại  là orderCode
 
-        const orderData = getFirst(orderResult);
+    let orderCode = '';
+    let params = {};
 
-        if (orderData) {
-            const bankResult = await customerClient.getListBankAccountServer(orderData.customerID);
-            orderData.bankInfo = getFirst(bankResult);
-        }
-
-        // data mapping
-        props.tickets = getData(ticketResult);
-        props.listReasons = getData(listReasonsResult);
-        props.listDepartment = listDepartment;
-        props.orderData = orderData;
-        props.so = so;
+    if (orderId && +orderId > 0) {
+        const ticketResult = await ticketClient.getAllTicket({ orderId }, 0, 1);
+        orderCode = getFirst(ticketResult)?.orderCode || null;
+        params = { orderId };
     }
+    if (so && so.length > 0) {
+        const soResult = await orderClient.filterOrder({ saleOrderCode: so });
+        const orderInfo = getFirst(soResult);
+        orderCode = orderInfo?.orderNo;
+        params = { orderId: orderInfo?.orderId };
+    }
+
+    const [listDepartment, listReasonsResult, orderResult, ticketResult] = await Promise.all([
+        accountClient.getListDepartmentData(0, 100, ''),
+        ticketClient.getReasonList(),
+        orderClient.getByOrderNo(orderCode),
+        ticketClient.getAllTicket(params, 0, 100),
+    ]);
+
+    const orderData = getFirst(orderResult);
+
+    if (orderData) {
+        const bankResult = await customerClient.getListBankAccountServer(orderData.customerID);
+        orderData.bankInfo = getFirst(bankResult);
+    }
+
+    // data mapping
+    props.tickets = getData(ticketResult);
+    props.listReasons = getData(listReasonsResult);
+    props.listDepartment = listDepartment;
+    props.orderData = orderData;
+    props.so = so;
 
     return data;
 }
@@ -103,7 +107,11 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
     });
 
     const onSearchOrder = useCallback(async (code) => {
-        router.push(`?so=${code}`);
+        if (code && +code > 0) {
+            router.push(`?orderId=${code}`);
+        } else {
+            router.push(`?so=${code}`);
+        }
     }, []);
 
     const handleRefreshData = () => {
