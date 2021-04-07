@@ -18,10 +18,8 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
     reasonList.forEach((item) => (reasonMap[item.value] = item.label));
 
     const router = useRouter();
-    const { ticketCode } = router.query;
+    const { ticketCode, limit = 20, page = 0 } = router.query;
     const [ticketSelected, setTicketSelected] = useState(ticketCode);
-    const limit = parseInt(router.query.limit, 20) || LIMIT_DEFAULT;
-    const page = parseInt(router.query.page, 10) || PAGE_DEFAULT;
 
     useEffect(() => {
         window.addEventListener('popstate', () => {
