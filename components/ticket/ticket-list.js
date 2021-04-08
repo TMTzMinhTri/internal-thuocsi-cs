@@ -43,28 +43,31 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
 
     // TODO:
     // function
-    const onSearch = useCallback(async ({ orderCode, orderId = 0, status, reasons, assignUser, fromTime, toTime, customerId, saleOrderCode }) => {
-        const filterData = cleanObj({
-            orderCode: orderCode.length === 0 ? null : orderCode,
-            saleOrderCode: saleOrderCode?.length === 0 ? null : saleOrderCode,
-            orderId: orderId && orderId > 0 ? parseInt(orderId, 10) : null,
-            customerId: customerId && customerId > 0 ? parseInt(customerId, 10) : null,
-            status: status?.value || null,
-            reasons: reasons?.length > 0 ? reasons.map((reason) => reason.value) : null,
-            assignUser: assignUser?.value || null,
-            fromTime,
-            toTime,
-        });
-        router.push(
-            {
-                pathname: '',
-                query: { q: JSON.stringify(filterData) },
-            },
-            `?q=${JSON.stringify(filterData)}`,
-            { shallow: false },
-        );
-        return false;
-    }, []);
+    const onSearch = useCallback(
+        async ({ orderCode, orderId = 0, status, reasonsFilter, assignUser, fromTime, toTime, customerId, saleOrderCode }) => {
+            const filterData = cleanObj({
+                orderCode: orderCode.length === 0 ? null : orderCode,
+                saleOrderCode: saleOrderCode?.length === 0 ? null : saleOrderCode,
+                orderId: orderId && orderId > 0 ? parseInt(orderId, 10) : null,
+                customerId: customerId && customerId > 0 ? parseInt(customerId, 10) : null,
+                status: status?.value || null,
+                reasons: reasonsFilter?.length > 0 ? reasonsFilter.map((reason) => reason.value) : null,
+                assignUser: assignUser?.value || null,
+                fromTime,
+                toTime,
+            });
+            router.push(
+                {
+                    pathname: '',
+                    query: { q: JSON.stringify(filterData) },
+                },
+                `?q=${JSON.stringify(filterData)}`,
+                { shallow: false },
+            );
+            return false;
+        },
+        [],
+    );
     const csvData = useCallback(async () => {
         setLoading(true);
         const limit = 100;
@@ -180,7 +183,13 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
                                         <Typography gutterBottom>
                                             <LabelFormCs>Lý do:</LabelFormCs>
                                         </Typography>
-                                        <MuiMultipleAuto name="reasons" options={reasonList} placeholder="Chọn" errors={errors} control={control} />
+                                        <MuiMultipleAuto
+                                            name="reasonsFilter"
+                                            options={reasonList}
+                                            placeholder="Chọn"
+                                            errors={errors}
+                                            control={control}
+                                        />
                                     </Grid>
                                     <Grid item container xs={12} justify="flex-end" spacing={1}>
                                         <Grid item>

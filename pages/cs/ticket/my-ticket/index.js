@@ -35,7 +35,7 @@ export async function loadRequestData(ctx) {
     // set value to props
     props.total = ticketResult?.total || 0;
     props.tickets = ticketResult?.data || [];
-    props.reasonList = listReasonRes?.data || [];
+    props.reasonList = listReasonRes?.data.map((reason) => ({ ...reason, label: reason.name, value: reason.code })) || [];
     props.filter = filter;
 
     return data;
