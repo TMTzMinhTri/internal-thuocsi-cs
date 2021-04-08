@@ -53,8 +53,9 @@ export async function loadRequestData(ctx) {
     let params = {};
 
     if (orderId && +orderId > 0) {
-        const ticketResult = await ticketClient.getAllTicket({ orderId }, 0, 1);
-        orderCode = getFirst(ticketResult)?.orderCode || null;
+        const orderResult = await orderClient.filterOrder({ orderId: parseFloat(orderId) });
+        // const ticketResult = await ticketClient.getAllTicket({ orderId }, 0, 1);
+        orderCode = getFirst(orderResult)?.orderNo || null;
         params = { orderId };
     }
     if (so && so.length > 0) {
@@ -84,6 +85,7 @@ export async function loadRequestData(ctx) {
     props.listDepartment = listDepartment;
     props.orderData = orderData;
     props.so = so;
+    props.orderId = orderId;
 
     return data;
 }
@@ -92,7 +94,7 @@ export async function getServerSideProps(ctx) {
     return doWithLoggedInUser(ctx, (cbCtx) => loadRequestData(cbCtx));
 }
 
-const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = [], so = '' }) => {
+const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = [], so = '', orderId = '' }) => {
     const router = useRouter();
     const [listAssignUser, setListAssignUser] = useState([{ value: '', label: 'Không có nguời tiếp nhận', name: '' }]);
     const [ticketImages, setTicketImages] = useState([]);
@@ -257,7 +259,7 @@ const PageNewCS = ({ listReasons, listDepartment, orderData = null, tickets = []
                                         size="small"
                                         type="text"
                                         placeholder="Nhập Mã SO / OrderId"
-                                        defaultValue={so}
+                                        defaultValue={so || orderId}
                                         onKeyDown={(e) => e.key === 'Enter' && onSearchOrder(getValues('orderNo'))}
                                     />
                                 </Grid>

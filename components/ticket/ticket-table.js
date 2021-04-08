@@ -46,8 +46,9 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
         } else {
             query.ticketCode = ticketCode;
         }
+        router.push(`${router.pathname}?${convertObjectToParameter(query)}`);
         // use window.history to avoid loading screen
-        window.history.pushState({}, '', `?${convertObjectToParameter(query)}`);
+        // window.history.pushState({}, '', `?${convertObjectToParameter(query)}`);
     };
 
     const onClickBtnEdit = useCallback(async (code) => {
