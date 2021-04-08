@@ -1,4 +1,4 @@
-import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@material-ui/core';
+import { IconButton, makeStyles, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip } from '@material-ui/core';
 
 import { Edit as EditIcon } from '@material-ui/icons';
 import { ErrorCode, formatDateTime } from 'components/global';
@@ -12,6 +12,16 @@ import moment from 'moment';
 import Link from 'next/link';
 import { TicketStatus, TicketReason, AccountType } from 'components/ticket/ticket-display';
 import TicketDetail, { loadTicketDetail } from './ticket-detail';
+
+const useStyles = makeStyles({
+    table: {
+        minWidth: 650,
+        overflowX: 'auto',
+    },
+    container: {
+        overflowX: 'auto',
+    },
+});
 
 const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
     const reasonMap = {};
@@ -81,23 +91,25 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
         })();
     }, [ticketSelected]);
 
+    const classess = useStyles();
+
     return (
         <>
-            <TableContainer component={Paper}>
-                <Table size="small">
+            <TableContainer component={Paper} className={classess.container}>
+                <Table className={classess.table}>
                     <colgroup>
-                        <col width={120} />
-                        <col width={120} />
-                        <col />
-                        <col />
-                        <col />
-                        <col />
-                        <col />
-                        <col />
-                        <col />
-                        <col />
-                        <col />
+                        <col width={50} />
                         <col width={100} />
+                        <col width={100} />
+                        <col width={100} />
+                        <col width={100} />
+                        <col width={100} />
+                        <col width={100} />
+                        <col width={100} />
+                        <col width={100} />
+                        <col width={50} />
+                        <col width={50} />
+                        <col width={50} />
                     </colgroup>
                     <TableHead>
                         <TableRow>
@@ -108,8 +120,14 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                             <TableCell align="left">Ghi chú</TableCell>
                             <TableCell align="left">Trạng thái</TableCell>
                             <TableCell align="left">Thời gian tạo</TableCell>
-                            <TableCell align="left">Người tạo</TableCell>
-                            {!isMyTicket && <TableCell align="left">Người tiếp nhận</TableCell>}
+                            <TableCell width={50} align="left">
+                                Người tạo
+                            </TableCell>
+                            {!isMyTicket && (
+                                <TableCell width={50} align="left">
+                                    Người tiếp nhận
+                                </TableCell>
+                            )}
                             <TableCell align="right">Thao tác</TableCell>
                         </TableRow>
                     </TableHead>

@@ -76,7 +76,6 @@ export async function loadRequestData(ctx) {
 
     if (orderData) {
         const bankResult = await customerClient.getListBankAccountServer(orderData.accountId);
-        console.log('bank result ', bankResult);
         orderData.bankInfo = getFirst(bankResult);
     }
 
