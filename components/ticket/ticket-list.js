@@ -32,8 +32,9 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
 
     // setup default values
     filter.statusFilter = filter?.status && listStatus.find((item) => item.value === filter.status);
-    filter.reasonsFilter = filter?.reasons && reasonList.filter((item) => filter.reasons.indexOf(item.value) >= 0);
 
+    filter.reasonsFilter = filter?.reasons && reasonList.filter((item) => filter.reasons.indexOf(item.value) >= 0);
+    console.log('filter reasons filter ', filter.reasonsFilter);
     const { register, handleSubmit, errors, control, getValues } = useForm({
         defaultValues: filter,
         mode: 'onChange',
@@ -44,7 +45,7 @@ const TicketList = ({ total, tickets, reasonList, filter = {}, isMyTicket = fals
     // TODO:
     // function
     const onSearch = useCallback(
-        async ({ orderCode, orderId = 0, status, reasonsFilter, assignUser, fromTime, toTime, customerId, saleOrderCode }) => {
+        async ({ orderCode, orderId = 0, status, reasonsFilter = [], assignUser, fromTime, toTime, customerId, saleOrderCode }) => {
             const filterData = cleanObj({
                 orderCode: orderCode.length === 0 ? null : orderCode,
                 saleOrderCode: saleOrderCode?.length === 0 ? null : saleOrderCode,
