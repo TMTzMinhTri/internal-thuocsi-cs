@@ -189,8 +189,8 @@ const TicketTable = ({ data, total, reasonList = [], isMyTicket = false }) => {
                             labelUnit="phiếu"
                             count={total}
                             rowsPerPage={limit}
-                            page={page}
-                            onChangePage={(event, newPage, rowsPerPage) => {
+                            page={page > 0 ? +page : 0}
+                            onChangePage={(event, newPage = 0, rowsPerPage) => {
                                 const pageSize = { page: newPage, limit: rowsPerPage };
                                 const { query } = router;
 
